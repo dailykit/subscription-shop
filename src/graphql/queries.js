@@ -753,3 +753,51 @@ export const REFERRER = gql`
       }
    }
 `
+
+export const WALLETS = gql`
+   subscription Wallets($brandId: Int!, $keycloakId: String!) {
+      wallets(
+         where: { brandId: { _eq: $brandId }, keycloakId: { _eq: $keycloakId } }
+      ) {
+         amount
+         walletTransactions(order_by: { created_at: desc_nulls_last }) {
+            id
+            type
+            amount
+            created_at
+         }
+      }
+   }
+`
+
+export const LOYALTY_POINTS = gql`
+   subscription LoyaltyPoints($brandId: Int!, $keycloakId: String!) {
+      loyaltyPoints(
+         where: { brandId: { _eq: $brandId }, keycloakId: { _eq: $keycloakId } }
+      ) {
+         points
+         loyaltyPointTransactions(order_by: { created_at: desc_nulls_last }) {
+            id
+            points
+            type
+            created_at
+         }
+      }
+   }
+`
+
+export const CUSTOMERS_REFERRED = gql`
+   query CustomersReferred($brandId: Int!, $code: String!) {
+      customerReferrals(
+         where: { brandId: { _eq: $brandId }, referredByCode: { _eq: $code } }
+      ) {
+         id
+         customer {
+            platform_customer {
+               firstName
+               lastName
+            }
+         }
+      }
+   }
+`

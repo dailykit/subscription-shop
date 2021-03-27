@@ -82,6 +82,9 @@ export const CouponsList = ({ closeTunnel }) => {
          <Styles.ListHeader>
             <Styles.Heading>Available Coupons</Styles.Heading>
          </Styles.ListHeader>
+         {!availableCoupons.length && (
+            <Styles.Title>No coupons available!</Styles.Title>
+         )}
          {availableCoupons.map(coupon => (
             <Styles.Coupon key={coupon.id}>
                <Styles.CouponTop>

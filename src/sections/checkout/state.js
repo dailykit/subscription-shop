@@ -12,6 +12,7 @@ const initialState = {
    payment: {
       selected: {},
    },
+   code: '',
 }
 
 const reducers = (state, { type, payload }) => {
@@ -28,6 +29,8 @@ const reducers = (state, { type, payload }) => {
          }
       case 'SET_PROFILE':
          return { ...state, profile: { ...state.profile, ...payload } }
+      case 'SET_CODE':
+         return { ...state, code: payload }
       default:
          return state
    }

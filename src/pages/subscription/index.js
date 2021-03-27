@@ -10,11 +10,14 @@ import { SEO, Layout, Loader } from '../../components'
 import { FaqSection, InfoSection } from '../../sections'
 import { webRenderer } from '@dailykit/web-renderer'
 import { isClient } from '../../utils'
+import { useQueryParams } from '../../utils/useQueryParams'
 
 export default () => {
    const { configOf } = useConfig()
    const { user, isAuthenticated } = useUser()
+   const params = useQueryParams()
    const theme = configOf('theme-color', 'Visual')
+
    const { loading } = useQuery(GET_FILEID, {
       variables: {
          divId: ['home-bottom-01'],
@@ -77,6 +80,13 @@ export default () => {
 
    //    })
    // }, [file])
+
+   React.useEffect(() => {
+      if (params) {
+         const code = params['invite-code']
+         localStorage.setItem('code', code)
+      }
+   }, [params])
 
    if (loading) return <Loader />
 

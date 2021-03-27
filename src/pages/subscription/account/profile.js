@@ -1,11 +1,9 @@
-import React from 'react'
 import { navigate } from 'gatsby'
-import tw, { styled, css } from 'twin.macro'
-
-import { useConfig } from '../../../lib'
+import React from 'react'
+import tw, { css, styled } from 'twin.macro'
+import { Form, Layout, ProfileSidebar, SEO } from '../../../components'
 import { useUser } from '../../../context'
-import { SEO, Layout, ProfileSidebar, Form } from '../../../components'
-import { formatCurrency } from '../../../utils'
+import { useConfig } from '../../../lib'
 
 const Profile = () => {
    const { isAuthenticated } = useUser()
@@ -34,9 +32,6 @@ const ProfileForm = () => {
    const { configOf } = useConfig()
 
    const theme = configOf('theme-color', 'Visual')
-   const loyaltyPointsAllowed = configOf('Loyalty Points', 'rewards')
-      ?.isAvailable
-   const walletAllowed = configOf('Wallet', 'rewards')?.isAvailable
 
    return (
       <section tw="px-6 w-full md:w-5/12">
@@ -69,19 +64,6 @@ const ProfileForm = () => {
                />
             </Form.Field>
          </div>
-         {walletAllowed && !!user?.wallets?.length && (
-            <>
-               <Form.Label>Wallet Amount</Form.Label>
-               {formatCurrency(user?.wallets[0]?.amount)}
-            </>
-         )}
-         <div tw="h-2" />
-         {loyaltyPointsAllowed && !!user?.loyaltyPoints?.length && (
-            <>
-               <Form.Label>Loyalty Points</Form.Label>
-               {user?.loyaltyPoints[0]?.points}
-            </>
-         )}
       </section>
    )
 }

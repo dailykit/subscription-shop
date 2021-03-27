@@ -2,7 +2,7 @@ import React from 'react'
 import tw from 'twin.macro'
 
 import { usePayment } from './state'
-import { Form } from '../../components'
+import { Form, Referral } from '../../components'
 import { useUser } from '../../context'
 
 export const ProfileSection = () => {
@@ -67,6 +67,7 @@ export const ProfileSection = () => {
                placeholder="Enter your phone no. eg. 987 987 9876"
             />
          </Form.Field>
+         <Referral />
       </main>
    )
 }
