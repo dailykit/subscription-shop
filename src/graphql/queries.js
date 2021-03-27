@@ -308,6 +308,38 @@ export const ZIPCODE = gql`
 `
 
 export const CART = gql`
+   query cart($id: Int!) {
+      cart(id: $id) {
+         id
+         tax
+         tip
+         address
+         totalPrice
+         paymentStatus
+         deliveryPrice
+         billingDetails
+         fulfillmentInfo
+         transactionId
+         transactionRemark
+         stripeInvoiceId
+         stripeInvoiceDetails
+         products: cartItemViews(where: { level: { _eq: 1 } }) {
+            id
+            isAddOn
+            unitPrice
+            addOnLabel
+            addOnPrice
+            isAutoAdded
+            name: displayName
+            image: displayImage
+            subscriptionOccurenceProductId
+            subscriptionOccurenceAddOnProductId
+         }
+      }
+   }
+`
+
+export const CART_SUBSCRIPTION = gql`
    subscription cart($id: Int!) {
       cart(id: $id) {
          id

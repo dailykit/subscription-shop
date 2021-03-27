@@ -50,21 +50,22 @@ const PaymentContent = ({ isCheckout }) => {
    const { addToast } = useToasts()
    const { configOf } = useConfig()
 
-   const [urlForAction, setUrlForAction] = React.useState(null)
-
-   const { loading, data: { cart = {} } = {} } = useSubscription(CART, {
-      skip: !isClient,
-      variables: {
-         id: isClient ? new URLSearchParams(location.search).get('id') : '',
-      },
-   })
+   const { loading, data: { cart = {} } = {} } = useSubscription(
+      CART_SUBSCRIPTION,
+      {
+         skip: !isClient,
+         variables: {
+            id: isClient ? new URLSearchParams(location.search).get('id') : '',
+         },
+      }
+   )
 
    React.useEffect(() => {
       if (!loading & !isEmpty(cart)) {
          if (cart.paymentStatus === 'SUCCEEDED') {
             navigate(`/subscription/placing-order?id=${cart.id}`)
          }
-         if (cart.paymentStatus === 'REQUIRED_ACTION') {
+         if (cart.paymentStatus === 'REQUIRES_ACTION') {
             console.log('Action required!')
             if (cart.transactionRemark?.next_action?.use_strip_sdk?.stripe_js) {
                console.log(
