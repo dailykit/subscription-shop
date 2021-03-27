@@ -308,7 +308,7 @@ export const ZIPCODE = gql`
 `
 
 export const CART = gql`
-   query cart($id: Int!) {
+   subscription cart($id: Int!) {
       cart(id: $id) {
          id
          tax
