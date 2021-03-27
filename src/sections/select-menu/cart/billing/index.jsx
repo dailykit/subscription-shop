@@ -1,7 +1,9 @@
 import React from 'react'
 import tw from 'twin.macro'
+import { navigate } from 'gatsby'
 
 import { useMenu } from '../../state'
+import { SaveButton } from '../styled'
 import { formatCurrency } from '../../../../utils'
 import {
    Billing,
@@ -9,10 +11,10 @@ import {
    LoyaltyPoints,
    WalletAmount,
 } from '../../../../components'
-import { PlusIcon, MinusIcon } from '../../../../assets/icons'
 import { useConfig } from '../../../../lib'
+import { PlusIcon, MinusIcon } from '../../../../assets/icons'
 
-const BillingDetails = () => {
+const BillingDetails = ({ isCheckout }) => {
    const { state } = useMenu()
    const { configOf } = useConfig()
    const [open, toggle] = React.useState(false)
@@ -24,6 +26,8 @@ const BillingDetails = () => {
    const walletAllowed = configOf('Wallet', 'rewards')?.isAvailable
    const loyaltyPointsAllowed = configOf('Loyalty Points', 'rewards')
       ?.isAvailable
+
+   const theme = configOf('theme-color', 'Visual')
 
    return (
       <div>
@@ -50,6 +54,18 @@ const BillingDetails = () => {
             {itemCountValid && <Toggle open={open} toggle={toggle} />}
          </header>
          {itemCountValid && open && <Billing billing={billing} />}
+         {!isCheckout && itemCountValid && (
+            <SaveButton
+               bg={theme?.accent}
+               onClick={() =>
+                  navigate(
+                     `/subscription/checkout/?id=${state.occurenceCustomer?.cart?.id}`
+                  )
+               }
+            >
+               Proceed to Checkout
+            </SaveButton>
+         )}
       </div>
    )
 }

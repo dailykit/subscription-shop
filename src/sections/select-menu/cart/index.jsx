@@ -63,7 +63,7 @@ export const CartPanel = ({ noSkip, isCheckout }) => {
             {/* Fulfilment Mode */}
             <Fulfillment />
             {/* Billing Details */}
-            <Billing />
+            <Billing isCheckout={isCheckout} />
             {/* Checkout */}
             {isCheckout && (
                <SaveButton

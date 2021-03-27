@@ -1,14 +1,13 @@
 import React from 'react'
-import { isEmpty } from 'lodash'
 import tw, { styled, css } from 'twin.macro'
 import { useSubscription } from '@apollo/react-hooks'
 
-import { useConfig } from '../../../lib'
-import { isClient } from '../../../utils'
-import { CART_STATUS } from '../../../graphql'
-import { Layout, SEO, Loader, HelperBar } from '../../../components'
-import { PlacedOrderIllo, CartIllo, PaymentIllo } from '../../../assets/icons'
-import OrderInfo from '../../../sections/OrderInfo'
+import { useConfig } from '../../lib'
+import { isClient } from '../../utils'
+import { CART_STATUS } from '../../graphql'
+import { Layout, SEO, Loader, HelperBar } from '../../components'
+import { PlacedOrderIllo, CartIllo, PaymentIllo } from '../../assets/icons'
+import OrderInfo from '../../sections/OrderInfo'
 
 const PlacingOrder = () => {
    const { configOf } = useConfig()
@@ -18,13 +17,6 @@ const PlacingOrder = () => {
          id: isClient ? new URLSearchParams(location.search).get('id') : '',
       },
    })
-
-   React.useEffect(() => {
-      if (!loading && !isEmpty(cart)) {
-         if (cart.paymentStatus === 'REQUIRES_ACTION') {
-         }
-      }
-   }, [loading, cart])
 
    const gotoMenu = () => {
       isClient && window.localStorage.removeItem('plan')
@@ -96,25 +88,23 @@ const PlacingOrder = () => {
                                     (!Boolean(cart.orderId) && <Pulse />)}
                               </Step>
                            </Steps>
-                           {cart.paymentStatus === 'SUCCEEDED' &&
-                              cart.status === 'ORDER_PENDING' &&
-                              cart.orderId && (
-                                 <HelperBar type="success" tw="mt-3">
-                                    <HelperBar.Title>
-                                       <span role="img" aria-label="celebrate">
-                                          🎉
-                                       </span>
-                                       Congratulations!{' '}
-                                    </HelperBar.Title>
-                                    <HelperBar.SubTitle>
-                                       Your order has been placed. Continue
-                                       selecting menu for others weeks.
-                                    </HelperBar.SubTitle>
-                                    <HelperBar.Button onClick={gotoMenu}>
-                                       Browse Menu
-                                    </HelperBar.Button>
-                                 </HelperBar>
-                              )}
+                           {cart.status === 'ORDER_PENDING' && cart.orderId && (
+                              <HelperBar type="success" tw="mt-3">
+                                 <HelperBar.Title>
+                                    <span role="img" aria-label="celebrate">
+                                       🎉
+                                    </span>
+                                    Congratulations!{' '}
+                                 </HelperBar.Title>
+                                 <HelperBar.SubTitle>
+                                    Your order has been placed. Continue
+                                    selecting menu for others weeks.
+                                 </HelperBar.SubTitle>
+                                 <HelperBar.Button onClick={gotoMenu}>
+                                    Browse Menu
+                                 </HelperBar.Button>
+                              </HelperBar>
+                           )}
                         </>
                      )}
                   </Content>

@@ -37,6 +37,25 @@ export const MUTATIONS = {
          `,
       },
    },
+   CUSTOMER_REFERRAL: {
+      UPDATE: gql`
+         mutation UpdateCustomerReferral(
+            $brandId: Int!
+            $keycloakId: String!
+            $_set: crm_customerReferral_set_input
+         ) {
+            updateCustomerReferrals(
+               where: {
+                  brandId: { _eq: $brandId }
+                  keycloakId: { _eq: $keycloakId }
+               }
+               _set: $_set
+            ) {
+               affected_rows
+            }
+         }
+      `,
+   },
    OCCURENCE: {
       CUSTOMER: {
          CREATE: {
@@ -183,8 +202,12 @@ export const CREATE_STRIPE_PAYMENT_METHOD = gql`
 `
 
 export const UPDATE_CART = gql`
-   mutation updateCart($id: Int!, $_set: order_cart_set_input!) {
-      updateCart(pk_columns: { id: $id }, _set: $_set) {
+   mutation updateCart(
+      $id: Int!
+      $_set: order_cart_set_input!
+      $_inc: order_cart_inc_input = {}
+   ) {
+      updateCart(pk_columns: { id: $id }, _set: $_set, _inc: $_inc) {
          id
       }
    }

@@ -1,28 +1,28 @@
 import React from 'react'
-import moment from 'moment'
 import { navigate } from 'gatsby'
 import tw, { styled, css } from 'twin.macro'
 import { useToasts } from 'react-toast-notifications'
 import { useMutation, useQuery } from '@apollo/react-hooks'
 
-import { useConfig } from '../../../lib'
-import { isClient, formatCurrency } from '../../../utils'
-import { SEO, Loader, Layout, StepsNavbar } from '../../../components'
+import { useConfig } from '../../lib'
+import { isClient, formatCurrency } from '../../utils'
+import { SEO, Loader, Layout, StepsNavbar } from '../../components'
 import {
    usePayment,
    ProfileSection,
    PaymentProvider,
    PaymentSection,
-} from '../../../sections/checkout'
-import { useUser } from '../../../context'
+} from '../../sections/checkout'
+import { useUser } from '../../context'
 import {
    CART,
    BRAND,
    MUTATIONS,
    UPDATE_CART,
    UPDATE_DAILYKEY_CUSTOMER,
-} from '../../../graphql'
-import OrderInfo from '../../../sections/OrderInfo'
+} from '../../graphql'
+import OrderInfo from '../../sections/OrderInfo'
+import { isEmpty } from 'lodash'
 
 const Checkout = () => {
    const { isAuthenticated } = useUser()
@@ -48,7 +48,7 @@ const PaymentContent = ({ isCheckout }) => {
    const { user } = useUser()
    const { state } = usePayment()
    const { addToast } = useToasts()
-   const { brand, configOf } = useConfig()
+   const { configOf } = useConfig()
 
    const { loading, data: { cart = {} } = {} } = useQuery(CART, {
       skip: !isClient,
@@ -57,13 +57,21 @@ const PaymentContent = ({ isCheckout }) => {
       },
    })
 
+   React.useEffect(() => {
+      if (!loading & !isEmpty(cart)) {
+         if (cart.paymentStatus === 'SUCCEEDED') {
+            navigate(`/subscription/placing-order?id=${cart.id}`)
+         }
+      }
+   }, [loading, cart])
+
    const [updateBrandCustomer] = useMutation(BRAND.CUSTOMER.UPDATE, {
       refetchQueries: ['customer'],
       onCompleted: () => {
          addToast('Saved you preferences.', {
             appearance: 'success',
          })
-         navigate(`/subscription/get-started/placing-order?id=${cart.id}`)
+         navigate(`/subscription/placing-order?id=${cart.id}`)
       },
    })
    const [updateCustomer] = useMutation(MUTATIONS.CUSTOMER.UPDATE, {
@@ -82,16 +90,6 @@ const PaymentContent = ({ isCheckout }) => {
          addToast(error.message, { appearance: 'danger' })
       },
    })
-   const [updateCustomerReferralRecord] = useMutation(
-      MUTATIONS.CUSTOMER_REFERRAL.UPDATE,
-      {
-         refetchQueries: ['customer'],
-         onError: error => {
-            console.log(error)
-            addToast('Referral code not applied!', { appearance: 'danger' })
-         },
-      }
-   )
 
    const [updateCart] = useMutation(UPDATE_CART, {
       onCompleted: () => {
@@ -101,20 +99,6 @@ const PaymentContent = ({ isCheckout }) => {
                _set: { isSubscriber: true },
             },
          })
-         if (
-            state.code &&
-            state.code !== user?.customerReferrals[0]?.referralCode
-         ) {
-            updateCustomerReferralRecord({
-               variables: {
-                  brandId: brand.id,
-                  keycloakId: user.keycloakId,
-                  _set: {
-                     referredByCode: state.code,
-                  },
-               },
-            })
-         }
       },
       onError: error => {
          addToast(error.message, { appearance: 'danger' })
@@ -127,16 +111,18 @@ const PaymentContent = ({ isCheckout }) => {
          updateCart({
             variables: {
                id: cart.id,
-               _inc: { paymentRetryAttempt: 1 },
                _set: {
                   amount: cart?.totalPrice,
-                  paymentMethodId: state.payment.selected.id,
                   customerInfo: {
                      customerEmail: user?.platform_customer?.email,
                      customerPhone: state?.profile?.phoneNumber,
                      customerLastName: state?.profile?.lastName,
                      customerFirstName: state?.profile?.firstName,
                   },
+                  paymentMethodId: state.payment.selected.id,
+                  ...(isCheckout && {
+                     status: 'CART_PROCESS',
+                  }),
                },
             },
          })

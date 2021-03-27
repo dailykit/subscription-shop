@@ -268,6 +268,7 @@ export const CART_BY_WEEK = gql`
             loyaltyPointsUsed
             billingDetails
             fulfillmentInfo
+            transactionId
             products: cartItemViews(where: { level: { _eq: 1 } }) {
                id
                name: displayName
@@ -314,9 +315,14 @@ export const CART = gql`
          tip
          address
          totalPrice
+         paymentStatus
          deliveryPrice
          billingDetails
          fulfillmentInfo
+         transactionId
+         transactionRemark
+         stripeInvoiceId
+         stripeInvoiceDetails
          products: cartItemViews(where: { level: { _eq: 1 } }) {
             id
             isAddOn
@@ -339,6 +345,8 @@ export const CART_STATUS = gql`
          status
          orderId
          address
+         transactionId
+         transactionRemark
          paymentStatus
          fulfillmentInfo
          billingDetails
@@ -591,6 +599,11 @@ export const CUSTOMER = {
                id
                points
             }
+            customerReferrals(where: { brandId: { _eq: $brandId } }) {
+               id
+               referralCode
+               referredByCode
+            }
             customerByClients: platform_customerByClients {
                stripeCustomerId: organizationStripeCustomerId
             }
@@ -721,6 +734,22 @@ export const ORGANIZATION = gql`
          id
          stripeAccountId
          stripeAccountType
+      }
+   }
+`
+
+export const REFERRER = gql`
+   query customerReferral($brandId: Int!, $code: String!) {
+      customerReferrals(
+         where: { brandId: { _eq: $brandId }, referralCode: { _eq: $code } }
+      ) {
+         id
+         customer {
+            platform_customer {
+               firstName
+               lastName
+            }
+         }
       }
    }
 `
