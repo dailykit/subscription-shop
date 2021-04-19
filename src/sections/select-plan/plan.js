@@ -39,7 +39,7 @@ export const Plan = ({ plan, handlePlanClick }) => {
       addToast('Successfully selected a plan.', {
          appearance: 'success',
       })
-      navigate('/subscription/get-started/register')
+      navigate('/get-started/register')
    }
 
    const config = configOf('primary-labels')

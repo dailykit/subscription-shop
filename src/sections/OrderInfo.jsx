@@ -6,7 +6,7 @@ import { useToasts } from 'react-toast-notifications'
 
 import { useUser } from '../context'
 import { normalizeAddress } from '../utils'
-import { Billing, CartProduct } from '../components'
+import { Billing, CartProduct, Button } from '../components'
 
 const OrderInfo = ({ cart, showViewOrderButton = false }) => {
    const { user } = useUser()
@@ -41,24 +41,25 @@ const OrderInfo = ({ cart, showViewOrderButton = false }) => {
                ))}
             </ProductCards>
          </section>
-         <section>
-            <header tw="mt-3 mb-2 pb-1 border-b flex items-center justify-between">
-               <h4 tw="text-lg text-gray-700">Your Add Ons</h4>
-            </header>
-            {addOnProducts.length > 0 ? (
-               <ProductCards>
-                  {addOnProducts.map(product => (
-                     <CartProduct
-                        product={product}
-                        isRemovable={false}
-                        key={`product-${product.id}`}
-                     />
-                  ))}
-               </ProductCards>
-            ) : (
-               <span>No Add Ons</span>
-            )}
-         </section>
+         {addOnProducts.length > 0 && (
+            <>
+               <section>
+                  <header tw="mt-3 mb-2 pb-1 border-b flex items-center justify-between">
+                     <h4 tw="text-lg text-gray-700">Your Add Ons</h4>
+                  </header>
+
+                  <ProductCards>
+                     {addOnProducts.map(product => (
+                        <CartProduct
+                           product={product}
+                           isRemovable={false}
+                           key={`product-${product.id}`}
+                        />
+                     ))}
+                  </ProductCards>
+               </section>
+            </>
+         )}
          <section>
             <h4 tw="text-lg text-gray-700 my-3 pb-1 border-b">Charges</h4>
             <Billing billing={cart?.billingDetails} />
@@ -81,10 +82,7 @@ const OrderInfo = ({ cart, showViewOrderButton = false }) => {
             ) : (
                <p tw="text-gray-500">
                   Pickup your box in between{' '}
-                  {moment(cart?.billingDetails?.deliveryPrice?.value).format(
-                     'MMM D'
-                  )}
-                  ,{' '}
+                  {moment(cart?.fulfillmentInfo?.slot?.from).format('MMM D')},{' '}
                   {moment(cart?.fulfillmentInfo?.slot?.from).format('hh:mm A')}{' '}
                   - {moment(cart?.fulfillmentInfo?.slot?.to).format('hh:mm A')}{' '}
                   from {normalizeAddress(cart?.fulfillmentInfo?.address)}
@@ -94,21 +92,20 @@ const OrderInfo = ({ cart, showViewOrderButton = false }) => {
          {showViewOrderButton && (
             <>
                {cart?.paymentStatus === 'SUCCEEDED' ? (
-                  <button
-                     tw="h-10 w-full rounded text-white text-center bg-green-500"
+                  <Button
+                     disabled={false}
+                     tw="w-full bg-green-500"
                      onClick={() =>
                         navigate(
-                           `/subscription/account/orders?id=${cart?.subscriptionOccurenceId}`
+                           `/account/orders?id=${cart?.subscriptionOccurenceId}`
                         )
                      }
                   >
                      Go to Order
-                  </button>
+                  </Button>
                ) : (
                   <SaveGhostButton
-                     onClick={() =>
-                        navigate(`/subscription/checkout/?id=${cart?.id}`)
-                     }
+                     onClick={() => navigate(`/checkout/?id=${cart?.id}`)}
                   >
                      EARLY PAY
                   </SaveGhostButton>
@@ -125,6 +122,9 @@ const ProductCards = styled.ul`
    display: grid;
    grid-gap: 16px;
    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+   @media screen and (max-width: 567px) {
+      grid-template-columns: 1fr;
+   }
 `
 
 export const SaveGhostButton = styled.button(

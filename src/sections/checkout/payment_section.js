@@ -66,14 +66,22 @@ export const PaymentSection = () => {
                         },
                      })
                   }
+                  className={`${
+                     state.payment.selected?.id ===
+                        method.stripePaymentMethodId && 'active'
+                  }`}
                >
-                  <PaymentMethodLeft
-                     className={`${
-                        state.payment.selected?.id ===
-                           method.stripePaymentMethodId && 'active'
-                     }`}
-                  >
-                     <CheckIcon size={20} tw="stroke-current text-gray-400" />
+                  <PaymentMethodLeft>
+                     <CheckIcon
+                        size={18}
+                        css={[
+                           tw`stroke-current`,
+                           state.payment.selected?.id ===
+                           method.stripePaymentMethodId
+                              ? tw`text-green-700`
+                              : tw`text-gray-400`,
+                        ]}
+                     />
                   </PaymentMethodLeft>
                   <section tw="p-2 w-full">
                      {user.subscriptionPaymentMethodId ===
@@ -120,10 +128,21 @@ const SectionTitle = styled.h3(
 )
 
 const PaymentMethod = styled.li`
-   ${tw`flex border text-gray-700`}
+   ${tw`flex border text-gray-700 rounded overflow-hidden hover:(border-2 border-green-700)`}
    > aside {
       width: 48px;
-      ${tw`border-r border-gray-300 flex justify-center h-full bg-gray-200 border-r`}
+      ${tw`flex justify-center h-full`}
+   }
+   &.active {
+      ${tw`border-2 border-green-700`}
+      svg {
+         ${tw`text-green-700`}
+      }
+   }
+   :hover {
+      svg {
+         ${tw`text-green-700`}
+      }
    }
 `
 
@@ -131,12 +150,7 @@ const PaymentMethodLeft = styled.aside(
    () => css`
       width: 48px;
       height: 48px;
-      ${tw`border-r border-gray-300 h-full mr-2 flex flex-shrink-0 items-center justify-center bg-gray-200`}
-      &.active {
-         svg {
-            ${tw`text-green-700`}
-         }
-      }
+      ${tw`h-full mr-2 flex flex-shrink-0 items-center justify-center`}
    `
 )
 

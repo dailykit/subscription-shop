@@ -16,7 +16,7 @@ export const Header = () => {
    const logout = () => {
       isClient && localStorage.removeItem('token')
       if (isClient) {
-         window.location.href = window.location.origin + '/subscription'
+         window.location.href = window.location.origin + ''
       }
    }
 
@@ -29,10 +29,7 @@ export const Header = () => {
    return (
       <>
          <Wrapper>
-            <Brand
-               to="/subscription"
-               title={brand?.name || 'Subscription Shop'}
-            >
+            <Brand to="/" title={brand?.name || 'Subscription Shop'}>
                {brand?.logo?.logoMark && (
                   <img
                      tw="h-12"
@@ -43,28 +40,24 @@ export const Header = () => {
                {brand?.name && <span tw="ml-2">{brand?.name}</span>}
             </Brand>
             <section tw="flex items-center justify-between">
-               <ul />
-               <ul tw="px-4 flex space-x-4">
-                  <Link
-                     to="/subscription/how-it-works/"
-                     tw="text-gray-800 hidden md:inline-block"
-                  >
-                     How It Works
-                  </Link>
+               <ul tw="ml-auto px-4 flex space-x-4">
+                  <li tw="hidden md:inline-block">
+                     <Link to="/how-it-works" tw="text-gray-800">
+                        How It Works
+                     </Link>
+                  </li>
                   {isAuthenticated && user?.isSubscriber ? (
-                     <li tw="text-gray-800 hidden hidden md:inline-block">
-                        <Link to="/subscription/menu">Select Menu</Link>
+                     <li tw="text-gray-800 hidden md:inline-block">
+                        <Link to="/menu">Select Menu</Link>
                      </li>
                   ) : (
                      <li tw="text-gray-800 hidden md:inline-block">
-                        <Link to="/subscription/our-menu">Our Menu</Link>
+                        <Link to="/our-menu">Our Menu</Link>
                      </li>
                   )}
-                  {!isAuthenticated && (
-                     <li tw="text-gray-800 hidden md:inline-block">
-                        <Link to="/subscription/get-started/select-plan">
-                           Our Plans
-                        </Link>
+                  {!user?.isSubscriber && (
+                     <li tw="hidden md:inline-block">
+                        <Link to="/get-started/select-plan">Get Started</Link>
                      </li>
                   )}
                </ul>
@@ -75,7 +68,7 @@ export const Header = () => {
                      {user?.platform_customer?.firstName &&
                         (isClient && window.innerWidth > 786 ? (
                            <Link
-                              to="/subscription/account/profile/"
+                              to="/account/profile/"
                               tw="mr-3 inline-flex items-center justify-center rounded-full h-10 w-10 bg-gray-200"
                            >
                               {getInitials(
@@ -95,17 +88,14 @@ export const Header = () => {
                         ))}
 
                      <button
-                        css={tw`text-red-600 rounded px-2 py-1 hidden md:inline-block `}
                         onClick={logout}
+                        css={tw`text-red-600 rounded px-2 py-1`}
                      >
                         Logout
                      </button>
                   </>
                ) : (
-                  <Login
-                     onClick={() => navigate('/subscription/login')}
-                     bg={theme?.accent}
-                  >
+                  <Login onClick={() => navigate('/login')} bg={theme?.accent}>
                      Log In
                   </Login>
                )}
@@ -122,23 +112,21 @@ export const Header = () => {
             </section>
             {isMobileNavVisible && (
                <section tw="absolute block md:hidden bg-white px-4 w-full top-16 list-none transition-all duration-200 ease-in-out">
-                  <li tw="text-gray-800 py-4">
-                     <Link to="/subscription/how-it-works/">How It Works</Link>
+                  <li tw="text-gray-800 py-2">
+                     <Link to="/how-it-works/">How It Works</Link>
                   </li>
                   {isAuthenticated && user?.isSubscriber ? (
-                     <li tw="text-gray-800 py-4">
-                        <Link to="/subscription/menu">Select Menu</Link>
+                     <li tw="text-gray-800 py-2">
+                        <Link to="/menu">Select Menu</Link>
                      </li>
                   ) : (
-                     <li tw="text-gray-800 py-4">
-                        <Link to="/subscription/our-menu">Our Menu</Link>
+                     <li tw="text-gray-800 py-2">
+                        <Link to="/our-menu">Our Menu</Link>
                      </li>
                   )}
-                  {!isAuthenticated && (
-                     <li tw="text-gray-800 py-4">
-                        <Link to="/subscription/get-started/select-plan">
-                           Our Plans
-                        </Link>
+                  {!user?.isSubscriber && (
+                     <li tw="text-gray-800 py-2">
+                        <Link to="/get-started/select-plan">Get Started</Link>
                      </li>
                   )}
                </section>

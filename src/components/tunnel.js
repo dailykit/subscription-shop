@@ -32,14 +32,14 @@ class Portal extends React.Component {
    }
 }
 
-export const Tunnel = ({ isOpen, toggleTunnel, size, children }) => {
+export const Tunnel = ({ isOpen, toggleTunnel, size, children, ...props }) => {
    const ref = React.useRef()
    useOnClickOutside(ref, () => toggleTunnel(false))
 
    if (isOpen)
       return (
          <Portal>
-            <Wrapper>
+            <Wrapper {...props}>
                <Content size={size} ref={ref}>
                   {children}
                </Content>
@@ -71,6 +71,9 @@ const Wrapper = styled.div`
    margin-top: 64px;
    ${tw`fixed inset-0`}
    background: rgba(0,0,0,0.2);
+   @media screen and (max-width: 767px) {
+      margin-top: 0;
+   }
 `
 
 const Title = styled.h2(
@@ -89,7 +92,7 @@ const Content = styled.div(
          ${size !== 'full' && tw`w-9/12`}
       }
       @media (max-width: 767px) {
-         ${tw`w-screen`}
+         ${tw`w-full`}
       }
    `
 )
@@ -115,7 +118,7 @@ const TunnelHeader = styled.header`
 `
 
 const TunnelBody = styled.main`
-   padding: 16px;
+   padding: 16px 16px 120px 16px;
    overflow-y: auto;
    height: calc(100vh - 128px);
 `

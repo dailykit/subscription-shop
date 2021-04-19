@@ -1,24 +1,25 @@
 import React from 'react'
 import tw, { styled } from 'twin.macro'
+import ReactImageFallback from 'react-image-fallback'
 
 import { formatCurrency } from '../utils'
 import { CloseIcon } from '../assets/icons'
+import { useConfig } from '../lib'
 
 export const CartProduct = ({ product, isRemovable, onDelete }) => {
+   const { buildImageUrl, noProductImage, imagePlaceholder } = useConfig()
    return (
       <Wrapper>
-         <aside tw="flex-shrink-0 relative">
+         <aside tw="flex-shrink-0 relative aspect-w-4 aspect-h-3">
             {product.image ? (
-               <img
-                  src={product.image}
+               <ReactImageFallback
+                  src={buildImageUrl('100x75', product.image)}
+                  fallbackImage={product.image}
+                  initialImage={imagePlaceholder}
                   alt={product.name}
-                  title={product.name}
-                  tw="object-cover rounded w-full h-full"
                />
             ) : (
-               <span tw="text-teal-500" title={product.name}>
-                  N/A
-               </span>
+               <img src={noProductImage} alt={product.name} />
             )}
          </aside>
          <main tw="pl-3">
@@ -56,7 +57,7 @@ const Wrapper = styled.li`
    ${tw`h-auto py-2 bg-white border grid items-start px-2 rounded`}
    grid-template-columns: 96px 1fr auto;
    aside {
-      ${tw`w-full h-16 bg-gray-300 rounded flex items-start justify-center`}
+      ${tw`w-full h-16 bg-gray-300 rounded flex items-start justify-center overflow-hidden`}
 
       :hover {
          span.remove_product {

@@ -28,38 +28,51 @@ const AddOnProducts = () => {
       ['CART_PENDING', undefined].includes(
          state?.occurenceCustomer?.cart?.status
       ) && state?.week?.isValid
+
+   let hasAddOns =
+      state?.occurenceCustomer?.cart?.products?.filter(node => node.isAddOn)
+         .length > 0
+
    return (
       <div>
-         <header tw="my-3 pb-1 border-b flex items-center justify-between">
-            <h4 tw="text-lg text-gray-700">Your Add Ons</h4>
-            <button
-               onClick={() => toggleTunnel(true)}
-               tw="text-green-800 uppercase px-3 py-1 rounded-full border text-sm font-medium border-green-400 flex items-center"
-            >
-               Explore
-               <span tw="pl-2">
-                  <PlusIcon size={16} tw="stroke-current text-green-400" />
-               </span>
-            </button>
-         </header>
-         <CartProducts>
-            {state?.occurenceCustomer?.cart?.products?.map(
-               product =>
-                  product.isAddOn && (
-                     <CartProduct
-                        product={product}
-                        key={product.id}
-                        isRemovable={isRemovable}
-                        onDelete={methods.products.delete}
-                     />
-                  )
-            )}
-         </CartProducts>
+         {hasAddOns && (
+            <>
+               <header tw="my-3 pb-1 border-b flex items-center justify-between">
+                  <h4 tw="text-lg text-gray-700">Your Add Ons</h4>
+                  <button
+                     onClick={() => toggleTunnel(true)}
+                     tw="text-green-800 uppercase px-3 py-1 rounded-full border text-sm font-medium border-green-400 flex items-center"
+                  >
+                     Explore
+                     <span tw="pl-2">
+                        <PlusIcon
+                           size={16}
+                           tw="stroke-current text-green-400"
+                        />
+                     </span>
+                  </button>
+               </header>
+               <CartProducts>
+                  {state?.occurenceCustomer?.cart?.products?.map(
+                     product =>
+                        product.isAddOn && (
+                           <CartProduct
+                              product={product}
+                              key={product.id}
+                              isRemovable={isRemovable}
+                              onDelete={methods.products.delete}
+                           />
+                        )
+                  )}
+               </CartProducts>
+            </>
+         )}
          {tunnel && (
             <Tunnel
                size="md"
                isOpen={tunnel}
                toggleTunnel={() => toggleTunnel(false)}
+               style={{ zIndex: 1030 }}
             >
                <Tunnel.Header title="Add Ons">
                   <Button size="sm" onClick={() => toggleTunnel(false)}>

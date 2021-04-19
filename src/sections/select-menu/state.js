@@ -83,7 +83,33 @@ export const MenuProvider = ({ children }) => {
    const { brand, configOf } = useConfig()
    const [cart, setCart] = React.useState({})
    const [fulfillment, setFulfillment] = React.useState({})
+   const [isCustomerLoading, setIsCustomerLoading] = React.useState(true)
    const [state, dispatch] = React.useReducer(reducers, initialState)
+
+   const {
+      error: occurenceCustomerError,
+      loading: occurenceCustomerLoading,
+      data: { subscriptionOccurenceCustomer: occurenceCustomer = {} } = {},
+   } = useSubscription(CART_BY_WEEK, {
+      skip: !state.week.id || !user.keycloakId || !user.brandCustomerId,
+      variables: {
+         weekId: state.week.id,
+         keycloakId: user?.keycloakId,
+         brand_customerId: user?.brandCustomerId,
+      },
+      onSubscriptionData: () => {
+         dispatch({ type: 'IS_CART_FULL', payload: false })
+         setIsCustomerLoading(false)
+      },
+   })
+
+   if (!occurenceCustomerLoading && occurenceCustomerError) {
+      setIsCustomerLoading(false)
+      addToast('Failed to fetch week details', {
+         appearance: 'error',
+      })
+   }
+
    const [updateOccurenceCustomer] = useMutation(
       MUTATIONS.OCCURENCE.CUSTOMER.UPDATE,
       {
@@ -106,15 +132,23 @@ export const MenuProvider = ({ children }) => {
       },
       onError: error => console.log('deleteCartItem => error =>', error),
    })
-   useSubscription(ZIPCODE, {
-      skip: !user?.subscriptionId || !user?.defaultAddress?.zipcode,
+
+   const {
+      loading: loadingZipcode,
+      data: { zipcode = {} } = {},
+   } = useSubscription(ZIPCODE, {
+      skip:
+         !user?.subscriptionId ||
+         !user?.defaultAddress?.zipcode ||
+         !state.week?.id,
       variables: {
          subscriptionId: user?.subscriptionId,
          zipcode: user?.defaultAddress?.zipcode,
       },
-      onSubscriptionData: ({
-         subscriptionData: { data: { zipcode = {} } = {} } = {},
-      }) => {
+   })
+
+   React.useEffect(() => {
+      if (!loadingZipcode && !isEmpty(zipcode) && state.week?.fulfillmentDate) {
          if (zipcode.isDeliveryActive) {
             setFulfillment({
                type: 'PREORDER_DELIVERY',
@@ -145,8 +179,9 @@ export const MenuProvider = ({ children }) => {
                address: zipcode?.pickupOption?.address,
             })
          }
-      },
-   })
+      }
+   }, [loadingZipcode, zipcode, state.week])
+
    const [insertOccurenceCustomer] = useMutation(
       MUTATIONS.OCCURENCE.CUSTOMER.CREATE.ONE,
       {
@@ -203,28 +238,10 @@ export const MenuProvider = ({ children }) => {
          })
       },
    })
-   const {
-      loading: occurenceCustomerLoading,
-      data: { subscriptionOccurenceCustomer: occurenceCustomer = {} } = {},
-   } = useSubscription(CART_BY_WEEK, {
-      skip: !state.week.id || !user.keycloakId || !user.brandCustomerId,
-      variables: {
-         weekId: state.week.id,
-         keycloakId: user?.keycloakId,
-         brand_customerId: user?.brandCustomerId,
-      },
-      onSubscriptionData: () => {
-         dispatch({ type: 'IS_CART_FULL', payload: false })
-      },
-      onError: error => {
-         addToast(error.message, {
-            appearance: 'error',
-         })
-      },
-   })
 
    React.useEffect(() => {
       if (
+         !isCustomerLoading &&
          !state.isOccurencesLoading &&
          !occurenceCustomerLoading &&
          state.week?.id
@@ -246,6 +263,7 @@ export const MenuProvider = ({ children }) => {
          }
       }
    }, [
+      isCustomerLoading,
       state.isOccurencesLoading,
       occurenceCustomerLoading,
       state.week,
@@ -389,7 +407,14 @@ export const MenuProvider = ({ children }) => {
       }
    }
 
-   if (state.isOccurencesLoading && state.week.id) return <Loader inline />
+   if (
+      state.isOccurencesLoading ||
+      loadingZipcode ||
+      isCustomerLoading ||
+      occurenceCustomerLoading ||
+      !state.week.id
+   )
+      return <Loader inline />
    return (
       <MenuContext.Provider
          value={{

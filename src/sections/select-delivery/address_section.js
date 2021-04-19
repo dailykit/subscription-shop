@@ -39,7 +39,7 @@ export const AddressSection = () => {
          <header css={tw`mt-6 mb-3 flex items-center justify-between`}>
             <SectionTitle theme={theme}>Select Address</SectionTitle>
             {user?.platform_customer?.addresses.length > 0 && (
-               <Button size="sm" onClick={() => toggleTunnel(true)}>
+               <Button bg={theme?.accent} onClick={() => toggleTunnel(true)}>
                   Add Address
                </Button>
             )}
@@ -48,9 +48,7 @@ export const AddressSection = () => {
             <HelperBar type="error">
                <HelperBar.SubTitle>{state.address.error}</HelperBar.SubTitle>
                <HelperBar.Buttom
-                  onClick={() =>
-                     navigate('/subscription/get-started/select-plan')
-                  }
+                  onClick={() => navigate('/get-started/select-plan')}
                >
                   Change Plan
                </HelperBar.Buttom>
@@ -62,15 +60,19 @@ export const AddressSection = () => {
                   <AddressCard
                      key={address.id}
                      onClick={() => addressSelection(address)}
+                     className={`${
+                        state.address.selected?.id === address.id && 'active'
+                     }`}
                   >
-                     <AddressCardLeft
-                        className={`${
-                           state.address.selected?.id === address.id && 'active'
-                        }`}
-                     >
+                     <AddressCardLeft>
                         <CheckIcon
-                           size={20}
-                           tw="stroke-current text-gray-400"
+                           size={18}
+                           css={[
+                              tw`stroke-current`,
+                              state.address.selected?.id === address.id
+                                 ? tw`text-green-700`
+                                 : tw`text-gray-400`,
+                           ]}
                         />
                      </AddressCardLeft>
                      <label onClick={() => addressSelection(address)}>
@@ -117,23 +119,24 @@ const SectionTitle = styled.h3(
 )
 
 const AddressCard = styled.li`
-   ${tw`flex border text-gray-700 cursor-pointer`}
+   ${tw`flex border border-gray-300 text-gray-700 cursor-pointer rounded overflow-hidden hover:(border-2 border-green-700)`}
    label {
       ${tw`p-3 cursor-pointer`}
    }
    span {
       ${tw`block`}
    }
+   &.active {
+      ${tw`border-2 border-green-700`}
+   }
+   :hover svg {
+      ${tw`text-green-700`}
+   }
 `
 
 const AddressCardLeft = styled.aside(
    () => css`
       width: 48px;
-      ${tw`border-r border-gray-300 flex items-center justify-center h-full bg-gray-200 border-r`}
-      &.active {
-         svg {
-            ${tw`text-green-700`}
-         }
-      }
+      ${tw`flex items-center justify-center h-full`}
    `
 )

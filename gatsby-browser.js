@@ -6,7 +6,7 @@ import { ToastProvider } from 'react-toast-notifications'
 import './src/styles/globals.css'
 
 import { UserProvider } from './src/context'
-import { ApolloProvider, ConfigProvider } from './src/lib'
+import { ApolloProvider, ConfigProvider, ScriptProvider } from './src/lib'
 
 export const wrapRootElement = ({ element }) => {
    return <App element={element} />
@@ -15,15 +15,17 @@ export const wrapRootElement = ({ element }) => {
 const App = ({ element }) => (
    <ApolloProvider>
       <ConfigProvider>
-         <UserProvider>
-            <ToastProvider
-               autoDismiss
-               placement="top-center"
-               autoDismissTimeout={3000}
-            >
-               <div css={tw`overflow-hidden`}>{element}</div>
-            </ToastProvider>
-         </UserProvider>
+         <ScriptProvider>
+            <UserProvider>
+               <ToastProvider
+                  autoDismiss
+                  placement="top-center"
+                  autoDismissTimeout={3000}
+               >
+                  <div css={tw`overflow-hidden`}>{element}</div>
+               </ToastProvider>
+            </UserProvider>
+         </ScriptProvider>
       </ConfigProvider>
    </ApolloProvider>
 )

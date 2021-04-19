@@ -49,5 +49,12 @@ export const SaveGhostButton = styled.button(
          text-gray-600
          cursor-not-allowed 
       `}
+      transition: all 0.3s ease-in-out;
+      ${!disabled &&
+      css`
+         :hover {
+            transform: translateY(-4px);
+         }
+      `}
    `
 )

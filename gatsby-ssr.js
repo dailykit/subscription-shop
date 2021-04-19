@@ -4,15 +4,7 @@ import { ToastProvider } from 'react-toast-notifications'
 import { ApolloProvider, ConfigProvider } from './src/lib'
 
 export const onRenderBody = ({ setPostBodyComponents }) => {
-   setPostBodyComponents([
-      <script
-         src={`${
-            process.env.NODE_ENV === 'production'
-               ? '/subscription/env-config.js'
-               : '/env-config.js'
-         }`}
-      ></script>,
-   ])
+   setPostBodyComponents([<script src={'/env-config.js'}></script>])
 }
 
 export const wrapRootElement = ({ element }) => {

@@ -37,4 +37,4 @@ RUN chmod +x script.sh
 
 
 # Start Nginx server
-CMD ["/bin/bash", "-c", "/usr/share/nginx/html/script.sh && cp /usr/share/nginx/html/env-config.js /usr/share/nginx/html/subscription && nginx -g \"daemon off;\""]
+CMD ["/bin/bash", "-c", "/usr/share/nginx/html/script.sh && nginx -g \"daemon off;\""]

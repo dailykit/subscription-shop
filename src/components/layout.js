@@ -62,17 +62,15 @@ export const Layout = ({ children, noHeader }) => {
                   <h4 tw="text-2xl mb-4 mt-2">Navigation</h4>
                   <ul>
                      <li tw="mb-3">
-                        <Link to="/subscription">Home</Link>
+                        <Link to="/">Home</Link>
                      </li>
                      {isAuthenticated && (
                         <li tw="mb-3">
-                           <Link to="/subscription/account/profile/">
-                              Profile
-                           </Link>
+                           <Link to="/account/profile/">Profile</Link>
                         </li>
                      )}
                      <li tw="mb-3">
-                        <Link to="/subscription/menu">Menu</Link>
+                        <Link to="/menu">Menu</Link>
                      </li>
                   </ul>
                </section>
@@ -84,23 +82,19 @@ export const Layout = ({ children, noHeader }) => {
                      <ul>
                         {isTermsAndConditionsAvailable && (
                            <li tw="mb-3">
-                              <Link to="/subscription/terms-and-conditions/">
+                              <Link to="/terms-and-conditions/">
                                  Terms and Conditions
                               </Link>
                            </li>
                         )}
                         {isPrivacyPolicyAvailable && (
                            <li tw="mb-3">
-                              <Link to="/subscription/privacy-policy/">
-                                 Privacy Policy
-                              </Link>
+                              <Link to="/privacy-policy/">Privacy Policy</Link>
                            </li>
                         )}
                         {isRefundPolicyAvailable && (
                            <li tw="mb-3">
-                              <Link to="/subscription/refund-policy/">
-                                 Refund Policy
-                              </Link>
+                              <Link to="/refund-policy/">Refund Policy</Link>
                            </li>
                         )}
                      </ul>

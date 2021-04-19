@@ -73,9 +73,7 @@ export const DeliveryDateSection = () => {
          <HelperBar.SubTitle>
             No dates are available for delivery on this address.
          </HelperBar.SubTitle>
-         <HelperBar.Button
-            onClick={() => navigate('/subscription/get-started/select-plan')}
-         >
+         <HelperBar.Button onClick={() => navigate('/get-started/select-plan')}>
             Select Plan
          </HelperBar.Button>
       </HelperBar>
@@ -86,14 +84,20 @@ export const DeliveryDateSection = () => {
             <DeliveryDate
                key={occurence.id}
                onClick={() => occurenceSelection(occurence)}
+               className={`${
+                  occurence.id === state.delivery_date.selected?.id && 'active'
+               }`}
             >
-               <DeliveryDateLeft
-                  className={`${
-                     occurence.id === state.delivery_date.selected?.id &&
-                     'active'
-                  }`}
-               >
-                  <CheckIcon size={20} tw="stroke-current text-gray-400" />
+               <DeliveryDateLeft>
+                  <CheckIcon
+                     size={18}
+                     css={[
+                        tw`stroke-current`,
+                        occurence.id === state.delivery_date.selected?.id
+                           ? tw`text-green-700`
+                           : tw`text-gray-400`,
+                     ]}
+                  />
                </DeliveryDateLeft>
                <label css={tw`w-full cursor-pointer`}>
                   {formatDate(occurence.fulfillmentDate, {
@@ -121,18 +125,13 @@ const DeliveryDateLeft = styled.aside(
    () => css`
       width: 48px;
       height: 48px;
-      ${tw`border-r border-gray-300 h-full mr-2 flex flex-shrink-0 items-center justify-center bg-gray-200`}
-      &.active {
-         svg {
-            ${tw`text-green-700`}
-         }
-      }
+      ${tw`h-full mr-2 flex flex-shrink-0 items-center justify-center`}
    `
 )
 
 const DeliveryDate = styled.li`
    height: 48px;
-   ${tw`cursor-pointer flex items-center border capitalize text-gray-700`}
+   ${tw`cursor-pointer flex items-center border capitalize text-gray-700 rounded overflow-hidden border-gray-300 hover:(border-2 border-green-700)`}
    &.invalid {
       opacity: 0.6;
       position: relative;
@@ -144,5 +143,11 @@ const DeliveryDate = styled.li`
          height: 100%;
          position: absolute;
       }
+   }
+   :hover svg {
+      ${tw`text-green-700`}
+   }
+   &.active {
+      ${tw`border-2 border-green-700`}
    }
 `

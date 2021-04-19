@@ -55,9 +55,7 @@ const BillingDetails = ({ isCheckout }) => {
          {!isCheckout && itemCountValid && (
             <SaveGhostButton
                onClick={() =>
-                  navigate(
-                     `/subscription/checkout/?id=${state.occurenceCustomer?.cart?.id}`
-                  )
+                  navigate(`/checkout/?id=${state.occurenceCustomer?.cart?.id}`)
                }
             >
                EARLY PAY

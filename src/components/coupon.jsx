@@ -167,6 +167,7 @@ export const Coupon = () => {
             <Tunnel
                isOpen={isCouponListOpen}
                toggleTunnel={setIsCouponListOpen}
+               style={{ zIndex: 1030 }}
             >
                <CouponsList createOrderCartRewards={createOrderCartRewards} />
             </Tunnel>

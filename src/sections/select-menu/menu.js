@@ -3,6 +3,7 @@ import { Link } from 'gatsby'
 import { isEmpty, uniqBy } from 'lodash'
 import tw, { styled, css } from 'twin.macro'
 import { useQuery } from '@apollo/react-hooks'
+import ReactImageFallback from 'react-image-fallback'
 import { useToasts } from 'react-toast-notifications'
 
 import { useMenu } from './state'
@@ -20,7 +21,12 @@ export const Menu = () => {
    const { user } = useUser()
    const { addToast } = useToasts()
    const { state } = useMenu()
-   const { configOf } = useConfig()
+   const {
+      configOf,
+      buildImageUrl,
+      noProductImage,
+      imagePlaceholder,
+   } = useConfig()
    const { loading, data: { categories = [] } = {} } = useQuery(
       OCCURENCE_PRODUCTS_BY_CATEGORIES,
       {
@@ -85,6 +91,9 @@ export const Menu = () => {
                         theme={theme}
                         key={node.id}
                         isAdded={isAdded}
+                        buildImageUrl={buildImageUrl}
+                        noProductImage={noProductImage}
+                        imagePlaceholder={imagePlaceholder}
                      />
                   ))}
                </Products>
@@ -94,7 +103,14 @@ export const Menu = () => {
    )
 }
 
-const Product = ({ node, isAdded, theme }) => {
+const Product = ({
+   node,
+   theme,
+   isAdded,
+   noProductImage,
+   buildImageUrl,
+   imagePlaceholder,
+}) => {
    const { addToast } = useToasts()
    const { state, methods } = useMenu()
 
@@ -156,18 +172,16 @@ const Product = ({ node, isAdded, theme }) => {
                )}
             </Styles.Type>
          )}
-         <div
-            css={tw`flex items-center justify-center h-48 bg-gray-200 mb-2 rounded overflow-hidden`}
-         >
+         <div tw="flex items-center justify-center aspect-w-4 aspect-h-3 bg-gray-200 mb-2 rounded overflow-hidden">
             {product.image ? (
-               <img
+               <ReactImageFallback
+                  src={buildImageUrl('400x300', product.image)}
+                  fallbackImage={product.image}
+                  initialImage={imagePlaceholder}
                   alt={product.name}
-                  src={product.image}
-                  title={product?.name}
-                  css={tw`h-full w-full object-cover select-none`}
                />
             ) : (
-               <span>No Photos</span>
+               <img src={noProductImage} alt={product.name} />
             )}
          </div>
          {node.addOnLabel && <Label>{node.addOnLabel}</Label>}

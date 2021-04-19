@@ -6,11 +6,11 @@ import { useMutation } from '@apollo/react-hooks'
 import Billing from './billing'
 import Products from './products'
 import { useMenu } from '../state'
-import { SaveButton } from './styled'
 import OrderInfo from '../../OrderInfo'
 import Fulfillment from './fulfillment'
 import { useConfig } from '../../../lib'
 import { useUser } from '../../../context'
+import { Button } from '../../../components'
 import { CloseIcon } from '../../../assets/icons'
 import { MUTATIONS, UPDATE_BRAND_CUSTOMER } from '../../../graphql'
 
@@ -57,7 +57,7 @@ export const CartPanel = ({ noSkip, isCheckout }) => {
             }
          }
          navigate(
-            `/subscription/get-started/checkout/?id=${state.occurenceCustomer?.cart?.id}`
+            `/get-started/checkout/?id=${state.occurenceCustomer?.cart?.id}`
          )
       } catch (error) {
          console.log('SKIP CARTS -> ERROR -> ', error)
@@ -94,11 +94,12 @@ export const CartPanel = ({ noSkip, isCheckout }) => {
          <Styles.Wrapper isCartPanelOpen={isCartPanelOpen}>
             <header tw="md:hidden flex items-center justify-between">
                <h1 tw="text-green-600 text-2xl tracking-wide">Cart Summary</h1>
-               <button
-                  tw="rounded-full border-2 border-green-400 h-6 w-8 flex items-center justify-center"
-                  onClick={() => setIsCartPanelOpen(false)}
-               >
-                  <CloseIcon size={16} tw="stroke-current text-green-400" />
+               <button tw="rounded-full border-2 border-green-400 h-6 w-8 flex items-center justify-center">
+                  <CloseIcon
+                     size={16}
+                     tw="stroke-current text-green-400"
+                     onClick={() => setIsCartPanelOpen(false)}
+                  />
                </button>
             </header>
             {/* Products */}
@@ -109,7 +110,8 @@ export const CartPanel = ({ noSkip, isCheckout }) => {
             <Billing isCheckout={isCheckout} />
             {/* Checkout */}
             {isCheckout && (
-               <SaveButton
+               <Button
+                  tw="w-full"
                   bg={theme?.accent}
                   onClick={onSubmit}
                   disabled={
@@ -118,7 +120,7 @@ export const CartPanel = ({ noSkip, isCheckout }) => {
                   }
                >
                   PROCEED TO CHECKOUT
-               </SaveButton>
+               </Button>
             )}
          </Styles.Wrapper>
       </>
@@ -129,16 +131,13 @@ const CartBar = ({ setIsCartPanelOpen }) => {
    const { state } = useMenu()
    const { user } = useUser()
    return (
-      <Styles.CartBar>
+      <Styles.CartBar onClick={() => setIsCartPanelOpen(true)}>
          <section>
             <h4 tw="text-base text-gray-700">
                Cart {state?.occurenceCustomer?.validStatus?.addedProductsCount}/
                {user?.subscription?.recipes?.count}
             </h4>
-            <h4
-               tw="text-blue-700 pt-2"
-               onClick={() => setIsCartPanelOpen(true)}
-            >
+            <h4 tw="text-blue-700 pt-2">
                View full summary <span>&#8657;</span>
             </h4>
          </section>
@@ -162,23 +161,20 @@ const Styles = {
    Wrapper: styled.div`
       @media (max-width: 786px) {
          position: fixed;
-         left: 0px;
-         right: 0px;
-         top: 30%;
-         bottom: 0px;
          background-color: #ffff;
-         padding: 1rem;
+         padding: 1rem 1rem 72px 1rem;
          z-index: 1020;
          overflow: scroll;
+         ${tw`inset-0`}
          ${({ isCartPanelOpen }) =>
             isCartPanelOpen
                ? css`
-                    display: block;
                     top: 100%;
+                    display: block;
                     animation: slide 0.5s forwards;
                     @keyframes slide {
                        100% {
-                          top: 30%;
+                          top: 0;
                        }
                     }
                  `
