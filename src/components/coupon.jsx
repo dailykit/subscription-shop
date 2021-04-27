@@ -106,7 +106,9 @@ export const Coupon = () => {
          }
       },
    })
-   console.log('🚀 Coupon ~ error', error)
+   if (error) {
+      console.log('🚀 Coupon ~ error', error)
+   }
 
    const [deleteCartRewards] = useMutation(MUTATIONS.CART_REWARDS.DELETE, {
       variables: {

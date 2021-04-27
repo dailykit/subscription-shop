@@ -8,6 +8,7 @@ import Products from './products'
 import { useMenu } from '../state'
 import OrderInfo from '../../OrderInfo'
 import Fulfillment from './fulfillment'
+import PaymentCard from './PaymentCard'
 import { useConfig } from '../../../lib'
 import { useUser } from '../../../context'
 import { Button } from '../../../components'
@@ -105,6 +106,8 @@ export const CartPanel = ({ noSkip, isCheckout }) => {
             <Products noSkip={noSkip} isCheckout={isCheckout} />
             {/* Fulfilment Mode */}
             <Fulfillment />
+            {/* Payment */}
+            <PaymentCard />
             {/* Billing Details */}
             <Billing isCheckout={isCheckout} />
             {/* Checkout */}

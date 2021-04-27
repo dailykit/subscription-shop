@@ -1,11 +1,11 @@
+import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
-import tw, { styled, css } from 'twin.macro'
-import { Loader } from './loader'
+import { useToasts } from 'react-toast-notifications'
+import tw, { styled } from 'twin.macro'
 import { CloseIcon } from '../assets/icons'
 import { useUser } from '../context'
 import { ZIPCODE_AVAILABILITY } from '../graphql'
-import { useToasts } from 'react-toast-notifications'
-import { useQuery } from '@apollo/react-hooks'
+import { Loader } from './loader'
 
 const AddressList = ({ closeTunnel, onSelect }) => {
    const { user } = useUser()
@@ -89,30 +89,4 @@ const Styles = {
    Heading: styled.h3`
       color: gray;
    `,
-   Coupon: styled.div`
-      padding: 8px;
-      border: 1px dashed #cacaca;
-      margin-bottom: 16px;
-      border-radius: 4px;
-   `,
-   CouponTop: styled.div`
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-   `,
-   Code: styled.h3`
-      text-transform: uppercase;
-      font-weight: 500;
-   `,
-   Button: styled.button`
-      color: teal;
-
-      &:disabled {
-         color: gray;
-      }
-   `,
-   CouponBottom: styled.div``,
-   Title: styled.p``,
-   Description: styled.p``,
 }

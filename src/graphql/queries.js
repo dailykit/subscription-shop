@@ -334,6 +334,7 @@ export const CART_BY_WEEK = gql`
             billingDetails
             fulfillmentInfo
             transactionId
+            paymentMethodId
             products: cartItemViews(where: { level: { _eq: 1 } }) {
                id
                name: displayName
