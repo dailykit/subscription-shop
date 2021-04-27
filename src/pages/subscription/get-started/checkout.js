@@ -189,7 +189,6 @@ const PaymentContent = () => {
                   id: cart.id,
                   _inc: { paymentRetryAttempt: 1 },
                   _set: {
-                     amount: cart?.totalPrice,
                      paymentMethodId: state.payment.selected.id,
                      customerInfo: {
                         customerEmail: user?.platform_customer?.email,
