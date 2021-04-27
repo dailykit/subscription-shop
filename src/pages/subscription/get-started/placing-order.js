@@ -1,4 +1,5 @@
 import React from 'react'
+import moment from 'moment'
 import tw, { styled, css } from 'twin.macro'
 import { useSubscription } from '@apollo/react-hooks'
 
@@ -21,7 +22,11 @@ const PlacingOrder = () => {
    const gotoMenu = () => {
       isClient && window.localStorage.removeItem('plan')
       if (isClient) {
-         window.location.href = window.location.origin + '/subscription/menu'
+         window.location.href = cart?.fulfillmentInfo?.slot?.from
+            ? `${window.location.origin}/subscription/menu?d=${moment(
+                 cart?.fulfillmentInfo?.slot?.from
+              ).format('YYYY-MM-DD')}`
+            : `${window.location.origin}/subscription/menu`
       }
    }
    const theme = configOf('theme-color', 'Visual')

@@ -209,9 +209,17 @@ export const MenuProvider = ({ children }) => {
       },
       onCompleted: ({ subscription = {} } = {}) => {
          if (subscription?.occurences?.length > 0) {
-            const validWeekIndex = subscription?.occurences.findIndex(
-               node => node.isValid
-            )
+            const date = new URL(location.href).searchParams.get('d')
+            let validWeekIndex = null
+            if (date) {
+               validWeekIndex = subscription?.occurences.findIndex(
+                  node => node.fulfillmentDate === date
+               )
+            } else {
+               validWeekIndex = subscription?.occurences.findIndex(
+                  node => node.isValid
+               )
+            }
             if (validWeekIndex === -1) return
             dispatch({ type: 'SET_IS_OCCURENCES_LOADING', payload: false })
             dispatch({

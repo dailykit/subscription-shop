@@ -1,5 +1,6 @@
 import React from 'react'
 import moment from 'moment'
+import { navigate } from 'gatsby-link'
 import tw, { styled } from 'twin.macro'
 
 import { useMenu } from './state'
@@ -28,9 +29,10 @@ export const WeekPicker = ({ isFixed }) => {
          {state.occurences.map(occurence => (
             <Occurence
                key={occurence.id}
-               onClick={() =>
+               onClick={() => {
+                  navigate(`/subscription/menu?d=${occurence.fulfillmentDate}`)
                   dispatch({ type: 'SET_WEEK', payload: occurence })
-               }
+               }}
                className={
                   state.week?.fulfillmentDate === occurence.fulfillmentDate
                      ? 'active'
