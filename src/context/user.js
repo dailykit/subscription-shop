@@ -14,6 +14,7 @@ import {
 } from '../graphql'
 import { PageLoader } from '../components'
 import { isClient, processUser } from '../utils'
+import { navigate } from 'gatsby-link'
 
 const UserContext = React.createContext()
 
@@ -125,6 +126,14 @@ export const UserProvider = ({ children }) => {
       },
    })
 
+   const sendBackToSourceRoute = () => {
+      const redirectRoute = localStorage.getItem('source-route')
+      if (redirectRoute) {
+         localStorage.removeItem('source-route')
+         navigate(redirectRoute)
+      }
+   }
+
    React.useEffect(() => {
       if (isClient) {
          const token = localStorage.getItem('token')
@@ -132,6 +141,7 @@ export const UserProvider = ({ children }) => {
             const user = jwtDecode(token)
             setKeycloakId(user?.sub)
             dispatch({ type: 'SET_USER', payload: { keycloakId: user?.sub } })
+            sendBackToSourceRoute()
          } else {
             dispatch({ type: 'CLEAR_USER' })
          }
@@ -143,6 +153,7 @@ export const UserProvider = ({ children }) => {
          if (customer?.id && organization?.id) {
             const user = processUser(customer, organization?.stripeAccountType)
             dispatch({ type: 'SET_USER', payload: user })
+            sendBackToSourceRoute()
          }
       }
       setIsLoading(false)
