@@ -118,10 +118,12 @@ export const AddressTunnel = () => {
             {address && (
                <>
                   <Form.Field>
-                     <Form.Label>Line 1*</Form.Label>
+                     <Form.Label>
+                        Apartment/Building Info/Street info*
+                     </Form.Label>
                      <Form.Text
                         type="text"
-                        placeholder="Enter line 1"
+                        placeholder="Enter apartment/building info/street info"
                         value={address.line1 || ''}
                         onChange={e =>
                            setAddress({ ...address, line1: e.target.value })

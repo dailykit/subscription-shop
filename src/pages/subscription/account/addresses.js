@@ -274,8 +274,17 @@ export const AddressTunnel = ({ theme, tunnel, toggleTunnel }) => {
             {address && (
                <>
                   <Form.Field>
-                     <Form.Label>Line 1</Form.Label>
-                     <FormPlaceholder>{address.line1}</FormPlaceholder>
+                     <Form.Label>
+                        Apartment/Building Info/Street info*
+                     </Form.Label>
+                     <Form.Text
+                        type="text"
+                        placeholder="Enter apartment/building info/street info"
+                        value={address.line1 || ''}
+                        onChange={e =>
+                           setAddress({ ...address, line1: e.target.value })
+                        }
+                     />
                   </Form.Field>
                   <Form.Field>
                      <Form.Label>Line 2</Form.Label>
@@ -288,10 +297,28 @@ export const AddressTunnel = ({ theme, tunnel, toggleTunnel }) => {
                         }
                      />
                   </Form.Field>
+                  <Form.Field>
+                     <Form.Label>Landmark</Form.Label>
+                     <Form.Text
+                        type="text"
+                        value={address.landmark || ''}
+                        placeholder="Enter landmark"
+                        onChange={e =>
+                           setAddress({ ...address, landmark: e.target.value })
+                        }
+                     />
+                  </Form.Field>
                   <div tw="flex flex-col md:flex-row gap-3">
                      <Form.Field>
-                        <Form.Label>City</Form.Label>
-                        <FormPlaceholder>{address.city}</FormPlaceholder>
+                        <Form.Label>City*</Form.Label>
+                        <Form.Text
+                           type="text"
+                           placeholder="Enter city"
+                           value={address.city || ''}
+                           onChange={e =>
+                              setAddress({ ...address, city: e.target.value })
+                           }
+                        />
                      </Form.Field>
                      <Form.Field>
                         <Form.Label>State</Form.Label>
@@ -333,7 +360,11 @@ export const AddressTunnel = ({ theme, tunnel, toggleTunnel }) => {
                   <Button
                      bg={theme?.accent}
                      onClick={() => handleSubmit()}
-                     disabled={formStatus === 'SAVING'}
+                     disabled={
+                        !address?.line1 ||
+                        !address?.city ||
+                        formStatus === 'SAVING'
+                     }
                   >
                      {formStatus === 'SAVING' ? 'Saving...' : 'Save Address'}
                   </Button>
