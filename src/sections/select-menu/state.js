@@ -206,6 +206,7 @@ export const MenuProvider = ({ children }) => {
                },
             }),
          },
+         where1: { keycloakId: { _eq: user?.keycloakId } },
       },
       onCompleted: ({ subscription = {} } = {}) => {
          if (subscription?.occurences?.length > 0) {
@@ -216,9 +217,12 @@ export const MenuProvider = ({ children }) => {
                   node => node.fulfillmentDate === date
                )
             } else {
-               validWeekIndex = subscription?.occurences.findIndex(
-                  node => node.isValid
-               )
+               validWeekIndex = subscription?.occurences.findIndex(node => {
+                  const { customers = [] } = node
+                  return customers.every(
+                     ({ itemCountValid }) => !itemCountValid
+                  )
+               })
             }
             if (validWeekIndex === -1) return
             dispatch({ type: 'SET_IS_OCCURENCES_LOADING', payload: false })

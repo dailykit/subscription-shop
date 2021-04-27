@@ -94,6 +94,7 @@ export const OCCURENCES_BY_SUBSCRIPTION = gql`
    query subscription(
       $id: Int!
       $where: subscription_subscriptionOccurence_bool_exp
+      $where1: subscription_subscriptionOccurence_customer_bool_exp
    ) {
       subscription: subscription_subscription_by_pk(id: $id) {
          id
@@ -106,6 +107,9 @@ export const OCCURENCES_BY_SUBSCRIPTION = gql`
             isVisible
             fulfillmentDate
             cutoffTimeStamp
+            customers(where: $where1) {
+               itemCountValid: validStatus(path: "itemCountValid")
+            }
          }
       }
    }
