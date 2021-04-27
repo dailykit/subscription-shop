@@ -531,6 +531,32 @@ const Header = styled.header`
    ${tw`w-full border-b flex justify-center`}
    div {
       ${tw`flex items-center space-x-3 divide-x py-3`}
+      @media screen and (max-width: 768px) {
+         ${tw`grid w-full divide-x-0 space-x-0`};
+         grid-gap: 16px;
+         grid-template-areas:
+            'header header'
+            'aside1 aside2'
+            'footer footer';
+         select {
+            ${tw`border h-10 rounded px-2`}
+         }
+         > section {
+            ${tw`px-0`}
+         }
+         > section:nth-of-type(1) {
+            grid-area: header;
+         }
+         > section:nth-of-type(2) {
+            grid-area: aside1;
+         }
+         > section:nth-of-type(3) {
+            grid-area: aside2;
+         }
+         > section:nth-of-type(4) {
+            grid-area: footer;
+         }
+      }
    }
 `
 
