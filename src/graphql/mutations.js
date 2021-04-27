@@ -331,3 +331,21 @@ export const VERIFY_RESET_PASSWORD_TOKEN = gql`
       }
    }
 `
+
+export const DELETE_CUSTOMER_ADDRESS = gql`
+   mutation deleteAddress($id: uuid!) {
+      deleteAddress: platform_deleteCustomerAddress(id: $id) {
+         id
+      }
+   }
+`
+
+export const DELETE_STRIPE_PAYMENT_METHOD = gql`
+   mutation deletePaymentMethod($stripePaymentMethodId: String!) {
+      deletePaymentMethod: platform_deleteStripePaymentMethod(
+         stripePaymentMethodId: $stripePaymentMethodId
+      ) {
+         stripePaymentMethodId
+      }
+   }
+`

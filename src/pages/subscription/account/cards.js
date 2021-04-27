@@ -23,10 +23,14 @@ import {
    ProfileSidebar,
 } from '../../../components'
 import { useConfig } from '../../../lib'
-import { useUser } from '../../../context'
-import { CloseIcon } from '../../../assets/icons'
-import { BRAND, CREATE_STRIPE_PAYMENT_METHOD } from '../../../graphql'
 import { isClient } from '../../../utils'
+import { useUser } from '../../../context'
+import { CloseIcon, DeleteIcon } from '../../../assets/icons'
+import {
+   BRAND,
+   CREATE_STRIPE_PAYMENT_METHOD,
+   DELETE_STRIPE_PAYMENT_METHOD,
+} from '../../../graphql'
 
 const ManageCards = () => {
    const { isAuthenticated } = useUser()
@@ -55,14 +59,47 @@ const Content = () => {
    const { addToast } = useToasts()
    const { brand, configOf } = useConfig()
    const [tunnel, toggleTunnel] = React.useState(false)
+   const [deleteStripePaymentMethod] = useMutation(
+      DELETE_STRIPE_PAYMENT_METHOD,
+      {
+         refetchQueries: ['customer'],
+         onCompleted: () => {
+            addToast('Successfully deleted the payment method.', {
+               appearance: 'success',
+            })
+         },
+         onError: () => {
+            addToast('Failed to delete the payment method.', {
+               appearance: 'error',
+            })
+         },
+      }
+   )
    const [updateBrandCustomer] = useMutation(BRAND.CUSTOMER.UPDATE, {
       refetchQueries: ['customer'],
       onCompleted: () => {
-         addToast('Successfully changed default address.', {
+         addToast('Successfully changed default payment method.', {
             appearance: 'success',
          })
       },
+      onError: () => {
+         addToast('Failed to change the default payment method.', {
+            appearance: 'error',
+         })
+      },
    })
+
+   const deletePaymentMethod = id => {
+      if (user?.subscriptionPaymentMethodId === id) {
+         addToast('Can not delete a default payment method!', {
+            appearance: 'error',
+         })
+         return
+      }
+      deleteStripePaymentMethod({
+         variables: { stripePaymentMethodId: id },
+      })
+   }
 
    const makeDefault = method => {
       updateBrandCustomer({
@@ -105,19 +142,35 @@ const Content = () => {
                            tw="flex border text-gray-700"
                         >
                            <section tw="p-2 w-full">
-                              {user.subscriptionPaymentMethodId ===
-                              method.stripePaymentMethodId ? (
-                                 <span tw="rounded border bg-teal-200 border-teal-300 px-2 text-teal-700">
-                                    Default
-                                 </span>
-                              ) : (
+                              <header tw="mb-2 w-full flex justify-between items-center">
+                                 {user.subscriptionPaymentMethodId ===
+                                 method.stripePaymentMethodId ? (
+                                    <span tw="rounded border bg-teal-200 border-teal-300 px-2 text-teal-700">
+                                       Default
+                                    </span>
+                                 ) : (
+                                    <button
+                                       tw="mb-2 rounded border border-orange-300 px-2 text-teal-700 cursor-pointer hover:(bg-orange-300 text-orange-900)"
+                                       onClick={() => makeDefault(method)}
+                                    >
+                                       Make Default
+                                    </button>
+                                 )}
                                  <button
-                                    tw="mb-2 rounded border border-orange-300 px-2 text-teal-700 cursor-pointer hover:(bg-orange-300 text-orange-900)"
-                                    onClick={() => makeDefault(method)}
+                                    className="group"
+                                    onClick={() =>
+                                       deletePaymentMethod(
+                                          method.stripePaymentMethodId
+                                       )
+                                    }
+                                    tw="flex items-center justify-center border border-red-400 rounded h-6 w-6 hover:bg-red-400"
                                  >
-                                    Make Default
+                                    <DeleteIcon
+                                       size={16}
+                                       tw="stroke-current group-hover:text-white"
+                                    />
                                  </button>
-                              )}
+                              </header>
                               <div tw="flex items-center justify-between">
                                  <span tw="text-xl my-2">
                                     {method.cardHolderName}

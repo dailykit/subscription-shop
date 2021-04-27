@@ -7,10 +7,15 @@ import { useMutation, useLazyQuery } from '@apollo/react-hooks'
 
 import { useConfig } from '../../../lib'
 import { useUser } from '../../../context'
-import { CloseIcon } from '../../../assets/icons'
+import { CloseIcon, DeleteIcon } from '../../../assets/icons'
 import { useScript, isClient } from '../../../utils'
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete'
-import { BRAND, MUTATIONS, ZIPCODE_AVAILABILITY } from '../../../graphql'
+import {
+   BRAND,
+   DELETE_CUSTOMER_ADDRESS,
+   MUTATIONS,
+   ZIPCODE_AVAILABILITY,
+} from '../../../graphql'
 import {
    SEO,
    Form,
@@ -51,12 +56,28 @@ const Content = () => {
    const { brand, configOf } = useConfig()
    const [selected, setSelected] = React.useState(null)
    const [tunnel, toggleTunnel] = React.useState(false)
+   const [deleteCustomerAddress] = useMutation(DELETE_CUSTOMER_ADDRESS, {
+      refetchQueries: ['customer'],
+      onCompleted: () => {
+         addToast('Successfully deleted the address.', {
+            appearance: 'success',
+         })
+      },
+      onError: () => {
+         addToast('Failed to delete the address', { appearance: 'error' })
+      },
+   })
    const [updateBrandCustomer] = useMutation(BRAND.CUSTOMER.UPDATE, {
       refetchQueries: ['customer'],
       onCompleted: () => {
          setSelected(null)
          addToast('Successfully changed default address.', {
             appearance: 'success',
+         })
+      },
+      onError: () => {
+         addToast('Failed to change the default address', {
+            appearance: 'error',
          })
       },
    })
@@ -91,6 +112,16 @@ const Content = () => {
          console.log('checkZipcodeValidity -> zipcode -> error', error)
       },
    })
+
+   const deleteAddress = id => {
+      if (user?.subscriptionAddressId === id) {
+         addToast('Can not delete a default address!', { appearance: 'error' })
+         return
+      }
+      deleteCustomerAddress({
+         variables: { id },
+      })
+   }
 
    const makeDefault = async address => {
       setSelected(address.id)
@@ -128,18 +159,30 @@ const Content = () => {
                            key={address.id}
                            tw="p-2 flex flex-col items-start border text-gray-700"
                         >
-                           {address.id === user?.subscriptionAddressId ? (
-                              <span tw="mb-2 rounded border bg-teal-200 border-teal-300 px-2 text-teal-700">
-                                 Default
-                              </span>
-                           ) : (
+                           <header tw="mb-2 w-full flex justify-between items-center">
+                              {address.id === user?.subscriptionAddressId ? (
+                                 <span tw="rounded border bg-teal-200 border-teal-300 px-2 text-teal-700">
+                                    Default
+                                 </span>
+                              ) : (
+                                 <button
+                                    tw="rounded border border-orange-300 px-2 text-teal-700 cursor-pointer hover:(bg-orange-300 text-orange-900)"
+                                    onClick={() => makeDefault(address)}
+                                 >
+                                    Make Default
+                                 </button>
+                              )}
                               <button
-                                 tw="mb-2 rounded border border-orange-300 px-2 text-teal-700 cursor-pointer hover:(bg-orange-300 text-orange-900)"
-                                 onClick={() => makeDefault(address)}
+                                 className="group"
+                                 onClick={() => deleteAddress(address.id)}
+                                 tw="flex items-center justify-center border border-red-400 rounded h-6 w-6 hover:bg-red-400"
                               >
-                                 Make Default
+                                 <DeleteIcon
+                                    size={16}
+                                    tw="stroke-current group-hover:text-white"
+                                 />
                               </button>
-                           )}
+                           </header>
                            <span>{address?.line1}</span>
                            <span>{address?.line2}</span>
                            <span>{address?.city}</span>
