@@ -8,10 +8,11 @@ import { useMutation, useSubscription } from '@apollo/react-hooks'
 import { useMenu } from '../../state'
 import { useConfig } from '../../../../lib'
 import { useUser } from '../../../../context'
-import { Loader } from '../../../../components'
+import { Loader, Tunnel } from '../../../../components'
 import { CheckIcon } from '../../../../assets/icons'
 import { ZIPCODE, MUTATIONS, UPDATE_CART } from '../../../../graphql'
 import { formatCurrency, normalizeAddress } from '../../../../utils'
+import AddressList from '../../../../components/address_list'
 
 const evalTime = (date, time) => {
    const [hour, minute] = time.split(':')
@@ -23,7 +24,11 @@ const Fulfillment = () => {
    const { user } = useUser()
    const { addToast } = useToasts()
    const { brand, configOf } = useConfig()
+
+   const [isAddressListOpen, setIsAddressListOpen] = React.useState(false)
+
    const store = configOf('Store Availability', 'availability')
+
    const [updateOccurenceCustomer] = useMutation(
       MUTATIONS.OCCURENCE.CUSTOMER.UPDATE,
       { onError: error => console.log(error) }
@@ -228,6 +233,15 @@ const Fulfillment = () => {
                               </span>
                            </p>
                         </main>
+                        <span
+                           tw="text-green-700 absolute top-1 right-1 text-sm"
+                           onClick={e => {
+                              e.stopPropagation()
+                              setIsAddressListOpen(true)
+                           }}
+                        >
+                           Change
+                        </span>
                      </Option>
                   )}
                   {zipcode.isPickupActive && zipcode?.pickupOptionId && (
@@ -278,6 +292,28 @@ const Fulfillment = () => {
                </section>
             )}
          </section>
+         <Tunnel
+            isOpen={isAddressListOpen}
+            toggleTunnel={setIsAddressListOpen}
+            style={{ zIndex: 1030 }}
+         >
+            <AddressList
+               closeTunnel={() => setIsAddressListOpen(false)}
+               onSelect={address =>
+                  updateCart({
+                     variables: {
+                        id: state.occurenceCustomer?.cart?.id,
+                        _set: { address },
+                     },
+                  }).then(() => {
+                     addToast('Address updated for delivery!', {
+                        appearance: 'success',
+                     })
+                     setIsAddressListOpen(false)
+                  })
+               }
+            />
+         </Tunnel>
       </div>
    )
 }
@@ -285,7 +321,7 @@ const Fulfillment = () => {
 export default Fulfillment
 
 const Option = styled.section`
-   ${tw`py-2 pr-2 rounded cursor-pointer flex items-center border text-gray-700`}
+   ${tw`py-2 pr-2 rounded cursor-pointer flex items-center border text-gray-700 relative`}
    aside {
       ${tw`flex-shrink-0 h-10 w-10 flex items-center justify-center`}
       ${({ isActive }) =>
