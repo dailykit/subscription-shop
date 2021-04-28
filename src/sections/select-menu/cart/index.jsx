@@ -58,7 +58,7 @@ export const CartPanel = ({ noSkip, isCheckout }) => {
             }
          }
          navigate(
-            `/subscription/get-started/checkout/?id=${state.occurenceCustomer?.cart?.id}`
+            `/get-started/checkout/?id=${state.occurenceCustomer?.cart?.id}`
          )
       } catch (error) {
          console.log('SKIP CARTS -> ERROR -> ', error)

@@ -48,9 +48,7 @@ export const AddressSection = () => {
             <HelperBar type="error">
                <HelperBar.SubTitle>{state.address.error}</HelperBar.SubTitle>
                <HelperBar.Buttom
-                  onClick={() =>
-                     navigate('/subscription/get-started/select-plan')
-                  }
+                  onClick={() => navigate('/get-started/select-plan')}
                >
                   Change Plan
                </HelperBar.Buttom>

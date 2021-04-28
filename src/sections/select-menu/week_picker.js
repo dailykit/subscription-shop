@@ -30,7 +30,7 @@ export const WeekPicker = ({ isFixed }) => {
             <Occurence
                key={occurence.id}
                onClick={() => {
-                  navigate(`/subscription/menu?d=${occurence.fulfillmentDate}`)
+                  navigate(`/menu?d=${occurence.fulfillmentDate}`)
                   dispatch({ type: 'SET_WEEK', payload: occurence })
                }}
                className={

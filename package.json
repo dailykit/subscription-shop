@@ -3,9 +3,9 @@
    "description": "A subscription based shop for restaurants.",
    "version": "0.1.0",
    "scripts": {
-      "build": "gatsby build --prefix-paths",
+      "build": "gatsby build",
       "develop": "gatsby develop",
-      "serve": "gatsby serve --prefix-paths",
+      "serve": "gatsby serve",
       "lint:graphql": "eslint src/graphql/**/*.js",
       "init:config": "chmod +x ./script.sh && ./script.sh && cp env-config.js ./public"
    },
@@ -59,7 +59,6 @@
       "autoprefixer": "^10.2.0",
       "babel-preset-gatsby": "^0.10.0",
       "eslint-plugin-graphql": "^4.0.0",
-      "gatsby-plugin-asset-path": "3.0.3",
       "postcss": "^8.2.3",
       "postcss-preset-env": "^6.7.0",
       "tailwindcss": "^2.0.2",

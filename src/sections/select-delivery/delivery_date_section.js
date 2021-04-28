@@ -73,9 +73,7 @@ export const DeliveryDateSection = () => {
          <HelperBar.SubTitle>
             No dates are available for delivery on this address.
          </HelperBar.SubTitle>
-         <HelperBar.Button
-            onClick={() => navigate('/subscription/get-started/select-plan')}
-         >
+         <HelperBar.Button onClick={() => navigate('/get-started/select-plan')}>
             Select Plan
          </HelperBar.Button>
       </HelperBar>

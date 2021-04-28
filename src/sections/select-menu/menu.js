@@ -101,8 +101,7 @@ const Product = ({ node, theme, isAdded, noProductImage, buildImageUrl }) => {
    const { addToast } = useToasts()
    const { state, methods } = useMenu()
 
-   const openRecipe = () =>
-      navigate(`/subscription/recipes/?id=${node?.productOption?.id}`)
+   const openRecipe = () => navigate(`/recipes/?id=${node?.productOption?.id}`)
 
    const add = item => {
       if (state.occurenceCustomer?.betweenPause) {

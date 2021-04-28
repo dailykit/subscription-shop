@@ -1,5 +1,4 @@
 module.exports = {
-   assetPrefix: `/subscription`,
    siteMetadata: {
       title: `Subsription Shop`,
       description: `A subscription based shop for restaurants`,
@@ -13,12 +12,6 @@ module.exports = {
          options: {
             key: 'portal',
             id: 'portal',
-         },
-      },
-      {
-         resolve: `gatsby-plugin-asset-path`,
-         options: {
-            fileTypes: ['js', 'map', 'css', 'xhtml'],
          },
       },
    ],

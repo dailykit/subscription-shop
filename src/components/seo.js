@@ -31,7 +31,7 @@ export const SEO = ({
    const { favicon } = useConfig().configOf('theme-brand', 'brand')
    const seo = useConfig().configOf('seo', 'App')
 
-   const path = location.pathname.replace('/subscription', '')
+   const path = location.pathname.replace('/', '')
 
    console.log({ seo })
 
