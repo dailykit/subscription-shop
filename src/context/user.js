@@ -2,7 +2,7 @@ import 'twin.macro'
 import React from 'react'
 import { isEmpty } from 'lodash'
 import jwtDecode from 'jwt-decode'
-import { useQuery, useSubscription } from '@apollo/react-hooks'
+import { useMutation, useQuery, useSubscription } from '@apollo/react-hooks'
 
 import { useConfig } from '../lib'
 import {
@@ -10,6 +10,7 @@ import {
    CUSTOMER,
    CUSTOMER_REFERRALS,
    LOYALTY_POINTS,
+   UPDATE_DAILYKEY_CUSTOMER,
    WALLETS,
 } from '../graphql'
 import { PageLoader } from '../components'
@@ -40,6 +41,13 @@ export const UserProvider = ({ children }) => {
    const { brand, organization } = useConfig()
    const [isLoading, setIsLoading] = React.useState(true)
    const [keycloakId, setKeycloakId] = React.useState('')
+   const [updatePlatformCustomer] = useMutation(UPDATE_DAILYKEY_CUSTOMER, {
+      onCompleted: () => {
+         isClient && localStorage.removeItem('phone')
+      },
+      onError: error =>
+         console.log('updatePlatformCustomer => error => ', error),
+   })
    const [state, dispatch] = React.useReducer(reducers, {
       isAuthenticated: false,
       user: { subscriptionOnboardStatus: 'SELECT_PLAN', keycloakId: '' },
@@ -152,6 +160,16 @@ export const UserProvider = ({ children }) => {
       if (!loading) {
          if (customer?.id && organization?.id) {
             const user = processUser(customer, organization?.stripeAccountType)
+            const hasPhone = Boolean(user?.platform_customer?.phoneNumber)
+            const phone = isClient && localStorage.getItem('phone')
+            if (user?.keycloakId && !hasPhone && phone && phone.length > 0) {
+               updatePlatformCustomer({
+                  variables: {
+                     keycloakId: user?.keycloakId,
+                     _set: { phoneNumber: phone },
+                  },
+               })
+            }
             dispatch({ type: 'SET_USER', payload: user })
             sendBackToSourceRoute()
          }

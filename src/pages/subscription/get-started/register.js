@@ -294,14 +294,20 @@ const RegisterPanel = ({ loading, customer, setCurrent }) => {
    const [error, setError] = React.useState('')
    const [emailError, setEmailError] = React.useState('')
    const [passwordError, setPasswordError] = React.useState('')
+   const [phoneError, setPhoneError] = React.useState('')
    const [form, setForm] = React.useState({
       email: '',
       password: '',
+      phone: '',
       code: '',
    })
 
    const isValid =
-      validateEmail(form.email) && form.password && form.password.length >= 6
+      validateEmail(form.email) &&
+      form.password &&
+      form.password.length >= 6 &&
+      form.phone &&
+      form.phone.length > 0
 
    React.useEffect(() => {
       const storedReferralCode = getStoredReferralCode('')
@@ -318,6 +324,9 @@ const RegisterPanel = ({ loading, customer, setCurrent }) => {
       }
       if (name === 'password' && value.length >= 6 && passwordError) {
          setPasswordError('')
+      }
+      if (name === 'phone' && value.length > 0 && phoneError) {
+         setPhoneError('')
       }
       setForm(form => ({
          ...form,
@@ -350,6 +359,7 @@ const RegisterPanel = ({ loading, customer, setCurrent }) => {
                password: form.password,
             })
             if (token?.sub) {
+               isClient && localStorage.setItem('phone', form.phone)
                customer({
                   variables: {
                      keycloakId: token?.sub,
@@ -406,6 +416,24 @@ const RegisterPanel = ({ loading, customer, setCurrent }) => {
          </FieldSet>
          {passwordError && (
             <span tw="self-start block text-red-500 mb-2">{passwordError}</span>
+         )}
+         <FieldSet css={[phoneError && tw`mb-1`]}>
+            <Label htmlFor="phone">Phone Number*</Label>
+            <Input
+               type="text"
+               name="phone"
+               value={form.phone}
+               onChange={onChange}
+               placeholder="Eg. 9879879876"
+               onBlur={e =>
+                  e.target.value.length === 0
+                     ? setPhoneError('Must be a valid phone number!')
+                     : setPhoneError('')
+               }
+            />
+         </FieldSet>
+         {phoneError && (
+            <span tw="self-start block text-red-500 mb-2">{phoneError}</span>
          )}
          {isReferralFieldVisible ? (
             <FieldSet>
