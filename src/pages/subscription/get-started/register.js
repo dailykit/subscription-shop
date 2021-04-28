@@ -1,6 +1,6 @@
 import React from 'react'
 import { isEmpty } from 'lodash'
-import { navigate } from 'gatsby'
+import { Link, navigate } from 'gatsby'
 import jwtDecode from 'jwt-decode'
 import tw, { styled } from 'twin.macro'
 import { useToasts } from 'react-toast-notifications'
@@ -287,6 +287,7 @@ function validateEmail(email) {
 
 const RegisterPanel = ({ loading, customer, setCurrent }) => {
    const { brand } = useConfig()
+   const [hasAccepted, setHasAccepted] = React.useState(false)
    const [isReferralFieldVisible, setIsReferralFieldVisible] = React.useState(
       false
    )
@@ -425,8 +426,23 @@ const RegisterPanel = ({ loading, customer, setCurrent }) => {
                Got a referral code?
             </button>
          )}
+         <section tw="self-start mt-2 mb-3">
+            <input
+               tw="mr-2"
+               type="checkbox"
+               name="terms&conditions"
+               id="terms&conditions"
+               onChange={() => setHasAccepted(!hasAccepted)}
+            />
+            <label htmlFor="terms&conditions" tw="text-gray-600">
+               I accept{' '}
+               <Link to="/subscription/terms-and-conditions">
+                  <span tw="text-blue-500">terms and conditions.</span>
+               </Link>
+            </label>
+         </section>
          <Submit
-            className={!isValid || loading ? 'disabled' : ''}
+            className={!hasAccepted || !isValid || loading ? 'disabled' : ''}
             onClick={() => isValid && submit()}
          >
             {loading ? 'Registering' : 'Register'}
