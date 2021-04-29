@@ -152,7 +152,7 @@ const PaymentContent = () => {
    )
 
    const [updateCart] = useMutation(QUERIES.UPDATE_CART, {
-      onCompleted: () => {
+      onCompleted: ({ updateCart = {} }) => {
          let referralCode = null
          if (
             Array.isArray(user?.customerReferrals) &&
@@ -169,6 +169,19 @@ const PaymentContent = () => {
                   keycloakId: user.keycloakId,
                   _set: {
                      referredByCode: state.code.value,
+                  },
+               },
+            })
+         }
+         if (
+            updateCart?.paymentMethodId &&
+            !user?.subscriptionPaymentMethodId
+         ) {
+            updateBrandCustomer({
+               variables: {
+                  id: user?.brandCustomerId,
+                  _set: {
+                     subscriptionPaymentMethodId: updateCart?.paymentMethodId,
                   },
                },
             })
