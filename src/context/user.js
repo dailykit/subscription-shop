@@ -32,7 +32,7 @@ const reducers = (state, { type, payload }) => {
          return {
             ...state,
             isAuthenticated: false,
-            user: { subscriptionOnboardStatus: 'SELECT_PLAN', keycloakId: '' },
+            user: { subscriptionOnboardStatus: 'REGISTER', keycloakId: '' },
          }
    }
 }
@@ -50,7 +50,7 @@ export const UserProvider = ({ children }) => {
    })
    const [state, dispatch] = React.useReducer(reducers, {
       isAuthenticated: false,
-      user: { subscriptionOnboardStatus: 'SELECT_PLAN', keycloakId: '' },
+      user: { subscriptionOnboardStatus: 'REGISTER', keycloakId: '' },
    })
    useSubscription(BRAND_CUSTOMER, {
       skip: !state?.user?.brandCustomerId,

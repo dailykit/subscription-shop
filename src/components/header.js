@@ -60,9 +60,7 @@ export const Header = () => {
                   )}
                   {!user?.isSubscriber && (
                      <li tw="hidden md:inline-block">
-                        <Link to="/subscription/get-started/select-plan">
-                           Get Started
-                        </Link>
+                        <Link to="/subscription/our-plans">Get Started</Link>
                      </li>
                   )}
                </ul>
@@ -142,9 +140,7 @@ export const Header = () => {
                   )}
                   {!user?.isSubscriber && (
                      <li tw="text-gray-800 py-2">
-                        <Link to="/subscription/get-started/select-plan">
-                           Get Started
-                        </Link>
+                        <Link to="/subscription/our-plans">Get Started</Link>
                      </li>
                   )}
                </section>
