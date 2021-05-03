@@ -703,6 +703,7 @@ export const CUSTOMER = {
             isTest
             carts {
                id
+               paymentStatus
                subscriptionOccurence {
                   fulfillmentDate
                }
@@ -720,6 +721,7 @@ export const CUSTOMER = {
                subscriptionId
                subscriptionAddressId
                subscriptionPaymentMethodId
+               subscriptionOnboardStatus
                subscription {
                   recipes: subscriptionItemCount {
                      count

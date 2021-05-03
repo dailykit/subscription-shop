@@ -10,6 +10,7 @@ import {
    CUSTOMER,
    CUSTOMER_REFERRALS,
    LOYALTY_POINTS,
+   UPDATE_BRAND_CUSTOMER,
    UPDATE_DAILYKEY_CUSTOMER,
    WALLETS,
 } from '../graphql'
@@ -47,6 +48,9 @@ export const UserProvider = ({ children }) => {
       },
       onError: error =>
          console.log('updatePlatformCustomer => error => ', error),
+   })
+   const [updateBrandCustomer] = useMutation(UPDATE_BRAND_CUSTOMER, {
+      onError: error => console.log('updateBrandCustomer => error => ', error),
    })
    const [state, dispatch] = React.useReducer(reducers, {
       isAuthenticated: false,
@@ -160,6 +164,7 @@ export const UserProvider = ({ children }) => {
       if (!loading) {
          if (customer?.id && organization?.id) {
             const user = processUser(customer, organization?.stripeAccountType)
+
             const hasPhone = Boolean(user?.platform_customer?.phoneNumber)
             const phone = isClient && localStorage.getItem('phone')
             if (user?.keycloakId && !hasPhone && phone && phone.length > 0) {
@@ -170,6 +175,22 @@ export const UserProvider = ({ children }) => {
                   },
                })
             }
+
+            if (Array.isArray(user?.carts) && user?.carts?.length > 0) {
+               const index = user.carts.findIndex(
+                  node => node.paymentStatus === 'SUCCEEDED'
+               )
+               if (index !== -1) {
+                  updateBrandCustomer({
+                     skip: !user?.brandCustomerId,
+                     variables: {
+                        id: user?.brandCustomerId,
+                        _set: { subscriptionOnboardStatus: 'ONBOARDED' },
+                     },
+                  })
+               }
+            }
+
             dispatch({ type: 'SET_USER', payload: user })
             sendBackToSourceRoute()
          }
