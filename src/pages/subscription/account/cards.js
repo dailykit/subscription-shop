@@ -261,7 +261,10 @@ export const PaymentForm = ({ intent, toggleTunnel }) => {
          if (setupIntent.status === 'succeeded') {
             const ORIGIN = isClient ? window._env_.GATSBY_DAILYKEY_URL : ''
             let URL = `${ORIGIN}/api/payment-method/${setupIntent.payment_method}`
-            if (organization.stripeAccountType === 'standard') {
+            if (
+               organization.stripeAccountType === 'standard' &&
+               organization.stripeAccountId
+            ) {
                URL += `?accountId=${organization.stripeAccountId}`
             }
             const { data: { success, data = {} } = {} } = await axios.get(URL)
@@ -316,9 +319,10 @@ export const PaymentForm = ({ intent, toggleTunnel }) => {
    const stripePromise = loadStripe(
       isClient ? window._env_.GATSBY_STRIPE_KEY : '',
       {
-         ...(organization.stripeAccountType === 'standard' && {
-            stripeAccount: organization.stripeAccountId,
-         }),
+         ...(organization.stripeAccountType === 'standard' &&
+            organization.stripeAccountId && {
+               stripeAccount: organization.stripeAccountId,
+            }),
       }
    )
 
@@ -430,7 +434,10 @@ const CardSection = () => {
 const createSetupIntent = async (customer, organization = {}) => {
    try {
       let stripeAccountId = null
-      if (organization?.stripeAccountType === 'standard') {
+      if (
+         organization?.stripeAccountType === 'standard' &&
+         organization?.stripeAccountId
+      ) {
          stripeAccountId = organization?.stripeAccountId
       }
       const URL = `${window._env_.GATSBY_DAILYKEY_URL}/api/setup-intent`

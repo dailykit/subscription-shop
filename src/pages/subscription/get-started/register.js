@@ -58,7 +58,6 @@ export default () => {
                   organization?.stripeAccountType
                )
                const storedCode = getStoredReferralCode(null)
-               console.log('🚀 ~ onCompleted: ~ storedCode', storedCode)
                if (storedCode) {
                   await applyReferralCode({
                      variables: {
