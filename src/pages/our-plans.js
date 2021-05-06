@@ -1,23 +1,14 @@
 import React from 'react'
-import { navigate } from 'gatsby-link'
 import tw, { styled } from 'twin.macro'
 import { useQuery } from '@apollo/react-hooks'
 import { webRenderer } from '@dailykit/web-renderer'
 
-import { isClient } from '../../utils'
-import { GET_FILEID } from '../../graphql'
-import { Plans } from '../../sections/select-plan'
-import { SEO, Layout, StepsNavbar } from '../../components'
+import { isClient } from '../utils'
+import { GET_FILEID } from '../graphql'
+import { Plans } from '../sections/select-plan'
+import { SEO, Layout } from '../components'
 
 const SelectPlan = () => {
-   React.useEffect(() => {
-      if (isClient) {
-         const plan = localStorage.getItem('plan')
-         if (plan) {
-            navigate('/get-started/select-delivery')
-         }
-      }
-   }, [])
    useQuery(GET_FILEID, {
       variables: {
          divId: ['select-plan-top-01', 'select-plan-bottom-01'],
@@ -92,12 +83,11 @@ const SelectPlan = () => {
    })
 
    return (
-      <Layout noHeader>
+      <Layout>
          <SEO title="Plans" />
-         <StepsNavbar />
          <Main>
             <div id="select-plan-top-01"></div>
-            <Plans />
+            <Plans cameFrom="our-plans" />
          </Main>
          <div id="select-plan-bottom-01"></div>
       </Layout>

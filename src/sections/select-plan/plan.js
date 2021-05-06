@@ -7,7 +7,7 @@ import { useConfig } from '../../lib'
 import { Loader } from '../../components'
 import { isClient, formatCurrency } from '../../utils'
 
-export const Plan = ({ plan, handlePlanClick }) => {
+export const Plan = ({ cameFrom = '', plan, handlePlanClick }) => {
    const { addToast } = useToasts()
    const { configOf } = useConfig('conventions')
    const [defaultItemCount, setDefaultItemCount] = React.useState(null)
@@ -39,7 +39,11 @@ export const Plan = ({ plan, handlePlanClick }) => {
       addToast('Successfully selected a plan.', {
          appearance: 'success',
       })
-      navigate('/get-started/register')
+      navigate(
+         `/get-started/${
+            cameFrom === 'our-plans' ? 'register' : 'select-delivery'
+         }`
+      )
    }
 
    const config = configOf('primary-labels')

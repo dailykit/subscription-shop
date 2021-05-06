@@ -32,7 +32,7 @@ const reducers = (state, { type, payload }) => {
          return {
             ...state,
             isAuthenticated: false,
-            user: { subscriptionOnboardStatus: 'SELECT_PLAN', keycloakId: '' },
+            user: { subscriptionOnboardStatus: 'REGISTER', keycloakId: '' },
          }
    }
 }
@@ -50,7 +50,7 @@ export const UserProvider = ({ children }) => {
    })
    const [state, dispatch] = React.useReducer(reducers, {
       isAuthenticated: false,
-      user: { subscriptionOnboardStatus: 'SELECT_PLAN', keycloakId: '' },
+      user: { subscriptionOnboardStatus: 'REGISTER', keycloakId: '' },
    })
    useSubscription(BRAND_CUSTOMER, {
       skip: !state?.user?.brandCustomerId,
@@ -160,6 +160,7 @@ export const UserProvider = ({ children }) => {
       if (!loading) {
          if (customer?.id && organization?.id) {
             const user = processUser(customer, organization?.stripeAccountType)
+
             const hasPhone = Boolean(user?.platform_customer?.phoneNumber)
             const phone = isClient && localStorage.getItem('phone')
             if (user?.keycloakId && !hasPhone && phone && phone.length > 0) {
@@ -170,6 +171,22 @@ export const UserProvider = ({ children }) => {
                   },
                })
             }
+
+            if (Array.isArray(user?.carts) && user?.carts?.length > 0) {
+               const index = user.carts.findIndex(
+                  node => node.paymentStatus === 'SUCCEEDED'
+               )
+               if (index !== -1) {
+                  updateBrandCustomer({
+                     skip: !user?.brandCustomerId,
+                     variables: {
+                        id: user?.brandCustomerId,
+                        _set: { subscriptionOnboardStatus: 'ONBOARDED' },
+                     },
+                  })
+               }
+            }
+
             dispatch({ type: 'SET_USER', payload: user })
             sendBackToSourceRoute()
          }

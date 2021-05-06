@@ -9,7 +9,7 @@ import { useConfig } from '../../lib'
 import { SkeletonPlan } from './skeletons'
 import { HelperBar } from '../../components'
 
-export const Plans = ({ handlePlanClick }) => {
+export const Plans = ({ cameFrom = '', handlePlanClick }) => {
    const { brand } = useConfig()
    const { addToast } = useToasts()
    const [list, setList] = React.useState([])
@@ -69,7 +69,12 @@ export const Plans = ({ handlePlanClick }) => {
    return (
       <List count={list.length}>
          {list.map(plan => (
-            <Plan key={plan.id} plan={plan} handlePlanClick={handlePlanClick} />
+            <Plan
+               plan={plan}
+               key={plan.id}
+               cameFrom={cameFrom}
+               handlePlanClick={handlePlanClick}
+            />
          ))}
       </List>
    )

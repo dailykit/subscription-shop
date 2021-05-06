@@ -62,7 +62,10 @@ export const PaymentTunnel = () => {
 const createSetupIntent = async (customer, organization = {}) => {
    try {
       let stripeAccountId = null
-      if (organization?.stripeAccountType === 'standard') {
+      if (
+         organization?.stripeAccountType === 'standard' &&
+         organization?.stripeAccountId
+      ) {
          stripeAccountId = organization?.stripeAccountId
       }
       const URL = `${window._env_.GATSBY_DAILYKEY_URL}/api/setup-intent`

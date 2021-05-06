@@ -33,7 +33,10 @@ export const PaymentForm = ({ intent }) => {
          if (setupIntent.status === 'succeeded') {
             const ORIGIN = isClient ? window._env_.GATSBY_DAILYKEY_URL : ''
             let URL = `${ORIGIN}/api/payment-method/${setupIntent.payment_method}`
-            if (organization.stripeAccountType === 'standard') {
+            if (
+               organization.stripeAccountType === 'standard' &&
+               organization.stripeAccountId
+            ) {
                URL += `?accountId=${organization.stripeAccountId}`
             }
             const { data: { success, data = {} } = {} } = await axios.get(URL)
@@ -87,9 +90,10 @@ export const PaymentForm = ({ intent }) => {
    const stripePromise = loadStripe(
       isClient ? window._env_.GATSBY_STRIPE_KEY : '',
       {
-         ...(organization.stripeAccountType === 'standard' && {
-            stripeAccount: organization.stripeAccountId,
-         }),
+         ...(organization.stripeAccountType === 'standard' &&
+            organization.stripeAccountId && {
+               stripeAccount: organization.stripeAccountId,
+            }),
       }
    )
 

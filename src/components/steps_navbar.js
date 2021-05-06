@@ -9,11 +9,11 @@ import { useUser } from '../context'
 import { isClient } from '../utils'
 
 const routes = {
+   '/get-started/register': { status: 'REGISTER', level: 0 },
    '/get-started/select-plan': {
       status: 'SELECT_PLAN',
-      level: 0,
+      level: 25,
    },
-   '/get-started/register': { status: 'REGISTER', level: 25 },
    '/get-started/select-delivery': {
       status: 'SELECT_DELIVERY',
       level: 50,
@@ -65,7 +65,7 @@ export const StepsNavbar = () => {
 
    const canGoToStep = route => {
       if (!has(routes, route) || !has(routes, location.pathname)) return
-      const status = user?.subscriptionOnboardStatus || 'SELECT_PLAN'
+      const status = user?.subscriptionOnboardStatus || 'REGISTER'
       const statusKey = findKey(routes, { status })
       const completedRoute = routes[statusKey]
       if (routes[route].level <= completedRoute?.level) {
@@ -75,6 +75,9 @@ export const StepsNavbar = () => {
    }
 
    const goToStep = route => {
+      if (route.includes('select-plan') && isClient) {
+         localStorage.removeItem('plan')
+      }
       let path = route
       if (canGoToStep(route)) {
          if (!isEmpty(user?.carts)) {
@@ -108,17 +111,17 @@ export const StepsNavbar = () => {
                   goToStep={goToStep}
                   canGoToStep={canGoToStep}
                   isActive={currentStep === 0}
-                  route="/get-started/select-plan"
+                  route="/get-started/register"
                >
-                  Select Plan
+                  {steps.register}
                </RenderStep>
                <RenderStep
                   goToStep={goToStep}
                   canGoToStep={canGoToStep}
                   isActive={currentStep === 25}
-                  route="/get-started/register"
+                  route="/get-started/select-plan"
                >
-                  {steps.register}
+                  Select Plan
                </RenderStep>
                <RenderStep
                   goToStep={goToStep}
