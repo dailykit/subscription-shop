@@ -6,33 +6,44 @@ import { useSubscription } from '@apollo/react-hooks'
 import { Plan } from './plan'
 import { PLANS } from '../../graphql'
 import { useConfig } from '../../lib'
+import { useUser } from '../../context'
 import { SkeletonPlan } from './skeletons'
 import { HelperBar } from '../../components'
 
 export const Plans = ({ cameFrom = '', handlePlanClick }) => {
+   const { user } = useUser()
    const { brand } = useConfig()
    const { addToast } = useToasts()
    const [list, setList] = React.useState([])
    const [isLoading, setIsLoading] = React.useState(true)
-   const { loading, error, data: { plans = [] } = {} } = useSubscription(
-      PLANS,
-      { variables: { brandId: brand.id } }
-   )
-
-   React.useEffect(() => {
-      if (!loading && plans.length > 0) {
-         const filtered = plans
-            .filter(plan => plan.servings.length > 0)
-            .map(plan => ({
-               ...plan,
-               servings: plan.servings.filter(
-                  serving => serving.itemCounts.length > 0
-               ),
-            }))
-         setList(filtered)
-         setIsLoading(false)
-      }
-   }, [loading, plans])
+   const { error } = useSubscription(PLANS, {
+      variables: {
+         isDemo: user?.isDemo,
+         where: {
+            isDemo: { _eq: user?.isDemo },
+            isActive: { _eq: true },
+            brands: { brandId: { _eq: brand.id }, isActive: { _eq: true } },
+         },
+      },
+      onSubscriptionData: ({
+         subscriptionData: { data: { plans = [] } = {} } = {},
+      }) => {
+         if (plans.length > 0) {
+            const filtered = plans
+               .map(plan => ({
+                  ...plan,
+                  servings: plan.servings.filter(
+                     serving => serving.itemCounts.length > 0
+                  ),
+               }))
+               .filter(plan => plan.servings.length > 0)
+            setList(filtered)
+            setIsLoading(false)
+         } else {
+            setIsLoading(false)
+         }
+      },
+   })
 
    if (isLoading)
       return (
@@ -57,7 +68,6 @@ export const Plans = ({ cameFrom = '', handlePlanClick }) => {
       )
    }
    if (list.length === 0) {
-      setIsLoading(false)
       return (
          <Wrapper tw="py-3">
             <HelperBar type="info">

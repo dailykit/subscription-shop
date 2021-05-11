@@ -4,17 +4,22 @@ import tw, { styled, css } from 'twin.macro'
 import { useToasts } from 'react-toast-notifications'
 
 import { useConfig } from '../../lib'
+import { useUser } from '../../context'
 import { Loader } from '../../components'
 import { isClient, formatCurrency } from '../../utils'
 
 export const Plan = ({ cameFrom = '', plan, handlePlanClick }) => {
+   const { user } = useUser()
    const { addToast } = useToasts()
    const { configOf } = useConfig('conventions')
    const [defaultItemCount, setDefaultItemCount] = React.useState(null)
    const [defaultServing, setDefaultServing] = React.useState(null)
 
    React.useEffect(() => {
-      if (plan.defaultServingId) {
+      if (
+         plan.defaultServingId &&
+         plan.defaultServing?.isDemo === user?.isDemo
+      ) {
          setDefaultServing(plan.defaultServing)
       }
       setDefaultServing(plan.servings[0])
@@ -22,7 +27,10 @@ export const Plan = ({ cameFrom = '', plan, handlePlanClick }) => {
 
    React.useEffect(() => {
       if (defaultServing) {
-         if (defaultServing.defaultItemCountId) {
+         if (
+            defaultServing.defaultItemCountId &&
+            defaultServing.defaultItemCount?.isDemo === user?.isDemo
+         ) {
             return setDefaultItemCount(defaultServing.defaultItemCount)
          }
          setDefaultItemCount(defaultServing.itemCounts[0])
