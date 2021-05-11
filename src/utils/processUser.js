@@ -9,6 +9,7 @@ export const processUser = (customer, stripeAccountType = '') => {
 
       const {
          id,
+         isDemo = false,
          subscription = null,
          subscriptionId = null,
          subscriptionAddressId = null,
@@ -17,12 +18,13 @@ export const processUser = (customer, stripeAccountType = '') => {
          pausePeriod = null,
       } = brand_customer
 
+      rest.isDemo = isDemo
       rest.brandCustomerId = id
-      rest.isSubscriptionCancelled = isSubscriptionCancelled
       rest.pausePeriod = pausePeriod
       rest.subscription = subscription
       rest.subscriptionId = subscriptionId
       rest.subscriptionAddressId = subscriptionAddressId
+      rest.isSubscriptionCancelled = isSubscriptionCancelled
       rest.subscriptionPaymentMethodId = subscriptionPaymentMethodId
 
       sub.defaultAddress = rest?.platform_customer?.addresses.find(

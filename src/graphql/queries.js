@@ -37,26 +37,29 @@ export const ITEM_COUNT = gql`
 `
 
 export const PLANS = gql`
-   subscription plans($brandId: Int!) {
-      plans: subscription_subscriptionTitle(
-         where: {
-            isActive: { _eq: true }
-            brands: { brandId: { _eq: $brandId }, isActive: { _eq: true } }
-         }
-      ) {
+   subscription plans(
+      $where: subscription_subscriptionTitle_bool_exp!
+      $isDemo: Boolean!
+   ) {
+      plans: subscription_subscriptionTitle(where: $where) {
          id
          title
+         isDemo
          defaultServingId: defaultSubscriptionServingId
          defaultServing: defaultSubscriptionServing {
             id
+            isDemo
             size: servingSize
             defaultItemCount: defaultSubscriptionItemCount {
                id
+               isDemo
                count
                price
                isTaxIncluded
             }
-            itemCounts: subscriptionItemCounts {
+            itemCounts: subscriptionItemCounts(
+               where: { isDemo: { _eq: $isDemo } }
+            ) {
                id
                count
                price
@@ -65,22 +68,25 @@ export const PLANS = gql`
          }
          servings: subscriptionServings(
             order_by: { servingSize: asc }
-            where: { isActive: { _eq: true } }
+            where: { isDemo: { _eq: $isDemo }, isActive: { _eq: true } }
          ) {
             id
+            isDemo
             size: servingSize
             defaultItemCountId: defaultSubscriptionItemCountId
             defaultItemCount: defaultSubscriptionItemCount {
                id
+               isDemo
                count
                price
                isTaxIncluded
             }
             itemCounts: subscriptionItemCounts(
                order_by: { count: asc, price: asc }
-               where: { isActive: { _eq: true } }
+               where: { isDemo: { _eq: $isDemo }, isActive: { _eq: true } }
             ) {
                id
+               isDemo
                count
                price
                isTaxIncluded
@@ -713,6 +719,7 @@ export const CUSTOMER = {
             }
             brandCustomers(where: { brandId: { _eq: $brandId } }) {
                id
+               isDemo
                brandId
                keycloakId
                isSubscriber
