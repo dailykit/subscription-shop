@@ -210,9 +210,14 @@ export const MenuProvider = ({ children }) => {
       },
       onCompleted: ({ subscription = {} } = {}) => {
          if (subscription?.occurences?.length > 0) {
-            const date = new URL(location.href).searchParams.get('d')
+            const d = new URL(location.href).searchParams.get('d')
+            const date = new URL(location.href).searchParams.get('date')
             let validWeekIndex = null
-            if (date) {
+            if (d) {
+               validWeekIndex = subscription?.occurences.findIndex(
+                  node => node.fulfillmentDate === d
+               )
+            } else if (date) {
                validWeekIndex = subscription?.occurences.findIndex(
                   node => node.fulfillmentDate === date
                )
