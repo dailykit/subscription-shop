@@ -29,7 +29,7 @@ export default () => {
       onCompleted: () => {
          if (isClient) {
             window.location.href =
-               window.location.origin + '/get-started/select-delivery'
+               window.location.origin + '/get-started/select-plan'
          }
       },
       onError: error => {
@@ -73,7 +73,7 @@ export default () => {
             }
             if (isClient) {
                window.location.href =
-                  window.location.origin + '/get-started/select-delivery'
+                  window.location.origin + '/get-started/select-plan'
             }
          },
          onError: () =>
@@ -141,7 +141,7 @@ export default () => {
                console.log('CUSTOMER ISNT SUBSCRIBED')
                if (isClient) {
                   window.location.href =
-                     window.location.origin + '/get-started/select-delivery'
+                     window.location.origin + '/get-started/select-plan'
                }
             }
          },
@@ -153,7 +153,7 @@ export default () => {
          if (user?.isSubscriber) navigate('/menu')
          else if (isClient) {
             window.location.href =
-               window.location.origin + '/get-started/select-delivery'
+               window.location.origin + '/get-started/select-plan'
          }
       }
    }, [user])
