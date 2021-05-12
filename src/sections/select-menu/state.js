@@ -229,15 +229,21 @@ export const MenuProvider = ({ children }) => {
                   )
                })
             }
-            if (validWeekIndex === -1) return
+            if (validWeekIndex === -1) {
+               dispatch({
+                  type: 'SET_WEEK',
+                  payload: subscription?.occurences[0],
+               })
+            } else {
+               dispatch({
+                  type: 'SET_WEEK',
+                  payload: subscription?.occurences[validWeekIndex],
+               })
+            }
             dispatch({ type: 'SET_IS_OCCURENCES_LOADING', payload: false })
             dispatch({
                type: 'SET_OCCURENCES',
                payload: subscription?.occurences,
-            })
-            dispatch({
-               type: 'SET_WEEK',
-               payload: subscription?.occurences[validWeekIndex],
             })
          } else if (
             subscription?.occurences?.length === 0 &&
