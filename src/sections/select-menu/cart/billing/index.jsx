@@ -1,6 +1,7 @@
 import React from 'react'
 import tw from 'twin.macro'
 import { navigate } from 'gatsby'
+import { useToasts } from 'react-toast-notifications'
 
 import { useMenu } from '../../state'
 import { SaveGhostButton } from '../styled'
@@ -16,6 +17,7 @@ import { PlusIcon, MinusIcon } from '../../../../assets/icons'
 
 const BillingDetails = ({ isCheckout }) => {
    const { state } = useMenu()
+   const { addToast } = useToasts()
    const { configOf } = useConfig()
    const [open, toggle] = React.useState(false)
    const { billingDetails: billing = {} } = state?.occurenceCustomer?.cart || {}
@@ -26,6 +28,18 @@ const BillingDetails = ({ isCheckout }) => {
    const walletAllowed = configOf('Wallet', 'rewards')?.isAvailable
    const loyaltyPointsAllowed = configOf('Loyalty Points', 'rewards')
       ?.isAvailable
+
+   const payEarly = () => {
+      if (state.occurenceCustomer?.betweenPause) {
+         addToast('You have paused your plan.', {
+            appearance: 'warning',
+         })
+         return
+      }
+      navigate(
+         `/subscription/checkout/?id=${state.occurenceCustomer?.cart?.id}`
+      )
+   }
 
    return (
       <div>
@@ -53,13 +67,7 @@ const BillingDetails = ({ isCheckout }) => {
          </header>
          {itemCountValid && open && <Billing billing={billing} />}
          {!isCheckout && itemCountValid && (
-            <SaveGhostButton
-               onClick={() =>
-                  navigate(`/checkout/?id=${state.occurenceCustomer?.cart?.id}`)
-               }
-            >
-               EARLY PAY
-            </SaveGhostButton>
+            <SaveGhostButton onClick={payEarly}>EARLY PAY</SaveGhostButton>
          )}
       </div>
    )
