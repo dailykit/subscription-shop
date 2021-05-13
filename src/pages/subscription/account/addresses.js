@@ -242,20 +242,20 @@ export const AddressTunnel = ({ theme, tunnel, toggleTunnel }) => {
          : ''
    )
 
-   const formatAddress = async address => {
+   const formatAddress = async input => {
       if (!isClient) return 'Runs only on client side.'
-
       const response = await fetch(
          `https://maps.googleapis.com/maps/api/geocode/json?key=${
             isClient ? window._env_.GATSBY_GOOGLE_API_KEY : ''
-         }&address=${encodeURIComponent(address.description)}`
+         }&address=${encodeURIComponent(input.description)}`
       )
       const data = await response.json()
       if (data.status === 'OK' && data.results.length > 0) {
          const [result] = data.results
 
          const address = {
-            line2: '',
+            line1: '',
+            line2: input?.description,
             lat: result.geometry.location.lat.toString(),
             lng: result.geometry.location.lng.toString(),
          }
