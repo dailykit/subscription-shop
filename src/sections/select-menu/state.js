@@ -1,6 +1,7 @@
 import React from 'react'
 import moment from 'moment'
 import { isEmpty } from 'lodash'
+import { navigate } from 'gatsby'
 import { useLocation } from '@reach/router'
 import { useToasts } from 'react-toast-notifications'
 import { useMutation, useQuery, useSubscription } from '@apollo/react-hooks'
@@ -213,11 +214,11 @@ export const MenuProvider = ({ children }) => {
             const d = new URL(location.href).searchParams.get('d')
             const date = new URL(location.href).searchParams.get('date')
             let validWeekIndex = null
-            if (d !== undefined) {
+            if (d !== undefined && d !== null) {
                validWeekIndex = subscription?.occurences.findIndex(
                   node => node.fulfillmentDate === d
                )
-            } else if (date !== undefined) {
+            } else if (date !== undefined && date !== null) {
                validWeekIndex = subscription?.occurences.findIndex(
                   node => node.fulfillmentDate === date
                )
@@ -228,6 +229,10 @@ export const MenuProvider = ({ children }) => {
                      ({ itemCountValid }) => !itemCountValid
                   )
                })
+               navigate(
+                  '/subscription/menu?d=' +
+                     subscription?.occurences[validWeekIndex].fulfillmentDate
+               )
             }
             if (validWeekIndex === -1) {
                dispatch({
