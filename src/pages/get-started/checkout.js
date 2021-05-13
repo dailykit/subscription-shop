@@ -111,6 +111,7 @@ const PaymentContent = () => {
                })
             } else if (status === 'SUCCEEDED') {
                await updateBrandCustomer({
+                  refetchQueries: ['customer'],
                   variables: {
                      id: user?.brandCustomerId,
                      _set: { subscriptionOnboardStatus: 'ONBOARDED' },
