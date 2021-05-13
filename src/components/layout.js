@@ -23,11 +23,12 @@ export const Layout = ({ children, noHeader }) => {
       <>
          {!noHeader && <Header />}
          {children}
-         {(user?.isTest === true || store?.isStoreLive === false) && (
-            <div tw="p-2 bg-gray-200 text-gray-700 w-full flex items-center justify-center">
-               Store running in test mode so payments will be bypassed
-            </div>
-         )}
+         <div tw="p-2 bg-gray-200 text-gray-700 w-full flex flex-col items-center justify-center gap-2">
+            {(user?.isTest === true || store?.isStoreLive === false) && (
+               <p>Store running in test mode so payments will be bypassed</p>
+            )}
+            {user?.isDemo && <p>Logged in user is in demo mode.</p>}
+         </div>
          <Footer theme={configOf('theme-color', 'Visual')}>
             <div>
                <section>
