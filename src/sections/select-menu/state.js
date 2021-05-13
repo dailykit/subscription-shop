@@ -210,9 +210,14 @@ export const MenuProvider = ({ children }) => {
       },
       onCompleted: ({ subscription = {} } = {}) => {
          if (subscription?.occurences?.length > 0) {
-            const date = new URL(location.href).searchParams.get('d')
+            const d = new URL(location.href).searchParams.get('d')
+            const date = new URL(location.href).searchParams.get('date')
             let validWeekIndex = null
-            if (date) {
+            if (d) {
+               validWeekIndex = subscription?.occurences.findIndex(
+                  node => node.fulfillmentDate === d
+               )
+            } else if (date) {
                validWeekIndex = subscription?.occurences.findIndex(
                   node => node.fulfillmentDate === date
                )
@@ -224,15 +229,21 @@ export const MenuProvider = ({ children }) => {
                   )
                })
             }
-            if (validWeekIndex === -1) return
+            if (validWeekIndex === -1) {
+               dispatch({
+                  type: 'SET_WEEK',
+                  payload: subscription?.occurences[0],
+               })
+            } else {
+               dispatch({
+                  type: 'SET_WEEK',
+                  payload: subscription?.occurences[validWeekIndex],
+               })
+            }
             dispatch({ type: 'SET_IS_OCCURENCES_LOADING', payload: false })
             dispatch({
                type: 'SET_OCCURENCES',
                payload: subscription?.occurences,
-            })
-            dispatch({
-               type: 'SET_WEEK',
-               payload: subscription?.occurences[validWeekIndex],
             })
          } else if (
             subscription?.occurences?.length === 0 &&
