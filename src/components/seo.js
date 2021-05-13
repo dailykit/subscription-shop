@@ -33,8 +33,6 @@ export const SEO = ({
 
    const path = location.pathname.replace('/subscription', '')
 
-   console.log({ seo })
-
    const metaTitle =
       title || seo[path]?.title || seo['/']?.title || 'Meal Kit Store'
 
