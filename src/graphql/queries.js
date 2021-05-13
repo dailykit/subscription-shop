@@ -1,14 +1,18 @@
 import gql from 'graphql-tag'
 
 export const ITEM_COUNT = gql`
-   query itemCount($id: Int!, $zipcode: String) {
+   query itemCount($id: Int!, $zipcode: String, $isDemo: Boolean) {
       itemCount: subscription_subscriptionItemCount_by_pk(id: $id) {
          id
          valid: subscriptions(
-            where: { availableZipcodes: { zipcode: { _eq: $zipcode } } }
+            where: {
+               isDemo: { _eq: $isDemo }
+               availableZipcodes: { zipcode: { _eq: $zipcode } }
+            }
             order_by: { position: desc_nulls_last }
          ) {
             id
+            isDemo
             rrule
             leadTime
             zipcodes: availableZipcodes(where: { zipcode: { _eq: $zipcode } }) {
@@ -19,11 +23,13 @@ export const ITEM_COUNT = gql`
          }
          invalid: subscriptions(
             where: {
+               isDemo: { _eq: $isDemo }
                _not: { availableZipcodes: { zipcode: { _eq: $zipcode } } }
             }
             order_by: { position: desc_nulls_last }
          ) {
             id
+            isDemo
             rrule
             leadTime
             zipcodes: availableZipcodes(where: { zipcode: { _eq: $zipcode } }) {
