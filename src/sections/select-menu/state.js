@@ -213,11 +213,11 @@ export const MenuProvider = ({ children }) => {
             const d = new URL(location.href).searchParams.get('d')
             const date = new URL(location.href).searchParams.get('date')
             let validWeekIndex = null
-            if (d) {
+            if (d !== undefined) {
                validWeekIndex = subscription?.occurences.findIndex(
                   node => node.fulfillmentDate === d
                )
-            } else if (date) {
+            } else if (date !== undefined) {
                validWeekIndex = subscription?.occurences.findIndex(
                   node => node.fulfillmentDate === date
                )
