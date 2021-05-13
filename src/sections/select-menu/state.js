@@ -34,6 +34,7 @@ const reducers = (state, { type, payload }) => {
          return {
             ...state,
             week: payload,
+            cartState: 'IDLE',
          }
       }
       case 'SET_IS_OCCURENCES_LOADING':
