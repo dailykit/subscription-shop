@@ -29,8 +29,7 @@ export default () => {
       onCompleted: () => {
          if (isClient) {
             window.location.href =
-               window.location.origin +
-               '/subscription/get-started/select-delivery'
+               window.location.origin + '/subscription/get-started/select-plan'
          }
       },
       onError: error => {
@@ -74,7 +73,7 @@ export default () => {
             if (isClient) {
                window.location.href =
                   window.location.origin +
-                  '/subscription/get-started/select-delivery'
+                  '/subscription/get-started/select-plan'
             }
          },
          onError: () =>
@@ -143,7 +142,7 @@ export default () => {
                if (isClient) {
                   window.location.href =
                      window.location.origin +
-                     '/subscription/get-started/select-delivery'
+                     '/subscription/get-started/select-plan'
                }
             }
          },
@@ -155,8 +154,7 @@ export default () => {
          if (user?.isSubscriber) navigate('/subscription/menu')
          else if (isClient) {
             window.location.href =
-               window.location.origin +
-               '/subscription/get-started/select-delivery'
+               window.location.origin + '/subscription/get-started/select-plan'
          }
       }
    }, [user])

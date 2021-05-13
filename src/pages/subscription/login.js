@@ -23,8 +23,7 @@ const Login = () => {
       onCompleted: () => {
          if (isClient) {
             window.location.href =
-               window.location.origin +
-               '/subscription/get-started/select-delivery'
+               window.location.origin + '/subscription/get-started/select-plan'
          }
       },
       onError: error => {
@@ -40,7 +39,7 @@ const Login = () => {
             if (isClient) {
                window.location.href =
                   window.location.origin +
-                  '/subscription/get-started/select-delivery'
+                  '/subscription/get-started/select-plan'
             }
          },
          onError: () =>
@@ -100,7 +99,7 @@ const Login = () => {
                if (isClient) {
                   window.location.href =
                      window.location.origin +
-                     '/subscription/get-started/select-delivery'
+                     '/subscription/get-started/select-plan'
                }
             }
          },
@@ -112,8 +111,7 @@ const Login = () => {
          if (user?.isSubscriber) navigate('/subscription/menu')
          else if (isClient) {
             window.location.href =
-               window.location.origin +
-               '/subscription/get-started/select-delivery'
+               window.location.origin + '/subscription/get-started/select-plan'
          }
       }
    }, [user])
@@ -215,7 +213,7 @@ const LoginPanel = ({ loading, customer }) => {
          </button>
          <button
             tw="self-start mb-2 text-blue-500"
-            onClick={() => navigate('/subscription/get-started/select-plan')}
+            onClick={() => navigate('/subscription/get-started/register')}
          >
             Register instead?
          </button>
