@@ -430,11 +430,13 @@ export const MenuProvider = ({ children }) => {
    }
 
    if (
-      state.isOccurencesLoading ||
-      loadingZipcode ||
-      isCustomerLoading ||
-      occurenceCustomerLoading ||
-      !state.week.id
+      [
+         state.isOccurencesLoading,
+         loadingZipcode,
+         isCustomerLoading,
+         occurenceCustomerLoading,
+         !Boolean(state.week?.id),
+      ].every(node => node)
    )
       return <PageLoader />
    return (
