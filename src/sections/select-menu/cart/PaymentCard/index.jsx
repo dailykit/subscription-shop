@@ -1,17 +1,20 @@
-import { useMutation } from '@apollo/react-hooks'
 import React from 'react'
-import { useToasts } from 'react-toast-notifications'
+import { isEmpty } from 'lodash'
 import tw, { css, styled } from 'twin.macro'
+import { useMutation } from '@apollo/react-hooks'
+import { useToasts } from 'react-toast-notifications'
+
+import { useMenu } from '../../state'
+import { useUser } from '../../../../context'
 import { Tunnel } from '../../../../components'
 import CardList from '../../../../components/card_list'
-import { useUser } from '../../../../context'
 import { MUTATIONS, UPDATE_CART } from '../../../../graphql'
-import { useMenu } from '../../state'
 
 const PaymentCard = () => {
    const { state, dispatch } = useMenu()
    const { user } = useUser()
    const { addToast } = useToasts()
+   const [card, setCard] = React.useState(null)
 
    const [isCardListOpen, setIsCardListOpen] = React.useState(false)
 
@@ -45,22 +48,18 @@ const PaymentCard = () => {
       },
    })
 
-   const renderCard = paymentMethodId => {
-      const card = user.platform_customer.paymentMethods.find(
-         pm => pm.stripePaymentMethodId === paymentMethodId
-      )
-
-      return (
-         <main>
-            <p tw="text-gray-500">{card.cardHolderName}</p>
-            <p>XXXX XXXX XXXX {card.last4}</p>
-            <p>
-               {card.expMonth}/{card.expYear}
-            </p>
-            <p tw="text-sm text-gray-500 uppercase">{card?.brand}</p>
-         </main>
-      )
-   }
+   React.useEffect(() => {
+      if (state.occurenceCustomer?.cart?.paymentMethodId) {
+         const index = user?.platform_customer?.paymentMethods.findIndex(
+            pm =>
+               pm.stripePaymentMethodId ===
+               state.occurenceCustomer?.cart?.paymentMethodId
+         )
+         if (index !== -1) {
+            setCard(user?.platform_customer?.paymentMethods[index])
+         }
+      }
+   }, [state.occurenceCustomer])
 
    if (!state.occurenceCustomer?.cart?.paymentMethodId) return null
    return (
@@ -69,17 +68,46 @@ const PaymentCard = () => {
             <h4 tw="text-lg text-gray-700 border-b mb-2">Payment Card</h4>
 
             <section tw="space-y-2">
-               <Option isActive>
-                  {renderCard(state.occurenceCustomer.cart.paymentMethodId)}
-                  <span
-                     tw="text-green-700 absolute top-1 right-1 text-sm cursor-pointer"
-                     onClick={e => {
-                        e.stopPropagation()
-                        setIsCardListOpen(true)
-                     }}
-                  >
-                     Change
-                  </span>
+               <Option isActive={card && !isEmpty(card)}>
+                  {card && !isEmpty(card) ? (
+                     <>
+                        <main>
+                           <p tw="text-gray-500">{card?.cardHolderName}</p>
+                           <p>XXXX XXXX XXXX {card?.last4}</p>
+                           <p>
+                              {card?.expMonth}/{card?.expYear}
+                           </p>
+                           <p tw="text-sm text-gray-500 uppercase">
+                              {card?.brand}
+                           </p>
+                        </main>
+                        <span
+                           tw="text-green-700 absolute top-1 right-1 text-sm cursor-pointer"
+                           onClick={e => {
+                              e.stopPropagation()
+                              setIsCardListOpen(true)
+                           }}
+                        >
+                           Change
+                        </span>
+                     </>
+                  ) : (
+                     <>
+                        <p tw="text-sm">
+                           Your linked payment method has been deleted. Please
+                           change the payment method to avoid inconvenience.
+                        </p>
+                        <button
+                           tw="text-blue-500 text-sm cursor-pointer"
+                           onClick={e => {
+                              e.stopPropagation()
+                              setIsCardListOpen(true)
+                           }}
+                        >
+                           Change Payment Method
+                        </button>
+                     </>
+                  )}
                </Option>
             </section>
          </section>
