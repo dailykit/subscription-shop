@@ -63,12 +63,42 @@ const Content = () => {
             const validOccurences = subscription.occurences.filter(
                node => node.isVisible
             )
-            if (validOccurences?.length) {
+            if (validOccurences?.length > 0) {
                setOccurences(validOccurences)
+
+               let nearest
+               let nearestIndex
+               const today = moment().format('YYYY-MM-DD')
+               validOccurences.forEach(node => {
+                  const { fulfillmentDate: date } = node
+                  let diff = moment(date).diff(moment(today), 'days')
+                  if (diff > 0) {
+                     if (nearest) {
+                        if (moment(date).diff(moment(nearest), 'days') < 0) {
+                           nearest = node
+                        }
+                     } else {
+                        nearest = node
+                     }
+                  }
+               })
+
+               if (nearest) {
+                  const index = validOccurences.findIndex(
+                     node => node.id === nearest.id
+                  )
+                  if (index !== -1) {
+                     nearestIndex = index
+                  }
+               }
+
                setIsCategoriesLoading(true)
+               setCurrent(nearestIndex || 0)
                fetchProducts({
                   variables: {
-                     occurenceId: { _eq: validOccurences[0].id },
+                     occurenceId: {
+                        _eq: validOccurences[nearestIndex || 0].id,
+                     },
                      subscriptionId: { _eq: subscription.id },
                   },
                })
@@ -143,7 +173,8 @@ const Content = () => {
    }, [fetchTitles, brand.id])
 
    const next = () => {
-      const nextOne = (current + 1 + occurences.length) % occurences.length
+      if (current === occurences.length - 1) return
+      const nextOne = current + 1
       setCurrent(nextOne)
       fetchProducts({
          variables: {
@@ -154,7 +185,8 @@ const Content = () => {
    }
 
    const previous = () => {
-      const previousOne = (current - 1 + occurences.length) % occurences.length
+      if (current === 0) return
+      const previousOne = current - 1
       setCurrent(previousOne)
       fetchProducts({
          variables: {
@@ -354,8 +386,18 @@ const Content = () => {
                   </HelperBar>
                ) : (
                   <Occurence>
-                     <SliderButton onClick={previous}>
-                        <ArrowLeftIcon tw="stroke-current text-green-800" />
+                     <SliderButton onClick={previous} disabled={current === 0}>
+                        <span>
+                           <ArrowLeftIcon
+                              css={[
+                                 tw`stroke-current`,
+                                 current === 0
+                                    ? tw`text-green-300`
+                                    : tw`text-green-800`,
+                              ]}
+                           />
+                        </span>
+                        Past week
                      </SliderButton>
                      {current in occurences && (
                         <span tw="flex items-center justify-center text-base text-center md:text-lg text-indigo-800">
@@ -379,8 +421,22 @@ const Content = () => {
                         </span>
                      )}
 
-                     <SliderButton onClick={next}>
-                        <ArrowRightIcon tw="stroke-current text-green-800" />
+                     <SliderButton
+                        hasRightIcon
+                        onClick={next}
+                        disabled={current === occurences.length - 1}
+                     >
+                        Upcoming Week
+                        <span>
+                           <ArrowRightIcon
+                              css={[
+                                 tw`stroke-current`,
+                                 current === occurences.length - 1
+                                    ? tw`text-green-300`
+                                    : tw`text-green-800`,
+                              ]}
+                           />
+                        </span>
                      </SliderButton>
                   </Occurence>
                )}
@@ -564,16 +620,19 @@ const Occurence = styled.div`
    height: 64px;
    display: grid;
    margin: auto;
-   grid-template-columns: 64px 1fr 64px;
+   grid-template-columns: auto 1fr auto;
    @media (max-width: 567px) {
-      grid-template-columns: 48px 1fr 48px;
+      height: auto;
+      grid-gap: 14px;
+      padding-top: 14px;
+      grid-template-rows: 48px;
+      grid-template-columns: 1fr;
    }
 `
 
 const SliderButton = styled.button`
-   width: 48px;
-   height: 48px;
    ${tw`
+      h-12
       mx-2
       self-center
       rounded-full
@@ -581,9 +640,16 @@ const SliderButton = styled.button`
       border border-green-800 
       flex items-center justify-center 
    `}
-   @media (max-width: 567px) {
-      width: 32px;
-      height: 32px;
+   ${({ hasRightIcon }) =>
+      hasRightIcon
+         ? tw`pl-3`
+         : tw`
+      pr-3`}
+   span {
+      ${tw`h-12 w-12 flex items-center justify-center`}
+   }
+   :disabled {
+      ${tw`cursor-not-allowed border-gray-300 text-gray-300 hover:bg-white`}
    }
 `
 

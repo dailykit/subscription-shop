@@ -661,7 +661,9 @@ export const OUR_MENU = {
       query subscription($id: Int!) {
          subscription: subscription_subscription_by_pk(id: $id) {
             id
-            occurences: subscriptionOccurences {
+            occurences: subscriptionOccurences(
+               order_by: { fulfillmentDate: asc }
+            ) {
                id
                isValid
                isVisible
