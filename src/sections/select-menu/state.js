@@ -150,7 +150,11 @@ export const MenuProvider = ({ children }) => {
 
    React.useEffect(() => {
       if (!loadingZipcode && !isEmpty(zipcode) && state.week?.fulfillmentDate) {
-         if (zipcode.isDeliveryActive) {
+         if (
+            zipcode.isDeliveryActive &&
+            zipcode?.deliveryTime?.from &&
+            zipcode?.deliveryTime?.to
+         ) {
             setFulfillment({
                type: 'PREORDER_DELIVERY',
                slot: {
@@ -164,7 +168,12 @@ export const MenuProvider = ({ children }) => {
                   ),
                },
             })
-         } else if (zipcode.isPickupActive && zipcode.pickupOptionId) {
+         } else if (
+            zipcode.isPickupActive &&
+            zipcode.pickupOptionId &&
+            zipcode?.pickupOption?.time?.from &&
+            zipcode?.pickupOption?.time?.to
+         ) {
             setFulfillment({
                type: 'PREORDER_PICKUP',
                slot: {

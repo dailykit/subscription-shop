@@ -96,22 +96,26 @@ const Fulfillment = () => {
 
       if (mode === 'DELIVERY') {
          const { from = '', to = '' } = zipcode?.deliveryTime
-         fulfillmentInfo = {
-            type: 'PREORDER_DELIVERY',
-            slot: {
-               from: evalTime(fulfillmentDate, from),
-               to: evalTime(fulfillmentDate, to),
-            },
+         if (from && to) {
+            fulfillmentInfo = {
+               type: 'PREORDER_DELIVERY',
+               slot: {
+                  from: evalTime(fulfillmentDate, from),
+                  to: evalTime(fulfillmentDate, to),
+               },
+            }
          }
       } else if (mode === 'PICKUP') {
          const { from = '', to = '' } = zipcode?.pickupOption?.time
-         fulfillmentInfo = {
-            type: 'PREORDER_PICKUP',
-            slot: {
-               from: evalTime(fulfillmentDate, from),
-               to: evalTime(fulfillmentDate, to),
-            },
-            address: zipcode?.pickupOption?.address,
+         if (from && to) {
+            fulfillmentInfo = {
+               type: 'PREORDER_PICKUP',
+               slot: {
+                  from: evalTime(fulfillmentDate, from),
+                  to: evalTime(fulfillmentDate, to),
+               },
+               address: zipcode?.pickupOption?.address,
+            }
          }
       }
 
