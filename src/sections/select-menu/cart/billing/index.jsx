@@ -36,9 +36,7 @@ const BillingDetails = ({ isCheckout }) => {
          })
          return
       }
-      navigate(
-         `/subscription/checkout/?id=${state.occurenceCustomer?.cart?.id}`
-      )
+      navigate(`/checkout/?id=${state.occurenceCustomer?.cart?.id}`)
    }
 
    return (

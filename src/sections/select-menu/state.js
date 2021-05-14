@@ -240,7 +240,7 @@ export const MenuProvider = ({ children }) => {
                   )
                })
                navigate(
-                  '/subscription/menu?d=' +
+                  '/menu?d=' +
                      subscription?.occurences[validWeekIndex].fulfillmentDate
                )
             }
