@@ -239,21 +239,24 @@ export const MenuProvider = ({ children }) => {
                      ({ itemCountValid }) => !itemCountValid
                   )
                })
-               navigate(
-                  '/menu?d=' +
-                     subscription?.occurences[validWeekIndex].fulfillmentDate
-               )
             }
             if (validWeekIndex === -1) {
                dispatch({
                   type: 'SET_WEEK',
                   payload: subscription?.occurences[0],
                })
+               navigate(
+                  '/menu?d=' + subscription?.occurences[0].fulfillmentDate
+               )
             } else {
                dispatch({
                   type: 'SET_WEEK',
                   payload: subscription?.occurences[validWeekIndex],
                })
+               navigate(
+                  '/menu?d=' +
+                     subscription?.occurences[validWeekIndex].fulfillmentDate
+               )
             }
             dispatch({ type: 'SET_IS_OCCURENCES_LOADING', payload: false })
             dispatch({
