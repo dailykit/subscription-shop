@@ -78,7 +78,7 @@ const insertCartId = (node, cartId) => {
    return node
 }
 
-export const MenuProvider = ({ children }) => {
+export const MenuProvider = ({ isCheckout, children }) => {
    const { user } = useUser()
    const location = useLocation()
    const { addToast } = useToasts()
@@ -223,40 +223,46 @@ export const MenuProvider = ({ children }) => {
          if (subscription?.occurences?.length > 0) {
             const d = new URL(location.href).searchParams.get('d')
             const date = new URL(location.href).searchParams.get('date')
-            let validWeekIndex = null
+            let validWeekIndex = 0
             if (d !== undefined && d !== null) {
                validWeekIndex = subscription?.occurences.findIndex(
                   node => node.fulfillmentDate === d
                )
-            } else if (date !== undefined && date !== null) {
+            } else if (isCheckout && date !== undefined && date !== null) {
                validWeekIndex = subscription?.occurences.findIndex(
                   node => node.fulfillmentDate === date
                )
             } else {
                validWeekIndex = subscription?.occurences.findIndex(node => {
                   const { customers = [] } = node
+                  if (customers.length === 0) return false
                   return customers.every(
                      ({ itemCountValid }) => !itemCountValid
                   )
                })
             }
+
             if (validWeekIndex === -1) {
                dispatch({
                   type: 'SET_WEEK',
                   payload: subscription?.occurences[0],
                })
-               navigate(
-                  '/menu?d=' + subscription?.occurences[0].fulfillmentDate
-               )
+               if (!isCheckout) {
+                  navigate(
+                     '/menu?d=' + subscription?.occurences[0].fulfillmentDate
+                  )
+               }
             } else {
                dispatch({
                   type: 'SET_WEEK',
                   payload: subscription?.occurences[validWeekIndex],
                })
-               navigate(
-                  '/menu?d=' +
-                     subscription?.occurences[validWeekIndex].fulfillmentDate
-               )
+               if (!isCheckout) {
+                  navigate(
+                     '/menu?d=' +
+                        subscription?.occurences[validWeekIndex].fulfillmentDate
+                  )
+               }
             }
             dispatch({ type: 'SET_IS_OCCURENCES_LOADING', payload: false })
             dispatch({

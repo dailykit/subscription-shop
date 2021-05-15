@@ -30,7 +30,7 @@ const SelectMenu = () => {
    const config = configOf('select-menu-header')
 
    return (
-      <MenuProvider>
+      <MenuProvider isCheckout>
          <Layout noHeader>
             <SEO title="Select Menu" />
             <StepsNavbar />
