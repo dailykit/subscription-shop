@@ -53,13 +53,15 @@ export const Coupon = () => {
                      }
                   }
                } else {
-                  const firstValidCoupon = coupon.rewards.find(
+                  const firstValidCouponIndex = coupon.rewards.findIndex(
                      reward => reward.condition.isValid
                   )
-                  objects.push({
-                     rewardId: firstValidCoupon.id,
-                     cartId: id,
-                  })
+                  if (firstValidCouponIndex !== -1) {
+                     objects.push({
+                        rewardId: coupon.rewards[firstValidCouponIndex].id,
+                        cartId: id,
+                     })
+                  }
                }
                console.log(objects)
                if (objects.length) {
