@@ -27,7 +27,6 @@ const SelectMenu = () => {
    const { isAuthenticated } = useUser()
    React.useEffect(() => {
       if (!isAuthenticated) {
-         console.log('navigate called')
          navigate('/subscription/get-started/select-plan')
       }
    }, [isAuthenticated])
@@ -36,7 +35,7 @@ const SelectMenu = () => {
    const config = configOf('select-menu-header')
 
    return (
-      <MenuProvider>
+      <MenuProvider isCheckout>
          <Layout noHeader>
             <SEO title="Select Menu" />
             <StepsNavbar />
