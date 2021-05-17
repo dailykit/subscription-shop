@@ -200,17 +200,24 @@ const Details = () => {
             </button>
          )}
          <section tw="mb-3 p-2 border w-full">
-            <div tw="rounded flex items-center justify-between">
-               <span tw="text-xl">{paymentMethod?.cardHolderName}</span>
-               <div tw="flex items-center">
-                  <span tw="font-medium">{paymentMethod?.expMonth}</span>
-                  &nbsp;/&nbsp;
-                  <span tw="font-medium">{paymentMethod?.expYear}</span>
-               </div>
-            </div>
-            <span>
-               <span tw="text-gray-500">Last 4:</span> {paymentMethod?.last4}
-            </span>
+            {paymentMethod ? (
+               <>
+                  <div tw="rounded flex items-center justify-between">
+                     <span tw="text-xl">{paymentMethod?.cardHolderName}</span>
+                     <div tw="flex items-center">
+                        <span tw="font-medium">{paymentMethod?.expMonth}</span>
+                        &nbsp;/&nbsp;
+                        <span tw="font-medium">{paymentMethod?.expYear}</span>
+                     </div>
+                  </div>
+                  <span>
+                     <span tw="text-gray-500">Last 4:</span>{' '}
+                     {paymentMethod?.last4}
+                  </span>
+               </>
+            ) : (
+               <p>Payment method linked to this order has been deleted.</p>
+            )}
          </section>
       </main>
    )
