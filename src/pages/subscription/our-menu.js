@@ -2,7 +2,8 @@
 
 import React from 'react'
 import moment from 'moment'
-import { Link, navigate } from 'gatsby'
+import { useRouter } from 'next/router'
+import Link from 'next/link'
 import { rrulestr } from 'rrule'
 import tw, { styled, css } from 'twin.macro'
 import ReactImageFallback from 'react-image-fallback'
@@ -19,8 +20,6 @@ import {
    GET_FILEID,
    OCCURENCE_PRODUCTS_BY_CATEGORIES,
 } from '../../graphql'
-import VegIcon from '../../assets/imgs/veg.png'
-import NonVegIcon from '../../assets/imgs/non-veg.png'
 
 const OurMenu = () => {
    return (
@@ -39,9 +38,8 @@ const Content = () => {
    const [categories, setCategories] = React.useState([])
    const [isCategoriesLoading, setIsCategoriesLoading] = React.useState(true)
    const [isOccurencesLoading, setIsOccurencesLoading] = React.useState(true)
-   const { brand, configOf, buildImageUrl, noProductImage } = useConfig(
-      'conventions'
-   )
+   const { brand, configOf, buildImageUrl, noProductImage } =
+      useConfig('conventions')
 
    const [fetchProducts] = useLazyQuery(OCCURENCE_PRODUCTS_BY_CATEGORIES, {
       onCompleted: ({ categories = [] }) => {
@@ -54,62 +52,60 @@ const Content = () => {
       },
    })
 
-   const [
-      fetchSubscription,
-      { data: { subscription = {} } = {} },
-   ] = useLazyQuery(OUR_MENU.SUBSCRIPTION, {
-      onCompleted: ({ subscription = {} }) => {
-         if (subscription.occurences.length > 0) {
-            const validOccurences = subscription.occurences.filter(
-               node => node.isVisible
-            )
-            if (validOccurences?.length > 0) {
-               setOccurences(validOccurences)
+   const [fetchSubscription, { data: { subscription = {} } = {} }] =
+      useLazyQuery(OUR_MENU.SUBSCRIPTION, {
+         onCompleted: ({ subscription = {} }) => {
+            if (subscription.occurences.length > 0) {
+               const validOccurences = subscription.occurences.filter(
+                  node => node.isVisible
+               )
+               if (validOccurences?.length > 0) {
+                  setOccurences(validOccurences)
 
-               let nearest
-               let nearestIndex
-               const today = moment().format('YYYY-MM-DD')
-               validOccurences.forEach(node => {
-                  const { fulfillmentDate: date } = node
-                  let diff = moment(date).diff(moment(today), 'days')
-                  if (diff > 0) {
-                     if (nearest) {
-                        if (moment(date).diff(moment(nearest), 'days') < 0) {
+                  let nearest
+                  let nearestIndex
+                  const today = moment().format('YYYY-MM-DD')
+                  validOccurences.forEach(node => {
+                     const { fulfillmentDate: date } = node
+                     let diff = moment(date).diff(moment(today), 'days')
+                     if (diff > 0) {
+                        if (nearest) {
+                           if (moment(date).diff(moment(nearest), 'days') < 0) {
+                              nearest = node
+                           }
+                        } else {
                            nearest = node
                         }
-                     } else {
-                        nearest = node
+                     }
+                  })
+
+                  if (nearest) {
+                     const index = validOccurences.findIndex(
+                        node => node.id === nearest.id
+                     )
+                     if (index !== -1) {
+                        nearestIndex = index
                      }
                   }
-               })
 
-               if (nearest) {
-                  const index = validOccurences.findIndex(
-                     node => node.id === nearest.id
-                  )
-                  if (index !== -1) {
-                     nearestIndex = index
-                  }
-               }
-
-               setIsCategoriesLoading(true)
-               setCurrent(nearestIndex || 0)
-               fetchProducts({
-                  variables: {
-                     occurenceId: {
-                        _eq: validOccurences[nearestIndex || 0].id,
+                  setIsCategoriesLoading(true)
+                  setCurrent(nearestIndex || 0)
+                  fetchProducts({
+                     variables: {
+                        occurenceId: {
+                           _eq: validOccurences[nearestIndex || 0].id,
+                        },
+                        subscriptionId: { _eq: subscription.id },
                      },
-                     subscriptionId: { _eq: subscription.id },
-                  },
-               })
+                  })
+               }
             }
-         }
-         setIsOccurencesLoading(false)
-      },
-      onError: () => {
-         setIsOccurencesLoading(false)
-      },
-   })
+            setIsOccurencesLoading(false)
+         },
+         onError: () => {
+            setIsOccurencesLoading(false)
+         },
+      })
 
    const [
       fetchItemCount,
@@ -136,18 +132,16 @@ const Content = () => {
       },
    })
 
-   const [
-      fetchTitle,
-      { loading: loadingTitle, data: { title = {} } = {} },
-   ] = useLazyQuery(OUR_MENU.TITLE, {
-      onCompleted: ({ title = {} }) => {
-         if (title?.servings.length > 0) {
-            const [serving] = title?.servings
-            fetchServing({ variables: { id: serving.id } })
-            setCurrent(0)
-         }
-      },
-   })
+   const [fetchTitle, { loading: loadingTitle, data: { title = {} } = {} }] =
+      useLazyQuery(OUR_MENU.TITLE, {
+         onCompleted: ({ title = {} }) => {
+            if (title?.servings.length > 0) {
+               const [serving] = title?.servings
+               fetchServing({ variables: { id: serving.id } })
+               setCurrent(0)
+            }
+         },
+      })
 
    const [fetchTitles, { loading, data: { titles = [] } = {} }] = useLazyQuery(
       OUR_MENU.TITLES,
@@ -205,11 +199,10 @@ const Content = () => {
             fileData.forEach(data => {
                if (data?.fileId) {
                   const fileId = [data?.fileId]
-                  const cssPath = data?.subscriptionDivFileId?.linkedCssFiles.map(
-                     file => {
+                  const cssPath =
+                     data?.subscriptionDivFileId?.linkedCssFiles.map(file => {
                         return file?.cssFile?.path
-                     }
-                  )
+                     })
                   const jsPath = data?.subscriptionDivFileId?.linkedJsFiles.map(
                      file => {
                         return file?.jsFile?.path
@@ -218,10 +211,9 @@ const Content = () => {
                   webRenderer({
                      type: 'file',
                      config: {
-                        uri: isClient && window._env_.GATSBY_DATA_HUB_HTTPS,
-                        adminSecret:
-                           isClient && window._env_.GATSBY_ADMIN_SECRET,
-                        expressUrl: isClient && window._env_.GATSBY_EXPRESS_URL,
+                        uri: isClient && window._env_.DATA_HUB_HTTPS,
+                        adminSecret: isClient && window._env_.ADMIN_SECRET,
+                        expressUrl: isClient && window._env_.EXPRESS_URL,
                      },
                      fileDetails: [
                         {
@@ -496,6 +488,8 @@ const Content = () => {
 }
 
 const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
+   const router = useRouter()
+
    const product = {
       name: node?.productOption?.product?.name || '',
       label: node?.productOption?.label || '',
@@ -508,7 +502,7 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
    }
 
    const openRecipe = () =>
-      navigate(`/subscription/recipes/?id=${node?.productOption?.id}`)
+      router.push(`/subscription/recipes/?id=${node?.productOption?.id}`)
 
    return (
       <Styles.Product>
@@ -516,7 +510,11 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
             <Styles.Type>
                <img
                   alt="Non-Veg Icon"
-                  src={product.type === 'Non-vegetarian' ? NonVegIcon : VegIcon}
+                  src={
+                     product.type === 'Non-vegetarian'
+                        ? '/imgs/non-veg.png'
+                        : '/imgs/veg.png'
+                  }
                   title={product.type}
                   tw="h-6 w-6"
                />

@@ -25,37 +25,36 @@ const SelectPlan = () => {
                   let jsPathForBottom = []
                   if (data?.id === 'select-plan-top-01') {
                      fileIdsForTop.push(data.fileId)
-                     cssPathForTop = data?.subscriptionDivFileId?.linkedCssFiles.map(
-                        file => {
-                           return file?.cssFile?.path
-                        }
-                     )
-                     jsPathForTop = data?.subscriptionDivFileId?.linkedJsFiles.map(
-                        file => {
+                     cssPathForTop =
+                        data?.subscriptionDivFileId?.linkedCssFiles.map(
+                           file => {
+                              return file?.cssFile?.path
+                           }
+                        )
+                     jsPathForTop =
+                        data?.subscriptionDivFileId?.linkedJsFiles.map(file => {
                            return file?.jsFile?.path
-                        }
-                     )
+                        })
                   } else if (data?.id === 'select-plan-bottom-01') {
                      fileIdsForBottom.push(data.fileId)
-                     cssPathForBottom = data?.subscriptionDivFileId?.linkedCssFiles.map(
-                        file => {
-                           return file?.cssFile?.path
-                        }
-                     )
-                     jsPathForBottom = data?.subscriptionDivFileId?.linkedJsFiles.map(
-                        file => {
+                     cssPathForBottom =
+                        data?.subscriptionDivFileId?.linkedCssFiles.map(
+                           file => {
+                              return file?.cssFile?.path
+                           }
+                        )
+                     jsPathForBottom =
+                        data?.subscriptionDivFileId?.linkedJsFiles.map(file => {
                            return file?.jsFile?.path
-                        }
-                     )
+                        })
                   }
 
                   webRenderer({
                      type: 'file',
                      config: {
-                        uri: isClient && window._env_.GATSBY_DATA_HUB_HTTPS,
-                        adminSecret:
-                           isClient && window._env_.GATSBY_ADMIN_SECRET,
-                        expressUrl: isClient && window._env_.GATSBY_EXPRESS_URL,
+                        uri: isClient && window._env_.DATA_HUB_HTTPS,
+                        adminSecret: isClient && window._env_.ADMIN_SECRET,
+                        expressUrl: isClient && window._env_.EXPRESS_URL,
                      },
                      fileDetails: [
                         {

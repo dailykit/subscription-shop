@@ -35,7 +35,7 @@ export const AddressTunnel = () => {
    })
    const [loaded, error] = useScript(
       isClient
-         ? `https://maps.googleapis.com/maps/api/js?key=${window._env_.GATSBY_GOOGLE_API_KEY}&libraries=places`
+         ? `https://maps.googleapis.com/maps/api/js?key=${window._env_.GOOGLE_API_KEY}&libraries=places`
          : ''
    )
 
@@ -44,7 +44,7 @@ export const AddressTunnel = () => {
 
       const response = await fetch(
          `https://maps.googleapis.com/maps/api/geocode/json?key=${
-            isClient ? window._env_.GATSBY_GOOGLE_API_KEY : ''
+            isClient ? window._env_.GOOGLE_API_KEY : ''
          }&address=${encodeURIComponent(input.description)}`
       )
       const data = await response.json()

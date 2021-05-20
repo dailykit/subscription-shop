@@ -1,6 +1,6 @@
 import React from 'react'
 import { isEmpty } from 'lodash'
-import { navigate } from 'gatsby'
+import { useRouter } from 'next/router'
 import jwtDecode from 'jwt-decode'
 import tw, { styled } from 'twin.macro'
 import { useToasts } from 'react-toast-notifications'
@@ -13,6 +13,7 @@ import { isClient, processUser } from '../../utils'
 import { BRAND, CUSTOMER, MUTATIONS } from '../../graphql'
 
 const Login = () => {
+   const router = useRouter()
    const { addToast } = useToasts()
    const { user, dispatch } = useUser()
    const { brand, organization } = useConfig()
@@ -64,7 +65,7 @@ const Login = () => {
                         keycloakId,
                         source: 'subscription',
                         sourceBrandId: brand.id,
-                        clientId: isClient && window._env_.GATSBY_CLIENTID,
+                        clientId: isClient && window._env_.CLIENTID,
                         brandCustomers: { data: { brandId: brand.id } },
                      },
                   },
@@ -92,7 +93,7 @@ const Login = () => {
                brandCustomers[0].isSubscriber
             ) {
                console.log('BRAND_CUSTOMER EXISTS & CUSTOMER IS SUBSCRIBED')
-               navigate('/subscription/menu')
+               router.push('/subscription/menu')
                isClient && localStorage.removeItem('plan')
             } else {
                console.log('CUSTOMER ISNT SUBSCRIBED')
@@ -108,7 +109,7 @@ const Login = () => {
 
    React.useEffect(() => {
       if (user?.keycloakId) {
-         if (user?.isSubscriber) navigate('/subscription/menu')
+         if (user?.isSubscriber) router.push('/subscription/menu')
          else if (isClient) {
             window.location.href =
                window.location.origin + '/subscription/get-started/select-plan'
@@ -142,6 +143,7 @@ const Login = () => {
 export default Login
 
 const LoginPanel = ({ loading, customer }) => {
+   const router = useRouter()
    const { brand } = useConfig()
    const [error, setError] = React.useState('')
    const [form, setForm] = React.useState({
@@ -207,13 +209,13 @@ const LoginPanel = ({ loading, customer }) => {
          </FieldSet>
          <button
             tw="self-start mb-2 text-blue-500"
-            onClick={() => navigate('/subscription/forgot-password')}
+            onClick={() => router.push('/subscription/forgot-password')}
          >
             Forgot password?
          </button>
          <button
             tw="self-start mb-2 text-blue-500"
-            onClick={() => navigate('/subscription/get-started/register')}
+            onClick={() => router.push('/subscription/get-started/register')}
          >
             Register instead?
          </button>

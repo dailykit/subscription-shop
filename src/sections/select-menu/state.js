@@ -1,8 +1,7 @@
 import React from 'react'
 import moment from 'moment'
 import { isEmpty } from 'lodash'
-import { navigate } from 'gatsby'
-import { useLocation } from '@reach/router'
+import { useRouter } from 'next/router'
 import { useToasts } from 'react-toast-notifications'
 import { useMutation, useQuery, useSubscription } from '@apollo/react-hooks'
 
@@ -79,8 +78,8 @@ const insertCartId = (node, cartId) => {
 }
 
 export const MenuProvider = ({ isCheckout, children }) => {
+   const router = useRouter()
    const { user } = useUser()
-   const location = useLocation()
    const { addToast } = useToasts()
    const { brand, configOf } = useConfig()
    const [cart, setCart] = React.useState({})
@@ -134,19 +133,17 @@ export const MenuProvider = ({ isCheckout, children }) => {
       },
       onError: error => console.log('deleteCartItem => error =>', error),
    })
-   const {
-      loading: loadingZipcode,
-      data: { zipcode = {} } = {},
-   } = useSubscription(ZIPCODE, {
-      skip:
-         !user?.subscriptionId ||
-         !user?.defaultAddress?.zipcode ||
-         !state.week?.id,
-      variables: {
-         subscriptionId: user?.subscriptionId,
-         zipcode: user?.defaultAddress?.zipcode,
-      },
-   })
+   const { loading: loadingZipcode, data: { zipcode = {} } = {} } =
+      useSubscription(ZIPCODE, {
+         skip:
+            !user?.subscriptionId ||
+            !user?.defaultAddress?.zipcode ||
+            !state.week?.id,
+         variables: {
+            subscriptionId: user?.subscriptionId,
+            zipcode: user?.defaultAddress?.zipcode,
+         },
+      })
 
    React.useEffect(() => {
       if (!loadingZipcode && !isEmpty(zipcode) && state.week?.fulfillmentDate) {
@@ -211,9 +208,9 @@ export const MenuProvider = ({ isCheckout, children }) => {
                isValid: { _eq: true },
                isVisible: { _eq: true },
             },
-            ...(Boolean(new URL(location.href).searchParams.get('date')) && {
+            ...(Boolean(router.query.date) && {
                fulfillmentDate: {
-                  _eq: new URL(location.href).searchParams.get('date'),
+                  _eq: router.query.date,
                },
             }),
          },
@@ -221,8 +218,8 @@ export const MenuProvider = ({ isCheckout, children }) => {
       },
       onCompleted: ({ subscription = {} } = {}) => {
          if (subscription?.occurences?.length > 0) {
-            const d = new URL(location.href).searchParams.get('d')
-            const date = new URL(location.href).searchParams.get('date')
+            const d = router.query.d
+            const date = router.query.date
             let validWeekIndex = 0
             if (d !== undefined && d !== null) {
                validWeekIndex = subscription?.occurences.findIndex(
@@ -248,7 +245,7 @@ export const MenuProvider = ({ isCheckout, children }) => {
                   payload: subscription?.occurences[0],
                })
                if (!isCheckout) {
-                  navigate(
+                  router.push(
                      '/subscription/menu?d=' +
                         subscription?.occurences[0].fulfillmentDate
                   )
@@ -259,7 +256,7 @@ export const MenuProvider = ({ isCheckout, children }) => {
                   payload: subscription?.occurences[validWeekIndex],
                })
                if (!isCheckout) {
-                  navigate(
+                  router.push(
                      '/subscription/menu?d=' +
                         subscription?.occurences[validWeekIndex].fulfillmentDate
                   )

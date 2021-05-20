@@ -1,5 +1,6 @@
 import React from 'react'
-import { Link, navigate } from 'gatsby'
+import { useRouter } from 'next/router'
+import Link from 'next/link'
 import { isEmpty, uniqBy } from 'lodash'
 import tw, { styled, css } from 'twin.macro'
 import { useQuery } from '@apollo/react-hooks'
@@ -14,8 +15,6 @@ import { formatCurrency } from '../../utils'
 import { SkeletonProduct } from './skeletons'
 import { CheckIcon } from '../../assets/icons'
 import { OCCURENCE_PRODUCTS_BY_CATEGORIES } from '../../graphql'
-import VegIcon from '../../assets/imgs/veg.png'
-import NonVegIcon from '../../assets/imgs/non-veg.png'
 
 export const Menu = () => {
    const { user } = useUser()
@@ -98,11 +97,12 @@ export const Menu = () => {
 }
 
 const Product = ({ node, theme, isAdded, noProductImage, buildImageUrl }) => {
+   const router = useRouter()
    const { addToast } = useToasts()
    const { state, methods } = useMenu()
 
    const openRecipe = () =>
-      navigate(`/subscription/recipes/?id=${node?.productOption?.id}`)
+      router.push(`/subscription/recipes/?id=${node?.productOption?.id}`)
 
    const add = item => {
       if (state.occurenceCustomer?.betweenPause) {
@@ -147,7 +147,11 @@ const Product = ({ node, theme, isAdded, noProductImage, buildImageUrl }) => {
             <Styles.Type>
                <img
                   alt="Non-Veg Icon"
-                  src={product.type === 'Non-vegetarian' ? NonVegIcon : VegIcon}
+                  src={
+                     product.type === 'Non-vegetarian'
+                        ? '/imgs/non-veg.png'
+                        : '/imgs/veg.png'
+                  }
                   title={product.type}
                   tw="h-6 w-6"
                />

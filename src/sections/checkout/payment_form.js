@@ -31,7 +31,7 @@ export const PaymentForm = ({ intent }) => {
    const handleResult = async ({ setupIntent }) => {
       try {
          if (setupIntent.status === 'succeeded') {
-            const ORIGIN = isClient ? window._env_.GATSBY_DAILYKEY_URL : ''
+            const ORIGIN = isClient ? window._env_.DAILYKEY_URL : ''
             let URL = `${ORIGIN}/api/payment-method/${setupIntent.payment_method}`
             if (
                organization.stripeAccountType === 'standard' &&
@@ -87,15 +87,12 @@ export const PaymentForm = ({ intent }) => {
       }
    }
 
-   const stripePromise = loadStripe(
-      isClient ? window._env_.GATSBY_STRIPE_KEY : '',
-      {
-         ...(organization.stripeAccountType === 'standard' &&
-            organization.stripeAccountId && {
-               stripeAccount: organization.stripeAccountId,
-            }),
-      }
-   )
+   const stripePromise = loadStripe(isClient ? window._env_.STRIPE_KEY : '', {
+      ...(organization.stripeAccountType === 'standard' &&
+         organization.stripeAccountId && {
+            stripeAccount: organization.stripeAccountId,
+         }),
+   })
 
    if (!intent) return <Loader inline />
    return (

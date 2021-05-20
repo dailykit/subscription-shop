@@ -1,14 +1,14 @@
 import React from 'react'
-import { Link } from 'gatsby'
+import Link from 'next/link'
 import 'regenerator-runtime'
 import tw, { styled, css } from 'twin.macro'
 import { useQuery } from '@apollo/react-hooks'
 import { webRenderer } from '@dailykit/web-renderer'
 
-import { isClient } from '../../utils'
-import { GET_FILEID } from '../../graphql'
-import { SEO, Layout, PageLoader } from '../../components'
-import { useQueryParams } from '../../utils/useQueryParams'
+import { isClient } from '../utils'
+import { GET_FILEID } from '../graphql'
+import { SEO, Layout, PageLoader } from '../components'
+import { useQueryParams } from '../utils/useQueryParams'
 
 export default () => {
    const params = useQueryParams()
@@ -22,11 +22,10 @@ export default () => {
             fileData.forEach(data => {
                if (data?.fileId) {
                   const fileId = [data?.fileId]
-                  const cssPath = data?.subscriptionDivFileId?.linkedCssFiles.map(
-                     file => {
+                  const cssPath =
+                     data?.subscriptionDivFileId?.linkedCssFiles.map(file => {
                         return file?.cssFile?.path
-                     }
-                  )
+                     })
                   const jsPath = data?.subscriptionDivFileId?.linkedJsFiles.map(
                      file => {
                         return file?.jsFile?.path
@@ -35,10 +34,9 @@ export default () => {
                   webRenderer({
                      type: 'file',
                      config: {
-                        uri: isClient && window._env_.GATSBY_DATA_HUB_HTTPS,
-                        adminSecret:
-                           isClient && window._env_.GATSBY_ADMIN_SECRET,
-                        expressUrl: isClient && window._env_.GATSBY_EXPRESS_URL,
+                        uri: isClient && window._env_.DATA_HUB_HTTPS,
+                        adminSecret: isClient && window._env_.ADMIN_SECRET,
+                        expressUrl: isClient && window._env_.EXPRESS_URL,
                      },
                      fileDetails: [
                         {

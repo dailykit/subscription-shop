@@ -1,6 +1,6 @@
 import React from 'react'
 import { isEmpty } from 'lodash'
-import { navigate } from 'gatsby'
+import { useRouter } from 'next/router'
 import tw, { styled } from 'twin.macro'
 import { useQuery } from '@apollo/react-hooks'
 import { webRenderer } from '@dailykit/web-renderer'
@@ -24,10 +24,11 @@ import {
 import { isClient } from '../../../utils'
 
 const SelectMenu = () => {
+   const router = useRouter()
    const { isAuthenticated } = useUser()
    React.useEffect(() => {
       if (!isAuthenticated) {
-         navigate('/subscription/get-started/select-plan')
+         router.push('/subscription/get-started/select-plan')
       }
    }, [isAuthenticated])
 
@@ -82,11 +83,10 @@ const MenuContent = () => {
             fileData.forEach(data => {
                if (data?.fileId) {
                   const fileId = [data?.fileId]
-                  const cssPath = data?.subscriptionDivFileId?.linkedCssFiles.map(
-                     file => {
+                  const cssPath =
+                     data?.subscriptionDivFileId?.linkedCssFiles.map(file => {
                         return file?.cssFile?.path
-                     }
-                  )
+                     })
                   const jsPath = data?.subscriptionDivFileId?.linkedJsFiles.map(
                      file => {
                         return file?.jsFile?.path
@@ -95,10 +95,9 @@ const MenuContent = () => {
                   webRenderer({
                      type: 'file',
                      config: {
-                        uri: isClient && window._env_.GATSBY_DATA_HUB_HTTPS,
-                        adminSecret:
-                           isClient && window._env_.GATSBY_ADMIN_SECRET,
-                        expressUrl: isClient && window._env_.GATSBY_EXPRESS_URL,
+                        uri: isClient && window._env_.DATA_HUB_HTTPS,
+                        adminSecret: isClient && window._env_.ADMIN_SECRET,
+                        expressUrl: isClient && window._env_.EXPRESS_URL,
                      },
                      fileDetails: [
                         {

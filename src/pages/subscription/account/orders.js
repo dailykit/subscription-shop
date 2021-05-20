@@ -1,6 +1,5 @@
 import React from 'react'
-import { navigate } from 'gatsby'
-import { useLocation } from '@reach/router'
+import { useRouter } from 'next/router'
 import tw, { styled, css } from 'twin.macro'
 import { useSubscription } from '@apollo/react-hooks'
 
@@ -16,13 +15,15 @@ import {
    ProductSkeleton,
 } from '../../../components'
 import OrderInfo from '../../../sections/OrderInfo'
+import { route } from 'next/dist/next-server/server/router'
 
 const Orders = () => {
+   const router = useRouter()
    const { isAuthenticated } = useUser()
 
    React.useEffect(() => {
       if (!isAuthenticated) {
-         navigate('/subscription')
+         router.push('/subscription')
       }
    }, [isAuthenticated])
 
@@ -49,8 +50,8 @@ const OrderHistory = () => {
 }
 
 const Listing = () => {
+   const router = useRouter()
    const { user } = useUser()
-   const location = useLocation()
    const { configOf } = useConfig()
    const [orderWindow, setOrderWindow] = React.useState(1)
    const { loading, data: { orders = {} } = {} } = useSubscription(
@@ -64,7 +65,9 @@ const Listing = () => {
          }) => {
             if (orders.aggregate.count > 0) {
                const [node] = orders.nodes
-               navigate(`/subscription/account/orders?id=${node.occurenceId}`)
+               router.push(
+                  `/subscription/account/orders?id=${node.occurenceId}`
+               )
             }
          },
       }
@@ -72,7 +75,7 @@ const Listing = () => {
    const theme = configOf('theme-color', 'Visual')
 
    const selectOrder = id => {
-      navigate(`/subscription/account/orders?id=${id}`)
+      router.push(`/subscription/account/orders?id=${id}`)
    }
 
    if (loading)
@@ -99,10 +102,7 @@ const Listing = () => {
                         key={node.occurrenceId}
                         onClick={() => selectOrder(node.occurenceId)}
                         className={`${
-                           node.occurenceId ===
-                           Number(
-                              new URLSearchParams(location.search).get('id')
-                           )
+                           node.occurenceId === Number(router.query.id)
                               ? 'active'
                               : ''
                         }`}
@@ -129,25 +129,21 @@ const Listing = () => {
 }
 
 const Details = () => {
+   const router = useRouter()
    const { user } = useUser()
-   const location = useLocation()
    const { configOf } = useConfig()
-   const { error, loading, data: { order = {} } = {} } = useSubscription(
-      ORDER,
-      {
-         skip:
-            !user?.keycloakId ||
-            !user?.brandCustomerId ||
-            !new URLSearchParams(location.search).get('id'),
-         variables: {
-            keycloakId: user?.keycloakId,
-            subscriptionOccurenceId: new URLSearchParams(location.search).get(
-               'id'
-            ),
-            brand_customerId: user?.brandCustomerId,
-         },
-      }
-   )
+   const {
+      error,
+      loading,
+      data: { order = {} } = {},
+   } = useSubscription(ORDER, {
+      skip: !user?.keycloakId || !user?.brandCustomerId || !router.query.id,
+      variables: {
+         keycloakId: user?.keycloakId,
+         subscriptionOccurenceId: router.query.id,
+         brand_customerId: user?.brandCustomerId,
+      },
+   })
    if (!loading && error) {
       console.log(error)
    }
@@ -167,7 +163,7 @@ const Details = () => {
             </ProductCards>
          </main>
       )
-   if (!new URLSearchParams(location.search).get('id'))
+   if (!router.query.id)
       return (
          <div tw="m-3">
             <HelperBar type="warning">
@@ -192,7 +188,7 @@ const Details = () => {
          {order?.cart?.paymentStatus !== 'SUCCEEDED' && (
             <button
                onClick={() =>
-                  navigate(`/subscription/checkout?id=${order?.cart?.id}`)
+                  route.push(`/subscription/checkout?id=${order?.cart?.id}`)
                }
                tw="rounded py-2 bg-red-500 text-white px-6 uppercase tracking-wider mb-3"
             >

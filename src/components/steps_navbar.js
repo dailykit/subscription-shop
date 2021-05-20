@@ -1,6 +1,6 @@
 import React from 'react'
-import { Link, navigate } from 'gatsby'
-import { useLocation } from '@reach/router'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import tw, { styled, css } from 'twin.macro'
 import { findKey, has, isEmpty } from 'lodash'
 
@@ -42,16 +42,16 @@ export const StepsNavbar = () => {
       }
    }, [hasConfig, configOf, setSteps])
 
-   const location = useLocation()
+   const router = useRouter()
 
    React.useEffect(() => {
-      if (location.pathname === '/subscription/get-started/select-delivery/') {
-         navigate('/subscription/get-started/select-delivery')
+      if (router.pathname === '/subscription/get-started/select-delivery/') {
+         router.push('/subscription/get-started/select-delivery')
       } else {
-         if (!has(routes, location.pathname)) return
-         setCurrentStep(routes[location.pathname].level)
+         if (!has(routes, router.pathname)) return
+         setCurrentStep(routes[router.pathname].level)
       }
-   }, [location.pathname])
+   }, [router.pathname])
 
    const brand = configOf('theme-brand', 'brand')
    const theme = configOf('theme-color', 'Visual')
@@ -64,7 +64,7 @@ export const StepsNavbar = () => {
    }
 
    const canGoToStep = route => {
-      if (!has(routes, route) || !has(routes, location.pathname)) return
+      if (!has(routes, route) || !has(routes, router.pathname)) return
       const status = user?.subscriptionOnboardStatus || 'REGISTER'
       const statusKey = findKey(routes, { status })
       const completedRoute = routes[statusKey]
@@ -88,13 +88,13 @@ export const StepsNavbar = () => {
                path += `?date=${cart.subscriptionOccurence?.fulfillmentDate}`
             }
          }
-         navigate(path)
+         router.push(path)
       }
    }
 
    return (
       <Navbar>
-         <Brand to="/subscription" title={brand?.name || 'Subscription Shop'}>
+         <Brand href="/subscription" title={brand?.name || 'Subscription Shop'}>
             {brand?.logo?.logoMark && (
                <img
                   tw="h-auto md:h-12"

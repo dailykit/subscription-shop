@@ -1,6 +1,6 @@
 import React from 'react'
 import tw, { styled } from 'twin.macro'
-import { useLocation } from '@reach/router'
+import { useRouter } from 'next/router'
 import { useLazyQuery } from '@apollo/react-hooks'
 import { useToasts } from 'react-toast-notifications'
 
@@ -15,7 +15,7 @@ import CuisineIcon from '../../../assets/icons/Cuisine'
 import { useConfig } from '../../../lib'
 
 const Recipe = () => {
-   const location = useLocation()
+   const router = useRouter()
    const { addToast } = useToasts()
    const [productOption, setProductOption] = React.useState(null)
    const [recipe, setRecipe] = React.useState(null)
@@ -41,14 +41,13 @@ const Recipe = () => {
    })
 
    React.useEffect(() => {
-      let params = new URL(location.href).searchParams
-      let productOptionId = Number(params.get('id'))
+      let productOptionId = Number(router.query.id)
       getRecipe({
          variables: {
             optionId: productOptionId,
          },
       })
-   }, [location.href, getRecipe])
+   }, [router.query, getRecipe])
 
    const renderIngredientName = (slipName, sachet) => {
       if (recipe.showIngredientsQuantity) {

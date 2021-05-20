@@ -1,6 +1,6 @@
 import React from 'react'
 import tw, { styled } from 'twin.macro'
-import { useLocation } from '@reach/router'
+import { useRouter } from 'next/router'
 import { useLazyQuery } from '@apollo/react-hooks'
 import { useToasts } from 'react-toast-notifications'
 
@@ -9,7 +9,7 @@ import { INVENTORY_DETAILS } from '../../../graphql'
 import { Loader, Layout, SEO } from '../../../components'
 
 const Inventory = () => {
-   const location = useLocation()
+   const router = useRouter()
    const { addToast } = useToasts()
    const [inventory, setInventory] = React.useState(null)
 
@@ -25,9 +25,8 @@ const Inventory = () => {
    })
    console.log(inventory)
    React.useEffect(() => {
-      let params = new URL(location.href).searchParams
-      let inventoryId = Number(params.get('id'))
-      let optionId = Number(params.get('option'))
+      let inventoryId = Number(router.query.id)
+      let optionId = Number(router.query.option)
       getInventory({
          variables: {
             id: inventoryId,
@@ -36,7 +35,7 @@ const Inventory = () => {
             },
          },
       })
-   }, [location.href, getInventory])
+   }, [router.query, getInventory])
 
    if (loading)
       return (

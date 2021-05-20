@@ -2,8 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Helmet } from 'react-helmet'
 import { useConfig } from '../lib'
-import { useStaticQuery, graphql } from 'gatsby'
-import { useLocation } from '@reach/router'
+import { useRouter } from 'next/router'
 
 export const SEO = ({
    description,
@@ -13,25 +12,25 @@ export const SEO = ({
    meta,
    richresult,
 }) => {
-   const location = useLocation()
+   const router = useRouter()
 
-   const { site } = useStaticQuery(
-      graphql`
-         query {
-            site {
-               siteMetadata {
-                  title
-                  description
-               }
-            }
-         }
-      `
-   )
+   // const { site } = useStaticQuery(
+   //    graphql`
+   //       query {
+   //          site {
+   //             siteMetadata {
+   //                title
+   //                description
+   //             }
+   //          }
+   //       }
+   //    `
+   // )
 
    const { favicon } = useConfig().configOf('theme-brand', 'brand')
    const seo = useConfig().configOf('seo', 'App')
 
-   const path = location.pathname.replace('/subscription', '')
+   const path = router.pathname.replace('/subscription', '')
 
    const metaTitle =
       title || seo[path]?.title || seo['/']?.title || 'Meal Kit Store'
@@ -52,7 +51,8 @@ export const SEO = ({
       <Helmet
          title={metaTitle}
          htmlAttributes={{ lang }}
-         titleTemplate={`%s | ${site.siteMetadata.title}`}
+         // titleTemplate={`%s | ${site.siteMetadata.title}`}
+         titleTemplate={`Test`}
          meta={[
             { name: `description`, content: metaDescription },
             { property: `og:title`, content: metaTitle },

@@ -16,11 +16,10 @@ const HowItWorks = () => {
             fileData.forEach(data => {
                if (data?.fileId) {
                   const fileId = [data?.fileId]
-                  const cssPath = data?.subscriptionDivFileId?.linkedCssFiles.map(
-                     file => {
+                  const cssPath =
+                     data?.subscriptionDivFileId?.linkedCssFiles.map(file => {
                         return file?.cssFile?.path
-                     }
-                  )
+                     })
                   const jsPath = data?.subscriptionDivFileId?.linkedJsFiles.map(
                      file => {
                         return file?.jsFile?.path
@@ -29,10 +28,9 @@ const HowItWorks = () => {
                   webRenderer({
                      type: 'file',
                      config: {
-                        uri: isClient && window._env_.GATSBY_DATA_HUB_HTTPS,
-                        adminSecret:
-                           isClient && window._env_.GATSBY_ADMIN_SECRET,
-                        expressUrl: isClient && window._env_.GATSBY_EXPRESS_URL,
+                        uri: isClient && window._env_.DATA_HUB_HTTPS,
+                        adminSecret: isClient && window._env_.ADMIN_SECRET,
+                        expressUrl: isClient && window._env_.EXPRESS_URL,
                      },
                      fileDetails: [
                         {

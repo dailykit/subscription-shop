@@ -1,6 +1,7 @@
 import React from 'react'
 import { isEmpty } from 'lodash'
-import { Link, navigate } from 'gatsby'
+import { useRouter } from 'next/router'
+import Link from 'next/link'
 import jwtDecode from 'jwt-decode'
 import tw, { styled } from 'twin.macro'
 import { useToasts } from 'react-toast-notifications'
@@ -19,6 +20,7 @@ import {
 } from '../../../utils/referrals'
 
 export default () => {
+   const router = useRouter()
    const { addToast } = useToasts()
    const { user, dispatch } = useUser()
    const { brand, organization } = useConfig()
@@ -98,7 +100,7 @@ export default () => {
                         keycloakId,
                         source: 'subscription',
                         sourceBrandId: brand.id,
-                        clientId: isClient && window._env_.GATSBY_CLIENTID,
+                        clientId: isClient && window._env_.CLIENTID,
                         brandCustomers: {
                            data: {
                               brandId: brand.id,
@@ -135,7 +137,7 @@ export default () => {
                brandCustomers[0].isSubscriber
             ) {
                console.log('BRAND_CUSTOMER EXISTS & CUSTOMER IS SUBSCRIBED')
-               navigate('/subscription/menu')
+               router.push('/subscription/menu')
                isClient && localStorage.removeItem('plan')
             } else {
                console.log('CUSTOMER ISNT SUBSCRIBED')
@@ -151,7 +153,7 @@ export default () => {
 
    React.useEffect(() => {
       if (user?.keycloakId) {
-         if (user?.isSubscriber) navigate('/subscription/menu')
+         if (user?.isSubscriber) router.push('/subscription/menu')
          else if (isClient) {
             window.location.href =
                window.location.origin + '/subscription/get-started/select-plan'
@@ -262,7 +264,7 @@ const LoginPanel = ({ loading, customer }) => {
          </FieldSet>
          <button
             tw="self-start mb-2 text-blue-500"
-            onClick={() => navigate('/subscription/forgot-password')}
+            onClick={() => router.push('/subscription/forgot-password')}
          >
             Forgot password?
          </button>
@@ -278,16 +280,16 @@ const LoginPanel = ({ loading, customer }) => {
 }
 
 function validateEmail(email) {
-   const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+   const re =
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
    return re.test(email)
 }
 
 const RegisterPanel = ({ loading, customer, setCurrent }) => {
    const { brand } = useConfig()
    const [hasAccepted, setHasAccepted] = React.useState(false)
-   const [isReferralFieldVisible, setIsReferralFieldVisible] = React.useState(
-      false
-   )
+   const [isReferralFieldVisible, setIsReferralFieldVisible] =
+      React.useState(false)
    const [error, setError] = React.useState('')
    const [emailError, setEmailError] = React.useState('')
    const [passwordError, setPasswordError] = React.useState('')
@@ -461,7 +463,7 @@ const RegisterPanel = ({ loading, customer, setCurrent }) => {
             />
             <label htmlFor="terms&conditions" tw="text-gray-600">
                I accept{' '}
-               <Link to="/subscription/terms-and-conditions">
+               <Link href="/subscription/terms-and-conditions">
                   <span tw="text-blue-500">terms and conditions.</span>
                </Link>
             </label>

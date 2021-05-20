@@ -9,7 +9,7 @@ import {
    CardElement,
 } from '@stripe/react-stripe-js'
 import { isEmpty } from 'lodash'
-import { navigate } from 'gatsby'
+import { useRouter } from 'next/router'
 import tw, { styled, css } from 'twin.macro'
 import { useToasts } from 'react-toast-notifications'
 
@@ -33,11 +33,12 @@ import {
 } from '../../../graphql'
 
 const ManageCards = () => {
+   const router = useRouter()
    const { isAuthenticated } = useUser()
 
    React.useEffect(() => {
       if (!isAuthenticated) {
-         navigate('/subscription')
+         router.push('/subscription')
       }
    }, [isAuthenticated])
 
@@ -259,7 +260,7 @@ export const PaymentForm = ({ intent, toggleTunnel }) => {
    const handleResult = async ({ setupIntent }) => {
       try {
          if (setupIntent.status === 'succeeded') {
-            const ORIGIN = isClient ? window._env_.GATSBY_DAILYKEY_URL : ''
+            const ORIGIN = isClient ? window._env_.DAILYKEY_URL : ''
             let URL = `${ORIGIN}/api/payment-method/${setupIntent.payment_method}`
             if (
                organization.stripeAccountType === 'standard' &&
@@ -316,15 +317,12 @@ export const PaymentForm = ({ intent, toggleTunnel }) => {
       } catch (error) {}
    }
 
-   const stripePromise = loadStripe(
-      isClient ? window._env_.GATSBY_STRIPE_KEY : '',
-      {
-         ...(organization.stripeAccountType === 'standard' &&
-            organization.stripeAccountId && {
-               stripeAccount: organization.stripeAccountId,
-            }),
-      }
-   )
+   const stripePromise = loadStripe(isClient ? window._env_.STRIPE_KEY : '', {
+      ...(organization.stripeAccountType === 'standard' &&
+         organization.stripeAccountId && {
+            stripeAccount: organization.stripeAccountId,
+         }),
+   })
 
    if (!intent) return <Loader inline />
    return (
@@ -440,7 +438,7 @@ const createSetupIntent = async (customer, organization = {}) => {
       ) {
          stripeAccountId = organization?.stripeAccountId
       }
-      const URL = `${window._env_.GATSBY_DAILYKEY_URL}/api/setup-intent`
+      const URL = `${window._env_.DAILYKEY_URL}/api/setup-intent`
       const { data } = await axios.post(URL, { customer, stripeAccountId })
       return data.data
    } catch (error) {

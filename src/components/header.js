@@ -1,5 +1,6 @@
 import React from 'react'
-import { Link, navigate } from 'gatsby'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import tw, { styled, css } from 'twin.macro'
 
 import { useConfig } from '../lib'
@@ -11,6 +12,7 @@ import { ProfileSidebar } from './profile_sidebar'
 import { CrossIcon } from '../assets/icons'
 
 export const Header = () => {
+   const router = useRouter()
    const { isAuthenticated, user } = useUser()
    const { configOf } = useConfig()
    const logout = () => {
@@ -29,38 +31,40 @@ export const Header = () => {
    return (
       <>
          <Wrapper>
-            <Brand
-               to="/subscription"
-               title={brand?.name || 'Subscription Shop'}
+            <Link
+               href="/subscription"
+               // title={brand?.name || 'Subscription Shop'}
             >
-               {brand?.logo?.logoMark && (
-                  <img
-                     tw="h-auto md:h-12"
-                     src={brand?.logo?.logoMark}
-                     alt={brand?.name || 'Subscription Shop'}
-                  />
-               )}
-               {brand?.name && <span tw="ml-2">{brand?.name}</span>}
-            </Brand>
+               <Brand>
+                  {brand?.logo?.logoMark && (
+                     <img
+                        tw="h-auto md:h-12"
+                        src={brand?.logo?.logoMark}
+                        alt={brand?.name || 'Subscription Shop'}
+                     />
+                  )}
+                  {brand?.name && <span tw="ml-2">{brand?.name}</span>}
+               </Brand>
+            </Link>
             <section tw="flex items-center justify-between">
                <ul tw="ml-auto px-4 flex space-x-4">
                   <li tw="hidden md:inline-block">
-                     <Link to="/subscription/how-it-works" tw="text-gray-800">
+                     <Link href="/subscription/how-it-works" tw="text-gray-800">
                         How It Works
                      </Link>
                   </li>
                   {isAuthenticated && user?.isSubscriber ? (
                      <li tw="text-gray-800 hidden hidden md:inline-block">
-                        <Link to="/subscription/menu">Select Menu</Link>
+                        <Link href="/subscription/menu">Select Menu</Link>
                      </li>
                   ) : (
                      <li tw="text-gray-800 hidden md:inline-block">
-                        <Link to="/subscription/our-menu">Our Menu</Link>
+                        <Link href="/subscription/our-menu">Our Menu</Link>
                      </li>
                   )}
                   {!user?.isSubscriber && (
                      <li tw="hidden md:inline-block">
-                        <Link to="/subscription/our-plans">Get Started</Link>
+                        <Link href="/subscription/our-plans">Get Started</Link>
                      </li>
                   )}
                </ul>
@@ -71,7 +75,7 @@ export const Header = () => {
                      {user?.platform_customer?.firstName &&
                         (isClient && window.innerWidth > 786 ? (
                            <Link
-                              to="/subscription/account/profile/"
+                              href="/subscription/account/profile/"
                               tw="mr-3 inline-flex items-center justify-center rounded-full h-10 w-10 bg-gray-200"
                            >
                               {getInitials(
@@ -80,7 +84,7 @@ export const Header = () => {
                            </Link>
                         ) : (
                            <Link
-                              to="#"
+                              href="#"
                               tw="mr-3 inline-flex items-center justify-center rounded-full h-10 w-10 bg-gray-200"
                               onClick={() => setToggle(!toggle)}
                            >
@@ -106,7 +110,7 @@ export const Header = () => {
                               window.location.pathname
                            )
                         }
-                        navigate('/subscription/login')
+                        router.push('/subscription/login')
                      }}
                      bg={theme?.accent}
                   >
@@ -127,20 +131,22 @@ export const Header = () => {
             {isMobileNavVisible && (
                <section tw="absolute block md:hidden bg-white px-4 w-full top-16 list-none transition-all duration-200 ease-in-out">
                   <li tw="text-gray-800 py-2">
-                     <Link to="/subscription/how-it-works/">How It Works</Link>
+                     <Link href="/subscription/how-it-works/">
+                        How It Works
+                     </Link>
                   </li>
                   {isAuthenticated && user?.isSubscriber ? (
                      <li tw="text-gray-800 py-2">
-                        <Link to="/subscription/menu">Select Menu</Link>
+                        <Link href="/subscription/menu">Select Menu</Link>
                      </li>
                   ) : (
                      <li tw="text-gray-800 py-2">
-                        <Link to="/subscription/our-menu">Our Menu</Link>
+                        <Link href="/subscription/our-menu">Our Menu</Link>
                      </li>
                   )}
                   {!user?.isSubscriber && (
                      <li tw="text-gray-800 py-2">
-                        <Link to="/subscription/our-plans">Get Started</Link>
+                        <Link href="/subscription/our-plans">Get Started</Link>
                      </li>
                   )}
                </section>
@@ -160,7 +166,7 @@ const Wrapper = styled.header`
    ${tw`w-full grid top-0 bg-white fixed border-b items-center`}
 `
 
-const Brand = styled(Link)`
+const Brand = styled.div`
    ${tw`h-full px-6 flex items-center border-r`}
 `
 

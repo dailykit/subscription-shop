@@ -32,10 +32,8 @@ const reducers = (state, { type, payload }) => {
 export const ConfigProvider = ({ children }) => {
    const [isLoading, setIsLoading] = React.useState(true)
    const [state, dispatch] = React.useReducer(reducers, initialState)
-   const {
-      loading: organizationLoading,
-      data: { organizations = [] } = {},
-   } = useQuery(ORGANIZATION)
+   const { loading: organizationLoading, data: { organizations = [] } = {} } =
+      useQuery(ORGANIZATION)
    const { loading, data: { settings = [] } = {} } = useSubscription(SETTINGS, {
       variables: {
          domain: {
@@ -75,7 +73,7 @@ export const ConfigProvider = ({ children }) => {
 
    const buildImageUrl = React.useCallback((size, url) => {
       const server_url = `${
-         new URL(window._env_.GATSBY_DATA_HUB_HTTPS).origin
+         new URL(window._env_.DATA_HUB_HTTPS).origin
       }/server/images`
       let bucket = ''
       if (new URL(url).host.split('.').length > 0) {
@@ -103,12 +101,8 @@ export const ConfigProvider = ({ children }) => {
 }
 
 export const useConfig = (globalType = '') => {
-   const {
-      state,
-      buildImageUrl,
-      noProductImage,
-      imagePlaceholder,
-   } = React.useContext(ConfigContext)
+   const { state, buildImageUrl, noProductImage, imagePlaceholder } =
+      React.useContext(ConfigContext)
 
    const hasConfig = React.useCallback(
       (identifier = '', localType = '') => {

@@ -1,5 +1,5 @@
 import React from 'react'
-import { navigate } from 'gatsby'
+import { useRouter } from 'next/router'
 import tw, { styled, css } from 'twin.macro'
 import { useMutation, useQuery } from '@apollo/react-hooks'
 import { useToasts } from 'react-toast-notifications'
@@ -20,10 +20,11 @@ import {
 import { isClient } from '../../../utils'
 
 const SelectDelivery = () => {
+   const router = useRouter()
    const { isAuthenticated } = useUser()
    React.useEffect(() => {
       if (!isAuthenticated) {
-         navigate('/subscription/get-started/select-plan')
+         router.push('/subscription/get-started/select-plan')
       }
    }, [isAuthenticated])
 
@@ -41,6 +42,7 @@ const SelectDelivery = () => {
 export default SelectDelivery
 
 const DeliveryContent = () => {
+   const router = useRouter()
    const { user } = useUser()
    const { state } = useDelivery()
    const { addToast } = useToasts()
@@ -57,11 +59,10 @@ const DeliveryContent = () => {
             fileData.forEach(data => {
                if (data?.fileId) {
                   const fileId = [data?.fileId]
-                  const cssPath = data?.subscriptionDivFileId?.linkedCssFiles.map(
-                     file => {
+                  const cssPath =
+                     data?.subscriptionDivFileId?.linkedCssFiles.map(file => {
                         return file?.cssFile?.path
-                     }
-                  )
+                     })
                   const jsPath = data?.subscriptionDivFileId?.linkedJsFiles.map(
                      file => {
                         return file?.jsFile?.path
@@ -70,10 +71,9 @@ const DeliveryContent = () => {
                   webRenderer({
                      type: 'file',
                      config: {
-                        uri: isClient && window._env_.GATSBY_DATA_HUB_HTTPS,
-                        adminSecret:
-                           isClient && window._env_.GATSBY_ADMIN_SECRET,
-                        expressUrl: isClient && window._env_.GATSBY_EXPRESS_URL,
+                        uri: isClient && window._env_.DATA_HUB_HTTPS,
+                        adminSecret: isClient && window._env_.ADMIN_SECRET,
+                        expressUrl: isClient && window._env_.EXPRESS_URL,
                      },
                      fileDetails: [
                         {
@@ -99,7 +99,7 @@ const DeliveryContent = () => {
          addToast('Successfully saved delivery preferences.', {
             appearance: 'success',
          })
-         navigate(
+         router.push(
             `/subscription/get-started/select-menu/?date=${
                state.delivery_date.selected.fulfillmentDate
             }${
