@@ -347,7 +347,7 @@ export const CART_BY_WEEK = gql`
             fulfillmentInfo
             transactionId
             paymentMethodId
-            products: cartItemViews(where: { level: { _eq: 1 } }) {
+            products: cartItems(where: { level: { _eq: 1 } }) {
                id
                name: displayName
                image: displayImage
@@ -401,7 +401,7 @@ export const CART = gql`
          transactionRemark
          stripeInvoiceId
          stripeInvoiceDetails
-         products: cartItemViews(where: { level: { _eq: 1 } }) {
+         products: cartItems(where: { level: { _eq: 1 } }) {
             id
             isAddOn
             unitPrice
@@ -433,7 +433,7 @@ export const CART_SUBSCRIPTION = gql`
          transactionRemark
          stripeInvoiceId
          stripeInvoiceDetails
-         products: cartItemViews(where: { level: { _eq: 1 } }) {
+         products: cartItems(where: { level: { _eq: 1 } }) {
             id
             isAddOn
             unitPrice
@@ -461,7 +461,7 @@ export const CART_STATUS = gql`
          paymentStatus
          fulfillmentInfo
          billingDetails
-         products: cartItemViews(where: { level: { _eq: 1 } }) {
+         products: cartItems(where: { level: { _eq: 1 } }) {
             id
             name: displayName
             image: displayImage
@@ -537,7 +537,7 @@ export const ORDER = gql`
             billingDetails
             fulfillmentInfo
             paymentStatus
-            products: cartItemViews(where: { level: { _eq: 1 } }) {
+            products: cartItems(where: { level: { _eq: 1 } }) {
                id
                name: displayName
                image: displayImage
