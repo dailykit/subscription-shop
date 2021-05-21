@@ -94,16 +94,18 @@ export const StepsNavbar = () => {
 
    return (
       <Navbar>
-         <Brand href="/subscription" title={brand?.name || 'Subscription Shop'}>
-            {brand?.logo?.logoMark && (
-               <img
-                  tw="h-auto md:h-12"
-                  src={brand?.logo?.logoMark}
-                  alt={brand?.name || 'Subscription Shop'}
-               />
-            )}
-            {brand?.name && <span tw="ml-2">{brand?.name}</span>}
-         </Brand>
+         <Link href="/subscription">
+            <Brand>
+               {brand?.logo?.logoMark && (
+                  <img
+                     tw="h-auto md:h-12"
+                     src={brand?.logo?.logoMark}
+                     alt={brand?.name || 'Subscription Shop'}
+                  />
+               )}
+               {brand?.name && <span tw="ml-2">{brand?.name}</span>}
+            </Brand>
+         </Link>
          <Progress>
             <ProgressBar theme={theme} current={currentStep} />
             <Steps>
@@ -191,7 +193,7 @@ const Navbar = styled.div`
    }
 `
 
-const Brand = styled(Link)`
+const Brand = styled.div`
    text-decoration: none;
    ${tw`h-full px-6 flex items-center border-r text-gray-800`}
 `

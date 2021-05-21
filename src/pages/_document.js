@@ -13,6 +13,7 @@ class MyDocument extends Document {
                <script src="/env-config.js"></script>
             </Head>
             <body>
+               <div id="portal" />
                <Main />
                <NextScript />
             </body>

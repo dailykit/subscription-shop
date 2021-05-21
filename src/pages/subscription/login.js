@@ -53,9 +53,9 @@ const Login = () => {
       CUSTOMER.DETAILS,
       {
          onCompleted: async ({ customer = {} }) => {
-            const { email = '', sub: keycloakId = '' } = jwtDecode(
-               localStorage.getItem('token')
-            )
+            const token = localStorage.getItem('token')
+            console.log({ token })
+            const { email = '', sub: keycloakId = '' } = jwtDecode(token)
             if (isEmpty(customer)) {
                console.log('CUSTOMER DOESNT EXISTS')
                create({
