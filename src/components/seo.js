@@ -1,17 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Helmet } from 'react-helmet'
+import Head from 'next/head'
 import { useConfig } from '../lib'
 import { useRouter } from 'next/router'
 
-export const SEO = ({
-   description,
-   title,
-   image,
-   lang = 'en',
-   meta,
-   richresult,
-}) => {
+export const SEO = ({ description, title, image, richresult, children }) => {
    const router = useRouter()
 
    // const { site } = useStaticQuery(
@@ -48,30 +41,34 @@ export const SEO = ({
       'https://dailykit-133-test.s3.amazonaws.com/images/1596121558382.png'
 
    return (
-      <Helmet
-         title={metaTitle}
-         htmlAttributes={{ lang }}
-         // titleTemplate={`%s | ${site.siteMetadata.title}`}
-         titleTemplate={`Test`}
-         meta={[
-            { name: `description`, content: metaDescription },
-            { property: `og:title`, content: metaTitle },
-            { property: `og:description`, content: metaDescription },
-            { property: `og:image`, content: metaImage },
-            { property: `og:type`, content: `website` },
-            { name: `twitter:card`, content: `summary` },
-            { name: `twitter:title`, content: metaTitle },
-            { name: `twitter:description`, content: metaDescription },
-            { property: `twitter:image:src`, content: metaImage },
-         ].concat(meta)}
-         link={[{ rel: 'icon', type: 'image/png', href: favicon }]}
-         script={[
-            {
-               type: 'application/ld+json',
-               innerHTML: JSON.stringify(richresult),
-            },
-         ]}
-      />
+      <Head>
+         <title>{metaTitle}</title>
+         <link rel="icon" href={favicon} type="image/png" />
+         <meta property="og:title" content={metaTitle} title="og-title" />
+         <meta
+            property="og:description"
+            content={metaDescription}
+            title="og-desc"
+         />
+         <meta property="og:image" content={metaImage} title="og-image" />
+         <meta property="og:type" content="website" />
+         <meta property="twitter:card" content="summary" />
+         <meta property="twitter:title" content={metaTitle} title="tw-title" />
+         <meta
+            property="twitter:description"
+            content={metaDescription}
+            title="tw-desc"
+         />
+         <meta
+            property="twitter:image:src"
+            content={metaImage}
+            title="tw-image"
+         />
+         {richresult && (
+            <script type="application/ld+json"> {richresult} </script>
+         )}
+         {children}
+      </Head>
    )
 }
 
