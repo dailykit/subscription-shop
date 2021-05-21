@@ -10,6 +10,7 @@ ENV PATH /app/node_modules/.bin:$PATH
 ENV SKIP_PREFLIGHT_CHECK true
 
 RUN yarn build
+RUN yarn export
 
 # => Run container
 FROM nginx:1.15.2-alpine
@@ -19,7 +20,7 @@ RUN rm -rf /etc/nginx/conf.d
 COPY conf /etc/nginx
 
 # Static build
-COPY --from=builder /usr/src/app/public /usr/share/nginx/html/
+COPY --from=builder /usr/src/app/out /usr/share/nginx/html/
 
 # Default port exposure
 EXPOSE 80
@@ -37,4 +38,4 @@ RUN chmod +x script.sh
 
 
 # Start Nginx server
-CMD ["/bin/bash", "-c", "/usr/share/nginx/html/script.sh && cp /usr/share/nginx/html/env-config.js /usr/share/nginx/html/subscription && nginx -g \"daemon off;\""]
+CMD ["/bin/bash", "-c", "/usr/share/nginx/html/script.sh && nginx -g \"daemon off;\""]
