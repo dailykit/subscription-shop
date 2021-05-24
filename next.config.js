@@ -2,7 +2,6 @@
 
 module.exports = {
    basePath: '/subscription',
-   distDir: 'subscription',
    pageExtensions: ['js', 'jsx'],
    webpack: (config, { isServer }) => {
       // Fixes npm packages that depend on `fs` module

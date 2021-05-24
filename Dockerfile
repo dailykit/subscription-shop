@@ -20,7 +20,7 @@ RUN rm -rf /etc/nginx/conf.d
 COPY conf /etc/nginx
 
 # Static build
-COPY --from=builder /usr/src/app/subscription /usr/share/nginx/html/subscription
+COPY --from=builder /usr/src/app/out /usr/share/nginx/html/subscription
 
 # Default port exposure
 EXPOSE 80
