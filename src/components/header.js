@@ -49,22 +49,22 @@ export const Header = () => {
             <section tw="flex items-center justify-between">
                <ul tw="ml-auto px-4 flex space-x-4">
                   <li tw="hidden md:inline-block">
-                     <Link href="/subscription/how-it-works" tw="text-gray-800">
+                     <Link href="/how-it-works" tw="text-gray-800">
                         How It Works
                      </Link>
                   </li>
                   {isAuthenticated && user?.isSubscriber ? (
                      <li tw="text-gray-800 hidden hidden md:inline-block">
-                        <Link href="/subscription/menu">Select Menu</Link>
+                        <Link href="/menu">Select Menu</Link>
                      </li>
                   ) : (
                      <li tw="text-gray-800 hidden md:inline-block">
-                        <Link href="/subscription/our-menu">Our Menu</Link>
+                        <Link href="/our-menu">Our Menu</Link>
                      </li>
                   )}
                   {!user?.isSubscriber && (
                      <li tw="hidden md:inline-block">
-                        <Link href="/subscription/our-plans">Get Started</Link>
+                        <Link href="/our-plans">Get Started</Link>
                      </li>
                   )}
                </ul>
@@ -75,7 +75,7 @@ export const Header = () => {
                      {user?.platform_customer?.firstName &&
                         (isClient && window.innerWidth > 786 ? (
                            <Link
-                              href="/subscription/account/profile/"
+                              href="/account/profile/"
                               tw="mr-3 inline-flex items-center justify-center rounded-full h-10 w-10 bg-gray-200"
                            >
                               {getInitials(
@@ -110,7 +110,7 @@ export const Header = () => {
                               window.location.pathname
                            )
                         }
-                        router.push('/subscription/login')
+                        router.push('/login')
                      }}
                      bg={theme?.accent}
                   >
@@ -131,22 +131,20 @@ export const Header = () => {
             {isMobileNavVisible && (
                <section tw="absolute block md:hidden bg-white px-4 w-full top-16 list-none transition-all duration-200 ease-in-out">
                   <li tw="text-gray-800 py-2">
-                     <Link href="/subscription/how-it-works/">
-                        How It Works
-                     </Link>
+                     <Link href="/how-it-works/">How It Works</Link>
                   </li>
                   {isAuthenticated && user?.isSubscriber ? (
                      <li tw="text-gray-800 py-2">
-                        <Link href="/subscription/menu">Select Menu</Link>
+                        <Link href="/menu">Select Menu</Link>
                      </li>
                   ) : (
                      <li tw="text-gray-800 py-2">
-                        <Link href="/subscription/our-menu">Our Menu</Link>
+                        <Link href="/our-menu">Our Menu</Link>
                      </li>
                   )}
                   {!user?.isSubscriber && (
                      <li tw="text-gray-800 py-2">
-                        <Link href="/subscription/our-plans">Get Started</Link>
+                        <Link href="/our-plans">Get Started</Link>
                      </li>
                   )}
                </section>

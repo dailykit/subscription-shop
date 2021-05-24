@@ -16,16 +16,16 @@ export const ProfileSidebar = ({ toggle = true, logout }) => {
    const referralsAllowed = configOf('Referral', 'rewards')?.isAvailable
 
    const [menu] = useState([
-      { title: 'Profile', href: '/subscription/account/profile/' },
-      { title: 'Wallet', href: '/subscription/account/wallet/' },
+      { title: 'Profile', href: '/account/profile/' },
+      { title: 'Wallet', href: '/account/wallet/' },
       {
          title: 'Loyalty Points',
-         href: '/subscription/account/loyalty-points/',
+         href: '/account/loyalty-points/',
       },
-      { title: 'Referrals', href: '/subscription/account/referrals/' },
-      { title: 'Order History', href: '/subscription/account/orders/' },
-      { title: 'Manage Addresses', href: '/subscription/account/addresses/' },
-      { title: 'Manage Cards', href: '/subscription/account/cards/' },
+      { title: 'Referrals', href: '/account/referrals/' },
+      { title: 'Order History', href: '/account/orders/' },
+      { title: 'Manage Addresses', href: '/account/addresses/' },
+      { title: 'Manage Cards', href: '/account/cards/' },
    ])
 
    return (

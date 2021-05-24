@@ -49,9 +49,7 @@ export const AddressSection = () => {
             <HelperBar type="error">
                <HelperBar.SubTitle>{state.address.error}</HelperBar.SubTitle>
                <HelperBar.Buttom
-                  onClick={() =>
-                     router.push('/subscription/get-started/select-plan')
-                  }
+                  onClick={() => router.push('/get-started/select-plan')}
                >
                   Change Plan
                </HelperBar.Buttom>

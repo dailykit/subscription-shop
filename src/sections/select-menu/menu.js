@@ -102,7 +102,7 @@ const Product = ({ node, theme, isAdded, noProductImage, buildImageUrl }) => {
    const { state, methods } = useMenu()
 
    const openRecipe = () =>
-      router.push(`/subscription/recipes/?id=${node?.productOption?.id}`)
+      router.push(`/recipes/?id=${node?.productOption?.id}`)
 
    const add = item => {
       if (state.occurenceCustomer?.betweenPause) {

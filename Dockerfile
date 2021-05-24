@@ -20,13 +20,13 @@ RUN rm -rf /etc/nginx/conf.d
 COPY conf /etc/nginx
 
 # Static build
-COPY --from=builder /usr/src/app/out /usr/share/nginx/html/
+COPY --from=builder /usr/src/app/subscription /usr/share/nginx/html/subscription
 
 # Default port exposure
 EXPOSE 80
 
 # Copy .env file and shell script to container
-WORKDIR /usr/share/nginx/html
+WORKDIR /usr/share/nginx/html/subscription
 COPY ./script.sh .
 COPY .env .
 
@@ -38,4 +38,4 @@ RUN chmod +x script.sh
 
 
 # Start Nginx server
-CMD ["/bin/bash", "-c", "/usr/share/nginx/html/script.sh && nginx -g \"daemon off;\""]
+CMD ["/bin/bash", "-c", "/usr/share/nginx/html/subscription/script.sh && nginx -g \"daemon off;\""]

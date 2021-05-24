@@ -246,8 +246,7 @@ export const MenuProvider = ({ isCheckout, children }) => {
                })
                if (!isCheckout) {
                   router.push(
-                     '/subscription/menu?d=' +
-                        subscription?.occurences[0].fulfillmentDate
+                     '/menu?d=' + subscription?.occurences[0].fulfillmentDate
                   )
                }
             } else {
@@ -257,7 +256,7 @@ export const MenuProvider = ({ isCheckout, children }) => {
                })
                if (!isCheckout) {
                   router.push(
-                     '/subscription/menu?d=' +
+                     '/menu?d=' +
                         subscription?.occurences[validWeekIndex].fulfillmentDate
                   )
                }

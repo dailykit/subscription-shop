@@ -9,20 +9,20 @@ import { useUser } from '../context'
 import { isClient } from '../utils'
 
 const routes = {
-   '/subscription/get-started/register': { status: 'REGISTER', level: 0 },
-   '/subscription/get-started/select-plan': {
+   '/get-started/register': { status: 'REGISTER', level: 0 },
+   '/get-started/select-plan': {
       status: 'SELECT_PLAN',
       level: 25,
    },
-   '/subscription/get-started/select-delivery': {
+   '/get-started/select-delivery': {
       status: 'SELECT_DELIVERY',
       level: 50,
    },
-   '/subscription/get-started/select-menu/': {
+   '/get-started/select-menu/': {
       status: 'SELECT_MENU',
       level: 75,
    },
-   '/subscription/get-started/checkout/': { status: 'CHECKOUT', level: 100 },
+   '/get-started/checkout/': { status: 'CHECKOUT', level: 100 },
 }
 
 export const StepsNavbar = () => {
@@ -45,8 +45,8 @@ export const StepsNavbar = () => {
    const router = useRouter()
 
    React.useEffect(() => {
-      if (router.pathname === '/subscription/get-started/select-delivery/') {
-         router.push('/subscription/get-started/select-delivery')
+      if (router.pathname === '/get-started/select-delivery/') {
+         router.push('/get-started/select-delivery')
       } else {
          if (!has(routes, router.pathname)) return
          setCurrentStep(routes[router.pathname].level)
@@ -82,9 +82,9 @@ export const StepsNavbar = () => {
       if (canGoToStep(route)) {
          if (!isEmpty(user?.carts)) {
             const [cart] = user?.carts
-            if (route === '/subscription/get-started/checkout/') {
+            if (route === '/get-started/checkout/') {
                path += `?id=${cart.id}`
-            } else if (route === '/subscription/get-started/select-menu/') {
+            } else if (route === '/get-started/select-menu/') {
                path += `?date=${cart.subscriptionOccurence?.fulfillmentDate}`
             }
          }
@@ -113,7 +113,7 @@ export const StepsNavbar = () => {
                   goToStep={goToStep}
                   canGoToStep={canGoToStep}
                   isActive={currentStep === 0}
-                  route="/subscription/get-started/register"
+                  route="/get-started/register"
                >
                   {steps.register}
                </RenderStep>
@@ -121,7 +121,7 @@ export const StepsNavbar = () => {
                   goToStep={goToStep}
                   canGoToStep={canGoToStep}
                   isActive={currentStep === 25}
-                  route="/subscription/get-started/select-plan"
+                  route="/get-started/select-plan"
                >
                   Select Plan
                </RenderStep>
@@ -129,7 +129,7 @@ export const StepsNavbar = () => {
                   goToStep={goToStep}
                   canGoToStep={canGoToStep}
                   isActive={currentStep === 50}
-                  route="/subscription/get-started/select-delivery"
+                  route="/get-started/select-delivery"
                >
                   {steps.selectDelivery}
                </RenderStep>
@@ -137,7 +137,7 @@ export const StepsNavbar = () => {
                   goToStep={goToStep}
                   canGoToStep={canGoToStep}
                   isActive={currentStep === 75}
-                  route="/subscription/get-started/select-menu/"
+                  route="/get-started/select-menu/"
                >
                   {steps.selectMenu}
                </RenderStep>
@@ -145,7 +145,7 @@ export const StepsNavbar = () => {
                   goToStep={goToStep}
                   canGoToStep={canGoToStep}
                   isActive={currentStep === 100}
-                  route="/subscription/get-started/checkout/"
+                  route="/get-started/checkout/"
                >
                   {steps.checkout}
                </RenderStep>
