@@ -117,6 +117,14 @@ AppWrapper.getInitialProps = async ({ ctx }) => {
       }
    } catch (err) {
       console.log(err)
+
+      return {
+         seo: {
+            title: 'Meal Kit Store',
+            description: 'A subscription based meal kit store',
+            image: 'https://dailykit-133-test.s3.amazonaws.com/images/1596121558382.png',
+         },
+      }
    }
 }
 
