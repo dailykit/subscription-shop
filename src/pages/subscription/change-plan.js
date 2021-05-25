@@ -61,6 +61,10 @@ const ChangePlan = () => {
             _set: {
                subscriptionId: state.delivery.selected.id,
                subscriptionAddressId: state.address.selected.id,
+               lastUpdatedBy: {
+                  type: 'manual',
+                  userId: user?.keycloakId,
+               },
             },
          },
       })

@@ -102,6 +102,10 @@ const Content = () => {
                   },
                   _set: {
                      subscriptionAddressId: selected,
+                     lastUpdatedBy: {
+                        type: 'manual',
+                        userId: user?.keycloakId,
+                     },
                   },
                },
             })

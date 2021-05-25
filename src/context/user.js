@@ -193,7 +193,13 @@ export const UserProvider = ({ children }) => {
                      skip: !user?.brandCustomerId,
                      variables: {
                         id: user?.brandCustomerId,
-                        _set: { subscriptionOnboardStatus: 'ONBOARDED' },
+                        _set: {
+                           subscriptionOnboardStatus: 'ONBOARDED',
+                           lastUpdatedBy: {
+                              type: 'manual',
+                              userId: user?.keycloakId,
+                           },
+                        },
                      },
                   })
                }

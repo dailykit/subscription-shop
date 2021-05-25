@@ -23,6 +23,10 @@ export const LoyaltyPoints = ({ cart }) => {
                _set: {
                   loyaltyPointsUsed: points,
                },
+               lastUpdatedBy: {
+                  type: 'manual',
+                  userId: user.keycloakId,
+               },
             },
          })
       }

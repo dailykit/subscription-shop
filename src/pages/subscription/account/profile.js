@@ -162,6 +162,10 @@ const CurrentPlan = () => {
             _set: {
                isSubscriptionCancelled: true,
                ...(reason && { subscriptionCancellationReason: reason }),
+               lastUpdatedBy: {
+                  type: 'manual',
+                  userId: user?.keycloakId,
+               },
             },
          },
       })

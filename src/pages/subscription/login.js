@@ -84,7 +84,11 @@ const Login = () => {
                console.log('BRAND_CUSTOMER DOESNT EXISTS')
                create_brand_customer({
                   variables: {
-                     object: { keycloakId, brandId: brand.id },
+                     object: {
+                        keycloakId,
+                        brandId: brand.id,
+                        lastUpdatedBy: { type: 'manual', userId: keycloakId },
+                     },
                   },
                })
             } else if (

@@ -404,6 +404,10 @@ export const MenuProvider = ({ isCheckout, children }) => {
                      paymentMethodId: user?.subscriptionPaymentMethodId,
                   }),
                   stripeCustomerId: user?.platform_customer?.stripeCustomerId,
+                  lastUpdatedBy: {
+                     type: 'manual',
+                     userId: user.keycloakId
+                  }
                },
             },
          })

@@ -67,7 +67,13 @@ export const PaymentForm = ({ intent }) => {
                            keycloakId: { _eq: user.keycloakId },
                            brandId: { _eq: brand.id },
                         },
-                        _set: { subscriptionPaymentMethodId: data.id },
+                        _set: {
+                           subscriptionPaymentMethodId: data.id,
+                           lastUpdatedBy: {
+                              type: 'manual',
+                              userId: user?.keycloakId,
+                           },
+                        },
                      },
                   })
                }

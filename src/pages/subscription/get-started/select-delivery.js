@@ -124,6 +124,10 @@ const DeliveryContent = () => {
                subscriptionOnboardStatus: 'SELECT_MENU',
                subscriptionId: state.delivery.selected.id,
                subscriptionAddressId: state.address.selected.id,
+               lastUpdatedBy: {
+                  type: 'manual',
+                  userId: user?.keycloakId,
+               },
             },
          },
       })

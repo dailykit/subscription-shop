@@ -161,6 +161,10 @@ const Fulfillment = () => {
                      paymentMethodId: user?.subscriptionPaymentMethodId,
                   }),
                   stripeCustomerId: user?.platform_customer?.stripeCustomerId,
+                  lastUpdatedBy: {
+                     type: 'manual',
+                     userId: user.keycloakId,
+                  },
                },
             },
          }).then(() =>

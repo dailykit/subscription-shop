@@ -127,6 +127,10 @@ export default () => {
                         keycloakId,
                         brandId: brand.id,
                         subscriptionOnboardStatus: 'SELECT_DELIVERY',
+                        lastUpdatedBy: {
+                           type: 'manual',
+                           userId: keycloakId,
+                        },
                      },
                   },
                })

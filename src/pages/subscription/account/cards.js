@@ -114,6 +114,10 @@ const Content = () => {
             },
             _set: {
                subscriptionPaymentMethodId: method.stripePaymentMethodId,
+               lastUpdatedBy: {
+                  type: 'manual',
+                  userId: user?.keycloakId,
+               },
             },
          },
       })
@@ -301,6 +305,10 @@ export const PaymentForm = ({ intent, toggleTunnel }) => {
                         },
                         _set: {
                            subscriptionPaymentMethodId: data.id,
+                           lastUpdatedBy: {
+                              type: 'manual',
+                              userId: user?.keycloakId,
+                           },
                         },
                      },
                   })

@@ -34,7 +34,13 @@ export const CartPanel = ({ noSkip, isCheckout }) => {
             await updateBrandCustomer({
                variables: {
                   id: user?.brandCustomerId,
-                  _set: { subscriptionOnboardStatus: 'CHECKOUT' },
+                  _set: {
+                     subscriptionOnboardStatus: 'CHECKOUT',
+                     lastUpdatedBy: {
+                        type: 'manual',
+                        userId: user?.keycloakId,
+                     },
+                  },
                },
             })
 

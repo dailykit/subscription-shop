@@ -24,6 +24,10 @@ export const WalletAmount = ({ cart }) => {
                _set: {
                   walletAmountUsed: amount,
                },
+               lastUpdatedBy: {
+                  type: 'manual',
+                  userId: user.keycloakId,
+               },
             },
          })
       }

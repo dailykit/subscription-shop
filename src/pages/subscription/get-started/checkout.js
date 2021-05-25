@@ -114,7 +114,13 @@ const PaymentContent = () => {
                   refetchQueries: ['customer'],
                   variables: {
                      id: user?.brandCustomerId,
-                     _set: { subscriptionOnboardStatus: 'ONBOARDED' },
+                     _set: {
+                        subscriptionOnboardStatus: 'ONBOARDED',
+                        lastUpdatedBy: {
+                           type: 'manual',
+                           userId: user?.keycloakId,
+                        },
+                     },
                   },
                })
                if (authTabRef.current) {
@@ -200,6 +206,10 @@ const PaymentContent = () => {
                      _set: {
                         subscriptionPaymentMethodId:
                            updateCart?.paymentMethodId,
+                        lastUpdatedBy: {
+                           type: 'manual',
+                           userId: user?.keycloakId,
+                        },
                      },
                   },
                })
