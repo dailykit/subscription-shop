@@ -94,7 +94,7 @@ export const StepsNavbar = () => {
 
    return (
       <Navbar>
-         <Link href="/subscription">
+         <Link href="/">
             <Brand>
                {brand?.logo?.logoMark && (
                   <img

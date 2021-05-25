@@ -32,7 +32,7 @@ export const Header = () => {
       <>
          <Wrapper>
             <Link
-               href="/subscription"
+               href="/"
                // title={brand?.name || 'Subscription Shop'}
             >
                <Brand>
