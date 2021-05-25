@@ -5,7 +5,7 @@
    "scripts": {
       "dev": "next dev",
       "build": "next build",
-      "start": "next start",
+      "start": "next start -p 80",
       "export": "next export",
       "init:config": "chmod +x \"./script.sh\" && \"./script.sh\" && cp env-config.js \"./public\""
    },
