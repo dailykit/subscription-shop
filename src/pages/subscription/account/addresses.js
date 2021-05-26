@@ -33,7 +33,7 @@ const Addresses = () => {
 
    React.useEffect(() => {
       if (!isAuthenticated) {
-         navigate('/subscription')
+         navigate('/subscription/get-started/register')
       }
    }, [isAuthenticated])
 

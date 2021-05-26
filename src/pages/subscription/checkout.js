@@ -23,7 +23,7 @@ const Checkout = () => {
 
    React.useEffect(() => {
       if (!isAuthenticated) {
-         navigate('/subscription/get-started/select-plan')
+         navigate('/subscription/get-started/register')
       }
    }, [isAuthenticated])
 
