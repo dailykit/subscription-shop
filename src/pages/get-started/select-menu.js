@@ -21,8 +21,7 @@ const SelectMenu = () => {
    const { isAuthenticated } = useUser()
    React.useEffect(() => {
       if (!isAuthenticated) {
-         console.log('navigate called')
-         navigate('/get-started/select-plan')
+         navigate('/get-started/register')
       }
    }, [isAuthenticated])
 

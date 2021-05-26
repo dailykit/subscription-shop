@@ -19,7 +19,7 @@ const MenuPage = () => {
 
    React.useEffect(() => {
       if (!isAuthenticated) {
-         navigate('/get-started/select-plan')
+         navigate('/our-plans')
       }
    }, [isAuthenticated])
 

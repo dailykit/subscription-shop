@@ -37,7 +37,7 @@ const ManageCards = () => {
 
    React.useEffect(() => {
       if (!isAuthenticated) {
-         navigate('/')
+         navigate('/get-started/register')
       }
    }, [isAuthenticated])
 

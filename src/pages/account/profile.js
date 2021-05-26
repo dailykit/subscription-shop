@@ -22,7 +22,7 @@ const Profile = () => {
 
    React.useEffect(() => {
       if (!isAuthenticated) {
-         navigate('/')
+         navigate('/get-started/register')
       }
    }, [isAuthenticated])
 
