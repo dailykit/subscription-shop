@@ -12,7 +12,6 @@ export const Layout = ({ children, noHeader }) => {
    const { isAuthenticated, user } = useUser()
    const { hasConfig, configOf } = useConfig()
 
-   const brand = configOf('theme-brand', 'brand')
    const {
       isPrivacyPolicyAvailable,
       isRefundPolicyAvailable,
@@ -32,7 +31,7 @@ export const Layout = ({ children, noHeader }) => {
          <Footer theme={configOf('theme-color', 'Visual')}>
             <div>
                <section>
-                  <h2 tw="text-3xl">{brand?.name || 'Subscription Shop'}</h2>
+                  <h4 tw="text-2xl mb-4 mt-2">Contact Us</h4>
                   {hasConfig('Location', 'availability') && (
                      <p tw="mt-2">
                         {normalizeAddress(configOf('Location', 'availability'))}
