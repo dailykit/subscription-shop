@@ -52,10 +52,19 @@ export const Layout = ({ children, noHeader }) => {
                               {configOf('Contact', 'brand')?.email}
                            </a>
                         </span>
-                        <span tw="mt-4 flex items-center">
-                           <PhoneIcon size={18} tw="stroke-current mr-2" />
-                           {configOf('Contact', 'brand')?.phoneNo}
-                        </span>
+                        {configOf('Contact', 'brand')?.phoneNo && (
+                           <a
+                              target="_blank"
+                              rel="noreferrer noopener"
+                              tw="mt-4 flex items-center"
+                              href={`https://api.whatsapp.com/send?phone=${
+                                 configOf('Contact', 'brand')?.phoneNo
+                              }`}
+                           >
+                              <PhoneIcon size={18} tw="stroke-current mr-2" />
+                              {configOf('Contact', 'brand')?.phoneNo}
+                           </a>
+                        )}
                      </>
                   )}
                </section>
