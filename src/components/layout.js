@@ -31,7 +31,11 @@ export const Layout = ({ children, noHeader }) => {
          <Footer theme={configOf('theme-color', 'Visual')}>
             <div>
                <section>
-                  <h4 tw="text-2xl mb-4 mt-2">Contact Us</h4>
+                  {configOf('footerTitle', 'footer')?.value && (
+                     <h2 tw="text-3xl">
+                        {configOf('footerTitle', 'footer')?.value}
+                     </h2>
+                  )}
                   {hasConfig('Location', 'availability') && (
                      <p tw="mt-2">
                         {normalizeAddress(configOf('Location', 'availability'))}
@@ -52,17 +56,10 @@ export const Layout = ({ children, noHeader }) => {
                            </a>
                         </span>
                         {configOf('Contact', 'brand')?.phoneNo && (
-                           <a
-                              target="_blank"
-                              rel="noreferrer noopener"
-                              tw="mt-4 flex items-center"
-                              href={`https://api.whatsapp.com/send?phone=${
-                                 configOf('Contact', 'brand')?.phoneNo
-                              }`}
-                           >
+                           <span tw="mt-4 flex items-center">
                               <PhoneIcon size={18} tw="stroke-current mr-2" />
                               {configOf('Contact', 'brand')?.phoneNo}
-                           </a>
+                           </span>
                         )}
                      </>
                   )}
@@ -111,6 +108,22 @@ export const Layout = ({ children, noHeader }) => {
                )}
             </div>
          </Footer>
+         {configOf('footerWhatsappPhone', 'footer')?.isVisible && (
+            <a
+               target="_blank"
+               rel="noreferrer noopener"
+               tw="fixed right-0 bottom-0 mb-4 mr-4"
+               href={`https://api.whatsapp.com/send?phone=${
+                  configOf('footerWhatsappPhone', 'footer')?.value
+               }`}
+            >
+               <img
+                  tw="h-10 w-10"
+                  alt="WhatsApp"
+                  src="https://s3.us-east-2.amazonaws.com/dailykit.org/whatsapp.png"
+               />
+            </a>
+         )}
       </>
    )
 }
