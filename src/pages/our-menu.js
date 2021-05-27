@@ -507,6 +507,8 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
       additionalText: node?.productOption?.product?.additionalText || '',
    }
 
+   const imageRatio = useConfig().configOf('image-aspect-ratio', 'Visual')
+   console.log(imageRatio)
    const openRecipe = () => navigate(`/recipes/?id=${node?.productOption?.id}`)
 
    return (
@@ -521,10 +523,7 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
                />
             </Styles.Type>
          )}
-         <div
-            tw="flex items-center justify-center aspect-w-4 aspect-h-3 bg-gray-200 mb-2 rounded overflow-hidden cursor-pointer"
-            onClick={openRecipe}
-         >
+         <ImageWrapper imageRatio={imageRatio} onClick={openRecipe}>
             {product.image ? (
                <ReactImageFallback
                   src={buildImageUrl('400x300', product.image)}
@@ -532,11 +531,16 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
                   initialImage={<Loader />}
                   alt={product.name}
                   className="image__thumbnail"
+                  css={css`
+                     aspect-ratio: ${imageRatio && imageRatio.width
+                        ? imageRatio.height / imageRatio.width
+                        : 4 / 3};
+                  `}
                />
             ) : (
                <img src={noProductImage} alt={product.name} />
             )}
-         </div>
+         </ImageWrapper>
          {node?.addOnLabel && <Label>{node?.addOnLabel}</Label>}
          <section>
             <Styles.GhostLink theme={theme} onClick={openRecipe}>
@@ -668,3 +672,11 @@ const Label = styled.span`
       text-sm uppercase font-medium tracking-wider text-white 
    `}
 `
+const ImageWrapper = styled.div(
+   ({ imageRatio }) => css`
+      ${tw`flex items-center justify-center bg-gray-200 mb-2 rounded overflow-hidden cursor-pointer `}
+      ${imageRatio && imageRatio.width
+         ? `aspect-ratio: ${imageRatio.height}/ ${imageRatio.width} }`
+         : tw`aspect-w-4 aspect-h-3`}
+   `
+)
