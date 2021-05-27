@@ -338,14 +338,9 @@ export const MenuProvider = ({ isCheckout, children }) => {
             variables: { object: cart },
          })
             .then(({ data: { createCartItem = {} } = {} }) => {
-               const { products = [] } = createCartItem
-               if (!isEmpty(products)) {
-                  const [product] = products
-                  addToast(`You've added the product - ${product.name}.`, {
-                     appearance: 'info',
-                  })
-               }
-
+               addToast(`Successfully added the product!`, {
+                  appearance: 'info',
+               })
                updateOccurenceCustomer({
                   variables: {
                      pk_columns: {
@@ -411,13 +406,9 @@ export const MenuProvider = ({ isCheckout, children }) => {
                insertCartItem({
                   variables: { object: cart },
                }).then(({ data: { createCartItem = {} } = {} }) => {
-                  const { products = [] } = createCartItem
-                  if (!isEmpty(products)) {
-                     const [product] = products
-                     addToast(`You've added the product - ${product.name}.`, {
-                        appearance: 'info',
-                     })
-                  }
+                  addToast(`Successfully added the product!`, {
+                     appearance: 'info',
+                  })
                   updateOccurenceCustomer({
                      variables: {
                         pk_columns: {
