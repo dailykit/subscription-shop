@@ -496,6 +496,7 @@ const Content = () => {
 }
 
 const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
+   console.log(node)
    const product = {
       name: node?.productOption?.product?.name || '',
       label: node?.productOption?.label || '',
@@ -505,10 +506,10 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
             ? node?.productOption?.product?.assets?.images[0]
             : null,
       additionalText: node?.productOption?.product?.additionalText || '',
+      tags: node?.productOption?.product?.tags || [],
    }
 
    const imageRatio = useConfig().configOf('image-aspect-ratio', 'Visual')
-   console.log(imageRatio)
    const openRecipe = () =>
       navigate(`/subscription/recipes/?id=${node?.productOption?.id}`)
 
@@ -549,6 +550,13 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
             </Styles.GhostLink>
          </section>
          <p>{product?.additionalText}</p>
+         {product.tags.length > 0 && (
+            <Styles.TagsList>
+               {product.tags.map(tag => (
+                  <Styles.Tags>{tag}</Styles.Tags>
+               ))}
+            </Styles.TagsList>
+         )}
       </Styles.Product>
    )
 }
@@ -574,6 +582,12 @@ const Styles = {
          }
       `
    ),
+   TagsList: styled.ul`
+      ${tw`list-none text-xs leading-6 text-gray-500 mb-3`}
+   `,
+   Tags: styled.li`
+      ${tw` m-2 bg-red-50 text-gray-500 inline-block text-xs uppercase p-1`}
+   `,
 }
 
 const Main = styled.main`
