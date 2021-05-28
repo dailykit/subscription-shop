@@ -244,6 +244,7 @@ export const OCCURENCE_PRODUCTS_BY_CATEGORIES = gql`
                      name
                      assets
                      additionalText
+                     tags
                   }
                }
             }
