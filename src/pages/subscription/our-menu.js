@@ -567,6 +567,9 @@ const Styles = {
       &.active {
          ${tw`border border-2 border-red-400`}
       }
+      &:hover {
+         ${tw`transition-all shadow-md -top-1 border-2 border-solid border-gray-200`}
+      }
    `,
    Type: styled.span`
       position: absolute;
