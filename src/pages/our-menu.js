@@ -501,8 +501,7 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
       additionalText: node?.productOption?.product?.additionalText || '',
    }
 
-   const openRecipe = () =>
-      router.push(`/recipes/?id=${node?.productOption?.id}`)
+   const openRecipe = () => router.push(`/recipes/${node?.productOption?.id}`)
 
    return (
       <Styles.Product>
@@ -512,8 +511,8 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
                   alt="Non-Veg Icon"
                   src={
                      product.type === 'Non-vegetarian'
-                        ? '/imgs/non-veg.png'
-                        : '/imgs/veg.png'
+                        ? '/subscription/imgs/non-veg.png'
+                        : '/subscription/imgs/veg.png'
                   }
                   title={product.type}
                   tw="h-6 w-6"

@@ -41,10 +41,10 @@ const Recipe = () => {
    })
 
    React.useEffect(() => {
-      let productOptionId = Number(router.query.id)
+      const { id } = router.query
       getRecipe({
          variables: {
-            optionId: productOptionId,
+            optionId: id,
          },
       })
    }, [router.query, getRecipe])
@@ -141,44 +141,46 @@ const Recipe = () => {
                   <p tw="text-teal-900">{recipe.notIncluded.join(', ')}</p>
                </div>
             )}
-            {recipe.showIngredients && (
-               <>
-                  <h2 tw="pb-2 mt-4 border-b border-gray-300 text-gray-600 text-lg font-normal mb-4">
-                     Ingredients
-                  </h2>
-                  <div tw="grid grid-cols-2 gap-2">
-                     {productOption.simpleRecipeYield.sachets.map(
-                        ({ isVisible, slipName, sachet }, index) => (
-                           <div
-                              key={index}
-                              css={[
-                                 tw`border h-16 px-2 rounded-sm flex items-center`,
-                                 !isVisible && tw`justify-center`,
-                              ]}
-                           >
-                              {isVisible ? (
-                                 <>
-                                    {sachet.ingredient.assets?.images
-                                       ?.length && (
-                                       <img
-                                          src={
-                                             sachet.ingredient.assets.images[0]
-                                          }
-                                          tw="w-12 h-12 mr-2 rounded-sm"
-                                       />
-                                    )}
-                                    {renderIngredientName(slipName, sachet)}
-                                 </>
-                              ) : (
-                                 <LockIcon />
-                              )}
-                           </div>
-                        )
-                     )}
-                  </div>
-               </>
-            )}
-            {recipe.showProcedures && (
+            {recipe.showIngredients &&
+               Boolean(productOption.simpleRecipeYield.sachets.length) && (
+                  <>
+                     <h2 tw="pb-2 mt-4 border-b border-gray-300 text-gray-600 text-lg font-normal mb-4">
+                        Ingredients
+                     </h2>
+                     <div tw="grid grid-cols-2 gap-2">
+                        {productOption.simpleRecipeYield.sachets.map(
+                           ({ isVisible, slipName, sachet }, index) => (
+                              <div
+                                 key={index}
+                                 css={[
+                                    tw`border h-16 px-2 rounded-sm flex items-center`,
+                                    !isVisible && tw`justify-center`,
+                                 ]}
+                              >
+                                 {isVisible ? (
+                                    <>
+                                       {sachet.ingredient.assets?.images
+                                          ?.length && (
+                                          <img
+                                             src={
+                                                sachet.ingredient.assets
+                                                   .images[0]
+                                             }
+                                             tw="w-12 h-12 mr-2 rounded-sm"
+                                          />
+                                       )}
+                                       {renderIngredientName(slipName, sachet)}
+                                    </>
+                                 ) : (
+                                    <LockIcon />
+                                 )}
+                              </div>
+                           )
+                        )}
+                     </div>
+                  </>
+               )}
+            {recipe.showProcedures && Boolean(recipe.instructionSets.length) && (
                <>
                   <h2 tw="pb-2 mt-4 border-b border-gray-300 text-gray-500 mb-3 text-lg font-medium">
                      Cooking Process

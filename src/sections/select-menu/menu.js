@@ -101,8 +101,7 @@ const Product = ({ node, theme, isAdded, noProductImage, buildImageUrl }) => {
    const { addToast } = useToasts()
    const { state, methods } = useMenu()
 
-   const openRecipe = () =>
-      router.push(`/recipes/?id=${node?.productOption?.id}`)
+   const openRecipe = () => router.push(`/recipes/${node?.productOption?.id}`)
 
    const add = item => {
       if (state.occurenceCustomer?.betweenPause) {
@@ -149,8 +148,8 @@ const Product = ({ node, theme, isAdded, noProductImage, buildImageUrl }) => {
                   alt="Non-Veg Icon"
                   src={
                      product.type === 'Non-vegetarian'
-                        ? '/imgs/non-veg.png'
-                        : '/imgs/veg.png'
+                        ? '/subscription/imgs/non-veg.png'
+                        : '/subscription/imgs/veg.png'
                   }
                   title={product.type}
                   tw="h-6 w-6"
