@@ -19,7 +19,7 @@ const Recipe = () => {
    const { addToast } = useToasts()
    const [productOption, setProductOption] = React.useState(null)
    const [recipe, setRecipe] = React.useState(null)
-   const { configOf } = useConfig()
+   const { configOf, noProductImage } = useConfig('convention')
 
    const theme = configOf('theme-color', 'Visual')
 
@@ -147,31 +147,36 @@ const Recipe = () => {
                   <h2 tw="pb-2 mt-4 border-b border-gray-300 text-gray-600 text-lg font-normal mb-4">
                      Ingredients
                   </h2>
-                  <div tw="grid grid-cols-2 gap-2">
+                  <div tw="grid sm:grid-cols-3 grid-cols-2 gap-4">
                      {productOption.simpleRecipeYield.sachets.map(
                         ({ isVisible, slipName, sachet }, index) => (
                            <div
                               key={index}
                               css={[
-                                 tw`border h-16 px-2 rounded-sm flex items-center`,
+                                 tw`px-2 flex flex-col items-center w-48 mb-4`,
                                  !isVisible && tw`justify-center`,
                               ]}
                            >
                               {isVisible ? (
                                  <>
                                     {sachet.ingredient.assets?.images
-                                       ?.length && (
+                                       ?.length ? (
                                        <img
                                           src={
                                              sachet.ingredient.assets.images[0]
                                           }
-                                          tw="w-12 h-12 mr-2 rounded-sm"
+                                          tw="w-24 h-24 rounded-full"
+                                       />
+                                    ) : (
+                                       <img
+                                          src={noProductImage}
+                                          tw="w-24 h-24 rounded-full"
                                        />
                                     )}
                                     {renderIngredientName(slipName, sachet)}
                                  </>
                               ) : (
-                                 <LockIcon />
+                                 <LockIcon size="32" />
                               )}
                            </div>
                         )
