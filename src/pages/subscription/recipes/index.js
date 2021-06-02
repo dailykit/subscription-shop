@@ -77,71 +77,79 @@ const Recipe = () => {
       <Layout>
          <SEO title={recipe.name} richresult={recipe.richResult} />
          <RecipeContainer>
-            <h1 tw="py-4 text-2xl md:text-3xl tracking-wide text-teal-900">
-               {recipe.name}
-            </h1>
             <RecipeImage>
                {recipe?.assets?.images?.length ? (
                   <img
                      src={recipe?.assets?.images[0]}
                      alt={recipe.name}
-                     tw="w-full h-full border-gray-100 object-cover rounded-lg"
+                     tw="w-full h-full border-gray-100 object-cover rounded-sm"
                   />
                ) : (
                   'N/A'
                )}
             </RecipeImage>
-            {!!recipe.description && (
-               <>
-                  <h2 tw="pb-2 mt-4 border-b border-gray-300 text-gray-600 text-lg font-normal mb-2">
-                     Description
-                  </h2>
-                  <p tw="text-teal-900">{recipe.description}</p>
-               </>
-            )}
-            <h2 tw="pb-2 mt-4 border-b border-gray-300 text-gray-600 text-lg font-normal mb-6">
-               Details
-            </h2>
-            <div tw="grid grid-cols-4 gap-2 mb-2">
-               {/* {!!recipe.type && (
+            <h1 tw="py-4 text-2xl md:text-3xl tracking-wide text-teal-900">
+               {recipe.name}
+            </h1>
+            <div tw="grid grid-flow-col grid-cols-2 gap-4">
+               {!!recipe.description && (
                   <div>
-                     <h6 tw="text-gray-500 text-sm font-normal">Type</h6>
-                     <p tw="text-teal-900">{recipe.type}</p>
-                  </div>
-               )} */}
-               {!!recipe.cuisine && (
-                  <div tw="flex flex-col items-center">
-                     <CuisineIcon size={40} color={theme?.accent} />
-                     <p tw="text-teal-900">{recipe.cuisine}</p>
+                     <h2 tw="pb-2 mt-4 border-b border-gray-300 text-gray-600 text-lg font-normal mb-2">
+                        Description
+                     </h2>
+                     <p tw="text-teal-900">{recipe.description}</p>
                   </div>
                )}
-               {!!recipe.author && (
-                  <div tw="flex flex-col items-center">
-                     <ChefIcon size={40} color={theme?.accent} />
-                     <p tw="text-teal-900">{recipe.author}</p>
+               <div>
+                  <div tw="mb-2 grid grid-cols-2 gap-4">
+                     <h2 tw="pb-2 mt-4 border-b border-gray-300 text-gray-600 text-lg font-normal mb-6">
+                        Details
+                     </h2>
+                     {/* {!!recipe.type && (
+                           <div>
+                              <h6 tw="text-gray-500 text-sm font-normal">Type</h6>
+                              <p tw="text-teal-900">{recipe.type}</p>
+                           </div>
+                        )} */}
+                     {!!recipe.cuisine && (
+                        <div tw="flex flex-col items-center">
+                           <CuisineIcon size={50} color={theme?.accent} />
+                           <p tw="text-teal-900">{recipe.cuisine}</p>
+                        </div>
+                     )}
+                     {!!recipe.author && (
+                        <div tw="flex flex-col items-center">
+                           <ChefIcon size={50} color={theme?.accent} />
+                           <p tw="text-teal-900">{recipe.author}</p>
+                        </div>
+                     )}
+                     {!!recipe.cookingTime && (
+                        <div tw="flex flex-col items-center">
+                           <TimeIcon size={50} color={theme?.accent} />
+                           <p tw="text-teal-900">{recipe.cookingTime} mins.</p>
+                        </div>
+                     )}
+                     {!!recipe.utensils?.length && (
+                        <div tw="flex flex-col items-center">
+                           <UtensilsIcon size={50} color={theme?.accent} />
+                           <p tw="text-teal-900">
+                              {recipe.utensils.join(', ')}
+                           </p>
+                        </div>
+                     )}
                   </div>
-               )}
-               {!!recipe.cookingTime && (
-                  <div tw="flex flex-col items-center">
-                     <TimeIcon size={40} color={theme?.accent} />
-                     <p tw="text-teal-900">{recipe.cookingTime} mins.</p>
-                  </div>
-               )}
-               {!!recipe.utensils?.length && (
-                  <div tw="flex flex-col items-center">
-                     <UtensilsIcon size={40} color={theme?.accent} />
-                     <p tw="text-teal-900">{recipe.utensils.join(', ')}</p>
-                  </div>
-               )}
-            </div>
-            {!!recipe.notIncluded?.length && (
-               <div tw="mb-2">
-                  <h6 tw="text-gray-500 text-sm font-normal">
-                     What you'll need
-                  </h6>
-                  <p tw="text-teal-900">{recipe.notIncluded.join(', ')}</p>
+                  {!!recipe.notIncluded?.length && (
+                     <div tw="mb-2">
+                        <h2 tw="pb-2 mt-4 border-b border-gray-300 text-gray-600 text-lg font-normal mb-6">
+                           What you'll need
+                        </h2>
+                        <p tw="text-teal-900">
+                           {recipe.notIncluded.join(', ')}
+                        </p>
+                     </div>
+                  )}
                </div>
-            )}
+            </div>
             {recipe.showIngredients && (
                <>
                   <h2 tw="pb-2 mt-4 border-b border-gray-300 text-gray-600 text-lg font-normal mb-4">
@@ -251,13 +259,14 @@ export default Recipe
 
 const RecipeContainer = styled.div`
    margin: auto;
-   max-width: 640px;
+   max-width: 1000px;
    padding: 16px 0;
    width: calc(100vw - 40px);
 `
 
 const RecipeImage = styled.div`
-   height: 320px;
+   height: 450px;
+   margin: 20px 0;
    @media (max-width: 567px) {
       height: 240px;
    }
