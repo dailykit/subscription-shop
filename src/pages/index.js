@@ -85,6 +85,12 @@ export default () => {
    )
 }
 
+export async function getStaticProps(context) {
+   return {
+      props: {}, // will be passed to the page component as props
+   }
+}
+
 const Main = styled.main`
    min-height: calc(100vh - 128px);
 `
