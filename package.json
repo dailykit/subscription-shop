@@ -10,6 +10,7 @@
       "init:config": "chmod +x \"./script.sh\" && \"./script.sh\" && cp env-config.js \"./public\""
    },
    "dependencies": {
+      "@apollo/client": "^3.3.19",
       "@apollo/react-hooks": "^3.1.5",
       "@dailykit/web-renderer": "^1.0.6",
       "@emotion/core": "^10.0.28",
@@ -28,7 +29,9 @@
       "axios": "^0.21.1",
       "babel-runtime": "^6.26.0",
       "core-js": "2.6.5",
+      "deepmerge": "^4.2.2",
       "graphql": "^15.4.0",
+      "graphql-request": "^3.4.0",
       "graphql-tag": "^2.11.0",
       "isomorphic-fetch": "^2.2.1",
       "jwt-decode": "^3.1.2",

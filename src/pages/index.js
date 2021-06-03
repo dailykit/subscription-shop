@@ -2,60 +2,62 @@ import React from 'react'
 import Link from 'next/link'
 import 'regenerator-runtime'
 import tw, { styled, css } from 'twin.macro'
-import { useQuery } from '@apollo/react-hooks'
 import { webRenderer } from '@dailykit/web-renderer'
 
 import { isClient } from '../utils'
 import { GET_FILEID } from '../graphql'
 import { SEO, Layout, PageLoader } from '../components'
 import { useQueryParams } from '../utils/useQueryParams'
+import { graphQLClient } from '../lib'
 
-export default () => {
+const Index = ({ data }) => {
    const params = useQueryParams()
+   const [loading, setLoading] = React.useState(true)
 
-   const { loading } = useQuery(GET_FILEID, {
-      variables: {
-         divId: ['home-bottom-01'],
-      },
-      onCompleted: ({ content_subscriptionDivIds: fileData }) => {
-         if (fileData.length) {
-            fileData.forEach(data => {
-               if (data?.fileId) {
-                  const fileId = [data?.fileId]
-                  const cssPath =
-                     data?.subscriptionDivFileId?.linkedCssFiles.map(file => {
-                        return file?.cssFile?.path
-                     })
-                  const jsPath = data?.subscriptionDivFileId?.linkedJsFiles.map(
-                     file => {
-                        return file?.jsFile?.path
-                     }
-                  )
-                  webRenderer({
-                     type: 'file',
-                     config: {
-                        uri: isClient && window._env_.DATA_HUB_HTTPS,
-                        adminSecret: isClient && window._env_.ADMIN_SECRET,
-                        expressUrl: isClient && window._env_.EXPRESS_URL,
-                     },
-                     fileDetails: [
-                        {
-                           elementId: 'home-bottom-01',
-                           fileId,
-                           cssPath: cssPath,
-                           jsPath: jsPath,
+   React.useEffect(() => {
+      try {
+         if (data?.content_subscriptionDivIds?.length) {
+            const fileData = data.content_subscriptionDivIds
+            window.requestAnimationFrame(function () {
+               fileData.forEach(data => {
+                  if (data?.fileId) {
+                     const fileId = [data?.fileId]
+                     const cssPath =
+                        data?.subscriptionDivFileId?.linkedCssFiles.map(
+                           file => {
+                              return file?.cssFile?.path
+                           }
+                        )
+                     const jsPath =
+                        data?.subscriptionDivFileId?.linkedJsFiles.map(file => {
+                           return file?.jsFile?.path
+                        })
+                     webRenderer({
+                        type: 'file',
+                        config: {
+                           uri: isClient && window._env_.DATA_HUB_HTTPS,
+                           adminSecret: isClient && window._env_.ADMIN_SECRET,
+                           expressUrl: isClient && window._env_.EXPRESS_URL,
                         },
-                     ],
-                  })
-               }
+                        fileDetails: [
+                           {
+                              elementId: 'home-bottom-01',
+                              fileId,
+                              cssPath: cssPath,
+                              jsPath: jsPath,
+                           },
+                        ],
+                     })
+                  }
+               })
             })
          }
-      },
-
-      onError: error => {
-         console.error(error)
-      },
-   })
+      } catch (err) {
+         console.log('Failed to render page: ', err)
+      } finally {
+         setLoading(false)
+      }
+   }, [data])
 
    React.useEffect(() => {
       if (params) {
@@ -85,9 +87,16 @@ export default () => {
    )
 }
 
-export async function getStaticProps(context) {
+export default Index
+
+export async function getStaticProps() {
+   const data = await graphQLClient.request(GET_FILEID, {
+      divId: ['home-bottom-01'],
+   })
+
    return {
-      props: {}, // will be passed to the page component as props
+      props: { data },
+      revalidate: 60 * 3, // will be passed to the page component as props
    }
 }
 
