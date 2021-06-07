@@ -14,7 +14,7 @@ import { ProductSkeleton, CartProduct } from '../../../../components'
 const PlanProducts = ({ noSkip, isCheckout }) => {
    const { user } = useUser()
    const { addToast } = useToasts()
-   const { state, methods } = useMenu()
+   const { state, methods, dispatch } = useMenu()
 
    const [upsertOccurenceCustomer] = useMutation(
       MUTATIONS.OCCURENCE.CUSTOMER.UPSERT,
@@ -60,6 +60,22 @@ const PlanProducts = ({ noSkip, isCheckout }) => {
          state?.occurenceCustomer?.cart?.status
       ) && state?.week?.isValid
 
+   const onWeekEnd = data => {
+      if (data?.completed) {
+         const { week = {} } = state
+         const weekIndex = state.occurences.findIndex(
+            node => node.id === week?.id
+         )
+         const nextWeekExists = weekIndex < state.occurences.length - 1
+         if (weekIndex !== -1 && nextWeekExists) {
+            dispatch({
+               type: 'SET_WEEK',
+               payload: state.occurences[weekIndex + 1],
+            })
+         }
+      }
+   }
+
    return (
       <div>
          <header tw="mt-3 mb-2 pb-1 border-b flex items-center justify-between">
@@ -102,7 +118,11 @@ const PlanProducts = ({ noSkip, isCheckout }) => {
                tw="block mb-3"
                title={formatDate(state.week.cutoffTimeStamp)}
             >
-               Time remaining: <Countdown date={state.week.cutoffTimeStamp} />
+               Time remaining:{' '}
+               <Countdown
+                  onComplete={onWeekEnd}
+                  date={state.week.cutoffTimeStamp}
+               />
             </section>
          )}
          <CartProducts>

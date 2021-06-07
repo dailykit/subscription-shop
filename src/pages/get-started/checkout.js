@@ -24,7 +24,7 @@ const Checkout = () => {
 
    React.useEffect(() => {
       if (!isAuthenticated) {
-         navigate('/get-started/select-plan')
+         navigate('/get-started/register')
       }
    }, [isAuthenticated])
 
@@ -111,6 +111,7 @@ const PaymentContent = () => {
                })
             } else if (status === 'SUCCEEDED') {
                await updateBrandCustomer({
+                  refetchQueries: ['customer'],
                   variables: {
                      id: user?.brandCustomerId,
                      _set: { subscriptionOnboardStatus: 'ONBOARDED' },
@@ -151,41 +152,75 @@ const PaymentContent = () => {
       }
    )
 
-   const [updateCart] = useMutation(QUERIES.UPDATE_CART, {
-      onCompleted: ({ updateCart = {} }) => {
-         let referralCode = null
-         if (
-            Array.isArray(user?.customerReferrals) &&
-            user?.customerReferrals.length > 0
-         ) {
-            const [referral] = user?.customerReferrals
-            referralCode = referral?.referralCode
-         }
+   const [insertOccurenceCustomers] = useMutation(
+      QUERIES.MUTATIONS.OCCURENCE.CUSTOMER.CREATE.MULTIPLE,
+      {
+         onCompleted: () => {
+            if (isClient) {
+               localStorage.removeItem('skipList')
+            }
+         },
+         onError: error => console.log('SKIP CARTS -> ERROR -> ', error),
+      }
+   )
 
-         if (state.code.value && state.code.value !== referralCode) {
-            updateCustomerReferralRecord({
-               variables: {
-                  brandId: brand.id,
-                  keycloakId: user.keycloakId,
-                  _set: {
-                     referredByCode: state.code.value,
+   const [updateCart] = useMutation(QUERIES.UPDATE_CART, {
+      onCompleted: async ({ updateCart = {} }) => {
+         try {
+            let referralCode = null
+            if (
+               Array.isArray(user?.customerReferrals) &&
+               user?.customerReferrals.length > 0
+            ) {
+               const [referral] = user?.customerReferrals
+               referralCode = referral?.referralCode
+            }
+
+            if (state.code.value && state.code.value !== referralCode) {
+               await updateCustomerReferralRecord({
+                  variables: {
+                     brandId: brand.id,
+                     keycloakId: user.keycloakId,
+                     _set: {
+                        referredByCode: state.code.value,
+                     },
                   },
-               },
-            })
-         }
-         if (
-            updateCart?.paymentMethodId &&
-            !user?.subscriptionPaymentMethodId
-         ) {
-            updateBrandCustomer({
-               variables: {
-                  id: user?.brandCustomerId,
-                  _set: {
-                     subscriptionPaymentMethodId: updateCart?.paymentMethodId,
+               })
+            }
+         } catch (error) {}
+
+         try {
+            if (
+               updateCart?.paymentMethodId &&
+               !user?.subscriptionPaymentMethodId
+            ) {
+               await updateBrandCustomer({
+                  variables: {
+                     id: user?.brandCustomerId,
+                     _set: {
+                        subscriptionPaymentMethodId:
+                           updateCart?.paymentMethodId,
+                     },
                   },
-               },
-            })
-         }
+               })
+            }
+         } catch (error) {}
+
+         try {
+            if (isClient) {
+               const skipList = localStorage.getItem('skipList')
+               await insertOccurenceCustomers({
+                  variables: {
+                     objects: skipList.split(',').map(id => ({
+                        isSkipped: true,
+                        keycloakId: user.keycloakId,
+                        subscriptionOccurenceId: Number(id),
+                        brand_customerId: user.brandCustomerId,
+                     })),
+                  },
+               })
+            }
+         } catch (error) {}
       },
       onError: error => {
          addToast(error.message, { appearance: 'error' })

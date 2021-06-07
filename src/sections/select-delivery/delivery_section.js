@@ -44,8 +44,9 @@ export const DeliverySection = ({ planId }) => {
       if (!isEmpty(state.address.selected)) {
          fetchDays({
             variables: {
-               id: planId ?? (isClient && window.localStorage.getItem('plan')),
+               isDemo: user?.isDemo,
                zipcode: state.address.selected.zipcode,
+               id: planId ?? (isClient && window.localStorage.getItem('plan')),
             },
          })
       }

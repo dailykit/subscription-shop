@@ -5,7 +5,6 @@ import { isClient } from './isClient'
 let cachedScripts = []
 
 export const useScript = src => {
-   console.log('🚀 ~ file: useScript.js ~ line 8 ~ src', src)
    const [state, setState] = React.useState({
       loaded: false,
       error: false,

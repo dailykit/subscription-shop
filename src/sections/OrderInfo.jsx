@@ -21,8 +21,8 @@ const OrderInfo = ({ cart, showViewOrderButton = false }) => {
       }
    }, [cart?.paymentStatus])
 
-   const planProducts = cart?.products.filter(node => !node.isAddOn) || []
-   const addOnProducts = cart?.products.filter(node => node.isAddOn) || []
+   const planProducts = cart?.products?.filter(node => !node.isAddOn) || []
+   const addOnProducts = cart?.products?.filter(node => node.isAddOn) || []
    return (
       <div>
          <section>

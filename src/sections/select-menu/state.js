@@ -1,6 +1,7 @@
 import React from 'react'
 import moment from 'moment'
 import { isEmpty } from 'lodash'
+import { navigate } from 'gatsby'
 import { useLocation } from '@reach/router'
 import { useToasts } from 'react-toast-notifications'
 import { useMutation, useQuery, useSubscription } from '@apollo/react-hooks'
@@ -33,6 +34,7 @@ const reducers = (state, { type, payload }) => {
          return {
             ...state,
             week: payload,
+            cartState: 'IDLE',
          }
       }
       case 'SET_IS_OCCURENCES_LOADING':
@@ -76,7 +78,7 @@ const insertCartId = (node, cartId) => {
    return node
 }
 
-export const MenuProvider = ({ children }) => {
+export const MenuProvider = ({ isCheckout, children }) => {
    const { user } = useUser()
    const location = useLocation()
    const { addToast } = useToasts()
@@ -148,7 +150,11 @@ export const MenuProvider = ({ children }) => {
 
    React.useEffect(() => {
       if (!loadingZipcode && !isEmpty(zipcode) && state.week?.fulfillmentDate) {
-         if (zipcode.isDeliveryActive) {
+         if (
+            zipcode.isDeliveryActive &&
+            zipcode?.deliveryTime?.from &&
+            zipcode?.deliveryTime?.to
+         ) {
             setFulfillment({
                type: 'PREORDER_DELIVERY',
                slot: {
@@ -162,7 +168,12 @@ export const MenuProvider = ({ children }) => {
                   ),
                },
             })
-         } else if (zipcode.isPickupActive && zipcode.pickupOptionId) {
+         } else if (
+            zipcode.isPickupActive &&
+            zipcode.pickupOptionId &&
+            zipcode?.pickupOption?.time?.from &&
+            zipcode?.pickupOption?.time?.to
+         ) {
             setFulfillment({
                type: 'PREORDER_PICKUP',
                slot: {
@@ -210,29 +221,53 @@ export const MenuProvider = ({ children }) => {
       },
       onCompleted: ({ subscription = {} } = {}) => {
          if (subscription?.occurences?.length > 0) {
-            const date = new URL(location.href).searchParams.get('d')
-            let validWeekIndex = null
-            if (date) {
+            const d = new URL(location.href).searchParams.get('d')
+            const date = new URL(location.href).searchParams.get('date')
+            let validWeekIndex = 0
+            if (d !== undefined && d !== null) {
+               validWeekIndex = subscription?.occurences.findIndex(
+                  node => node.fulfillmentDate === d
+               )
+            } else if (isCheckout && date !== undefined && date !== null) {
                validWeekIndex = subscription?.occurences.findIndex(
                   node => node.fulfillmentDate === date
                )
             } else {
                validWeekIndex = subscription?.occurences.findIndex(node => {
                   const { customers = [] } = node
+                  if (customers.length === 0) return false
                   return customers.every(
                      ({ itemCountValid }) => !itemCountValid
                   )
                })
             }
-            if (validWeekIndex === -1) return
+
+            if (validWeekIndex === -1) {
+               dispatch({
+                  type: 'SET_WEEK',
+                  payload: subscription?.occurences[0],
+               })
+               if (!isCheckout) {
+                  navigate(
+                     '/menu?d=' + subscription?.occurences[0].fulfillmentDate
+                  )
+               }
+            } else {
+               dispatch({
+                  type: 'SET_WEEK',
+                  payload: subscription?.occurences[validWeekIndex],
+               })
+               if (!isCheckout) {
+                  navigate(
+                     '/menu?d=' +
+                        subscription?.occurences[validWeekIndex].fulfillmentDate
+                  )
+               }
+            }
             dispatch({ type: 'SET_IS_OCCURENCES_LOADING', payload: false })
             dispatch({
                type: 'SET_OCCURENCES',
                payload: subscription?.occurences,
-            })
-            dispatch({
-               type: 'SET_WEEK',
-               payload: subscription?.occurences[validWeekIndex],
             })
          } else if (
             subscription?.occurences?.length === 0 &&
@@ -303,14 +338,9 @@ export const MenuProvider = ({ children }) => {
             variables: { object: cart },
          })
             .then(({ data: { createCartItem = {} } = {} }) => {
-               const { products = [] } = createCartItem
-               if (!isEmpty(products)) {
-                  const [product] = products
-                  addToast(`You've added the product - ${product.name}.`, {
-                     appearance: 'info',
-                  })
-               }
-
+               addToast(`Successfully added the product!`, {
+                  appearance: 'info',
+               })
                updateOccurenceCustomer({
                   variables: {
                      pk_columns: {
@@ -376,13 +406,9 @@ export const MenuProvider = ({ children }) => {
                insertCartItem({
                   variables: { object: cart },
                }).then(({ data: { createCartItem = {} } = {} }) => {
-                  const { products = [] } = createCartItem
-                  if (!isEmpty(products)) {
-                     const [product] = products
-                     addToast(`You've added the product - ${product.name}.`, {
-                        appearance: 'info',
-                     })
-                  }
+                  addToast(`Successfully added the product!`, {
+                     appearance: 'info',
+                  })
                   updateOccurenceCustomer({
                      variables: {
                         pk_columns: {
@@ -419,11 +445,13 @@ export const MenuProvider = ({ children }) => {
    }
 
    if (
-      state.isOccurencesLoading ||
-      loadingZipcode ||
-      isCustomerLoading ||
-      occurenceCustomerLoading ||
-      !state.week.id
+      [
+         state.isOccurencesLoading,
+         loadingZipcode,
+         isCustomerLoading,
+         occurenceCustomerLoading,
+         !Boolean(state.week?.id),
+      ].every(node => node)
    )
       return <PageLoader />
    return (

@@ -65,6 +65,7 @@ export const Plan = ({ cameFrom = '', plan, handlePlanClick }) => {
       plural: config?.itemLabel?.singular || 'recipes',
    }
    const theme = configOf('theme-color', 'Visual')
+   const priceDisplay = configOf('priceDisplay', 'Visual')
    if (!defaultServing) return <Loader inline />
    return (
       <li css={tw`border rounded-lg p-8`}>
@@ -137,33 +138,44 @@ export const Plan = ({ cameFrom = '', plan, handlePlanClick }) => {
             )}
          </section>
          <hr />
-         <div tw="mb-6 flex items-center">
-            <section tw="h-full flex-1">
-               <Price theme={theme}>
-                  {formatCurrency(
-                     Number.parseFloat(
-                        (defaultItemCount?.price || 1) /
-                           ((defaultItemCount?.count || 1) *
-                              (defaultServing?.size || 1))
-                     ).toFixed(2)
-                  )}{' '}
-               </Price>
-               <span tw="text-gray-600">
-                  / {yieldLabel.singular} x{' '}
-                  {(defaultServing.size || 1) * (defaultItemCount?.count || 1)}
-               </span>
-            </section>
-            <section tw="h-full flex-1 flex flex-col text-right border-l py-1">
-               <TotalPrice theme={theme}>
-                  {formatCurrency(defaultItemCount?.price)}
-               </TotalPrice>
-               <span tw="text-gray-600 italic text-sm">
-                  {defaultItemCount?.isTaxIncluded
-                     ? 'Tax Inclusive'
-                     : 'Tax Exclusive'}
-               </span>
-               <span tw="text-gray-600">Weekly total</span>
-            </section>
+         <div tw="py-3 flex items-center divide-x">
+            {priceDisplay?.pricePerServing?.isVisible === true && (
+               <section tw="h-full flex-1">
+                  {priceDisplay?.pricePerServing?.prefix && (
+                     <span tw="text-gray-600">
+                        {priceDisplay?.pricePerServing?.prefix}{' '}
+                     </span>
+                  )}
+                  <Price theme={theme}>
+                     {formatCurrency(
+                        Number.parseFloat(
+                           (defaultItemCount?.price || 1) /
+                              ((defaultItemCount?.count || 1) *
+                                 (defaultServing?.size || 1))
+                        ).toFixed(2)
+                     )}{' '}
+                  </Price>
+                  <span tw="text-gray-600">
+                     {priceDisplay?.pricePerServing?.suffix ||
+                        `per ${yieldLabel.singular}`}
+                  </span>
+               </section>
+            )}
+            {priceDisplay?.pricePerPlan?.isVisible === true && (
+               <section tw="h-full flex-1 flex flex-col text-right py-1">
+                  <TotalPrice theme={theme}>
+                     {formatCurrency(defaultItemCount?.price)}
+                  </TotalPrice>
+                  <span tw="text-gray-600 italic text-sm">
+                     {defaultItemCount?.isTaxIncluded
+                        ? 'Tax Inclusive'
+                        : 'Tax Exclusive'}
+                  </span>
+                  <span tw="text-gray-600">
+                     {priceDisplay?.pricePerPlan?.suffix || 'Weekly total'}
+                  </span>
+               </section>
+            )}
          </div>
          <Button bg={colorConfig?.accent} onClick={() => selectPlan()}>
             Select

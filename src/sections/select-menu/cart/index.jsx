@@ -11,9 +11,10 @@ import Fulfillment from './fulfillment'
 import PaymentCard from './PaymentCard'
 import { useConfig } from '../../../lib'
 import { useUser } from '../../../context'
+import { isClient } from '../../../utils'
 import { Button } from '../../../components'
 import { CloseIcon } from '../../../assets/icons'
-import { MUTATIONS, UPDATE_BRAND_CUSTOMER } from '../../../graphql'
+import { UPDATE_BRAND_CUSTOMER } from '../../../graphql'
 
 export const CartPanel = ({ noSkip, isCheckout }) => {
    const { user } = useUser()
@@ -27,11 +28,6 @@ export const CartPanel = ({ noSkip, isCheckout }) => {
    })
    const [isCartPanelOpen, setIsCartPanelOpen] = React.useState(false)
 
-   const [insertOccurenceCustomers] = useMutation(
-      MUTATIONS.OCCURENCE.CUSTOMER.CREATE.MULTIPLE,
-      { onError: error => console.log('SKIP CARTS -> ERROR -> ', error) }
-   )
-
    const onSubmit = async () => {
       try {
          if (isCheckout) {
@@ -43,18 +39,8 @@ export const CartPanel = ({ noSkip, isCheckout }) => {
             })
 
             const skipList = new URL(location.href).searchParams.get('previous')
-
             if (skipList && skipList.split(',').length > 0) {
-               await insertOccurenceCustomers({
-                  variables: {
-                     objects: skipList.split(',').map(id => ({
-                        isSkipped: true,
-                        keycloakId: user.keycloakId,
-                        subscriptionOccurenceId: id,
-                        brand_customerId: user.brandCustomerId,
-                     })),
-                  },
-               })
+               isClient && localStorage.setItem('skipList', skipList.split(','))
             }
          }
          navigate(

@@ -5,11 +5,19 @@ import { useQuery } from '@apollo/react-hooks'
 import { webRenderer } from '@dailykit/web-renderer'
 
 import { isClient } from '../../utils'
+import { useUser } from '../../context'
 import { GET_FILEID } from '../../graphql'
 import { Plans } from '../../sections/select-plan'
 import { SEO, Layout, StepsNavbar } from '../../components'
 
 const SelectPlan = () => {
+   const { isAuthenticated } = useUser()
+   React.useEffect(() => {
+      if (!isAuthenticated) {
+         navigate('/get-started/register')
+      }
+   }, [isAuthenticated])
+
    React.useEffect(() => {
       if (isClient) {
          const plan = localStorage.getItem('plan')

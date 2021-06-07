@@ -1,14 +1,18 @@
 import gql from 'graphql-tag'
 
 export const ITEM_COUNT = gql`
-   query itemCount($id: Int!, $zipcode: String) {
+   query itemCount($id: Int!, $zipcode: String, $isDemo: Boolean) {
       itemCount: subscription_subscriptionItemCount_by_pk(id: $id) {
          id
          valid: subscriptions(
-            where: { availableZipcodes: { zipcode: { _eq: $zipcode } } }
+            where: {
+               isDemo: { _eq: $isDemo }
+               availableZipcodes: { zipcode: { _eq: $zipcode } }
+            }
             order_by: { position: desc_nulls_last }
          ) {
             id
+            isDemo
             rrule
             leadTime
             zipcodes: availableZipcodes(where: { zipcode: { _eq: $zipcode } }) {
@@ -19,11 +23,13 @@ export const ITEM_COUNT = gql`
          }
          invalid: subscriptions(
             where: {
+               isDemo: { _eq: $isDemo }
                _not: { availableZipcodes: { zipcode: { _eq: $zipcode } } }
             }
             order_by: { position: desc_nulls_last }
          ) {
             id
+            isDemo
             rrule
             leadTime
             zipcodes: availableZipcodes(where: { zipcode: { _eq: $zipcode } }) {
@@ -341,7 +347,7 @@ export const CART_BY_WEEK = gql`
             fulfillmentInfo
             transactionId
             paymentMethodId
-            products: cartItemViews(where: { level: { _eq: 1 } }) {
+            products: cartItems(where: { level: { _eq: 1 } }) {
                id
                name: displayName
                image: displayImage
@@ -395,7 +401,7 @@ export const CART = gql`
          transactionRemark
          stripeInvoiceId
          stripeInvoiceDetails
-         products: cartItemViews(where: { level: { _eq: 1 } }) {
+         products: cartItems(where: { level: { _eq: 1 } }) {
             id
             isAddOn
             unitPrice
@@ -427,7 +433,7 @@ export const CART_SUBSCRIPTION = gql`
          transactionRemark
          stripeInvoiceId
          stripeInvoiceDetails
-         products: cartItemViews(where: { level: { _eq: 1 } }) {
+         products: cartItems(where: { level: { _eq: 1 } }) {
             id
             isAddOn
             unitPrice
@@ -455,7 +461,7 @@ export const CART_STATUS = gql`
          paymentStatus
          fulfillmentInfo
          billingDetails
-         products: cartItemViews(where: { level: { _eq: 1 } }) {
+         products: cartItems(where: { level: { _eq: 1 } }) {
             id
             name: displayName
             image: displayImage
@@ -531,7 +537,7 @@ export const ORDER = gql`
             billingDetails
             fulfillmentInfo
             paymentStatus
-            products: cartItemViews(where: { level: { _eq: 1 } }) {
+            products: cartItems(where: { level: { _eq: 1 } }) {
                id
                name: displayName
                image: displayImage
@@ -661,7 +667,9 @@ export const OUR_MENU = {
       query subscription($id: Int!) {
          subscription: subscription_subscription_by_pk(id: $id) {
             id
-            occurences: subscriptionOccurences {
+            occurences: subscriptionOccurences(
+               order_by: { fulfillmentDate: asc }
+            ) {
                id
                isValid
                isVisible

@@ -11,6 +11,7 @@ import {
    CUSTOMER_REFERRALS,
    LOYALTY_POINTS,
    UPDATE_DAILYKEY_CUSTOMER,
+   UPDATE_BRAND_CUSTOMER,
    WALLETS,
 } from '../graphql'
 import { PageLoader } from '../components'
@@ -51,6 +52,9 @@ export const UserProvider = ({ children }) => {
       },
       onError: error =>
          console.log('updatePlatformCustomer => error => ', error),
+   })
+   const [updateBrandCustomer] = useMutation(UPDATE_BRAND_CUSTOMER, {
+      onError: error => console.log('updateBrandCustomer => error => ', error),
    })
    const [state, dispatch] = React.useReducer(reducers, {
       isAuthenticated: false,

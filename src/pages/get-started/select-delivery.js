@@ -6,8 +6,8 @@ import { useToasts } from 'react-toast-notifications'
 import { webRenderer } from '@dailykit/web-renderer'
 
 import { useConfig } from '../../lib'
-import { BRAND, DELETE_OCCURENCE_CUSTOMER, GET_FILEID } from '../../graphql'
 import { useUser } from '../../context'
+import { BRAND, DELETE_OCCURENCE_CUSTOMER, GET_FILEID } from '../../graphql'
 import { SEO, Layout, StepsNavbar, Loader, Button } from '../../components'
 
 import {
@@ -23,7 +23,7 @@ const SelectDelivery = () => {
    const { isAuthenticated } = useUser()
    React.useEffect(() => {
       if (!isAuthenticated) {
-         navigate('/get-started/select-plan')
+         navigate('/get-started/register')
       }
    }, [isAuthenticated])
 

@@ -12,7 +12,6 @@ export const Layout = ({ children, noHeader }) => {
    const { isAuthenticated, user } = useUser()
    const { hasConfig, configOf } = useConfig()
 
-   const brand = configOf('theme-brand', 'brand')
    const {
       isPrivacyPolicyAvailable,
       isRefundPolicyAvailable,
@@ -23,15 +22,20 @@ export const Layout = ({ children, noHeader }) => {
       <>
          {!noHeader && <Header />}
          {children}
-         {(user?.isTest === true || store?.isStoreLive === false) && (
-            <div tw="p-2 bg-gray-200 text-gray-700 w-full flex items-center justify-center">
-               Store running in test mode so payments will be bypassed
-            </div>
-         )}
+         <div tw="p-2 bg-gray-200 text-gray-700 w-full flex flex-col items-center justify-center gap-2">
+            {(user?.isTest === true || store?.isStoreLive === false) && (
+               <p>Store running in test mode so payments will be bypassed</p>
+            )}
+            {user?.isDemo && <p>Logged in user is in demo mode.</p>}
+         </div>
          <Footer theme={configOf('theme-color', 'Visual')}>
             <div>
                <section>
-                  <h2 tw="text-3xl">{brand?.name || 'Subscription Shop'}</h2>
+                  {configOf('footerTitle', 'footer')?.value && (
+                     <h2 tw="text-3xl">
+                        {configOf('footerTitle', 'footer')?.value}
+                     </h2>
+                  )}
                   {hasConfig('Location', 'availability') && (
                      <p tw="mt-2">
                         {normalizeAddress(configOf('Location', 'availability'))}
@@ -51,10 +55,12 @@ export const Layout = ({ children, noHeader }) => {
                               {configOf('Contact', 'brand')?.email}
                            </a>
                         </span>
-                        <span tw="mt-4 flex items-center">
-                           <PhoneIcon size={18} tw="stroke-current mr-2" />
-                           {configOf('Contact', 'brand')?.phoneNo}
-                        </span>
+                        {configOf('Contact', 'brand')?.phoneNo && (
+                           <span tw="mt-4 flex items-center">
+                              <PhoneIcon size={18} tw="stroke-current mr-2" />
+                              {configOf('Contact', 'brand')?.phoneNo}
+                           </span>
+                        )}
                      </>
                   )}
                </section>
@@ -102,6 +108,22 @@ export const Layout = ({ children, noHeader }) => {
                )}
             </div>
          </Footer>
+         {configOf('footerWhatsappPhone', 'footer')?.isVisible && (
+            <a
+               target="_blank"
+               rel="noreferrer noopener"
+               tw="fixed right-0 bottom-0 mb-4 mr-4"
+               href={`https://api.whatsapp.com/send?phone=${
+                  configOf('footerWhatsappPhone', 'footer')?.value
+               }`}
+            >
+               <img
+                  tw="h-10 w-10"
+                  alt="WhatsApp"
+                  src="https://s3.us-east-2.amazonaws.com/dailykit.org/whatsapp.png"
+               />
+            </a>
+         )}
       </>
    )
 }
