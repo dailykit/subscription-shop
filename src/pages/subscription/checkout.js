@@ -69,62 +69,77 @@ const PaymentContent = () => {
    )
 
    React.useEffect(() => {
-      ;(async () => {
-         const status = cart.paymentStatus
-         const remark = cart.transactionRemark
-         const next_action = cart.transactionRemark?.next_action
+      if (!loading) {
+         if (cart.customerKeycloakId !== user.keycloakId) {
+            navigate(`/subscription/menu`)
+         } else {
+            ;(async () => {
+               const status = cart.paymentStatus
+               const remark = cart.transactionRemark
+               const next_action = cart.transactionRemark?.next_action
 
-         try {
-            if (status === 'PENDING') {
-               setOverlayMessage(messages['PENDING'])
-            } else if (status === 'REQUIRES_ACTION' && !next_action?.type) {
-               toggleOverlay(true)
-               setOverlayMessage(messages['REQUIRES_ACTION'])
-            } else if (status === 'REQUIRES_ACTION' && next_action?.type) {
-               toggleOverlay(true)
-               setOverlayMessage(messages['REQUIRES_ACTION_WITH_URL'])
-               let TAB_URL = ''
-               let remark = remark
-               if (next_action?.type === 'use_stripe_sdk') {
-                  TAB_URL = next_action?.use_stripe_sdk?.stripe_js
-               } else {
-                  TAB_URL = next_action?.redirect_to_url?.url
-               }
-               setOtpPageUrl(TAB_URL)
-               authTabRef.current = window.open(TAB_URL, 'payment_auth_page')
-            } else if (
-               status === 'REQUIRES_PAYMENT_METHOD' &&
-               remark?.last_payment_error?.code
-            ) {
-               toggleOverlay(false)
-               setOverlayMessage(messages['PENDING'])
-               addToast(remark?.last_payment_error?.message, {
-                  appearance: 'error',
-               })
-            } else if (cart.paymentStatus === 'SUCCEEDED') {
-               if (authTabRef.current) {
-                  authTabRef.current.close()
-                  if (!authTabRef.current.closed) {
-                     window.open(
-                        `/subscription/checkout?id=${cart.id}`,
+               try {
+                  if (status === 'PENDING') {
+                     setOverlayMessage(messages['PENDING'])
+                  } else if (
+                     status === 'REQUIRES_ACTION' &&
+                     !next_action?.type
+                  ) {
+                     toggleOverlay(true)
+                     setOverlayMessage(messages['REQUIRES_ACTION'])
+                  } else if (
+                     status === 'REQUIRES_ACTION' &&
+                     next_action?.type
+                  ) {
+                     toggleOverlay(true)
+                     setOverlayMessage(messages['REQUIRES_ACTION_WITH_URL'])
+                     let TAB_URL = ''
+                     let remark = remark
+                     if (next_action?.type === 'use_stripe_sdk') {
+                        TAB_URL = next_action?.use_stripe_sdk?.stripe_js
+                     } else {
+                        TAB_URL = next_action?.redirect_to_url?.url
+                     }
+                     setOtpPageUrl(TAB_URL)
+                     authTabRef.current = window.open(
+                        TAB_URL,
                         'payment_auth_page'
                      )
+                  } else if (
+                     status === 'REQUIRES_PAYMENT_METHOD' &&
+                     remark?.last_payment_error?.code
+                  ) {
+                     toggleOverlay(false)
+                     setOverlayMessage(messages['PENDING'])
+                     addToast(remark?.last_payment_error?.message, {
+                        appearance: 'error',
+                     })
+                  } else if (cart.paymentStatus === 'SUCCEEDED') {
+                     if (authTabRef.current) {
+                        authTabRef.current.close()
+                        if (!authTabRef.current.closed) {
+                           window.open(
+                              `/subscription/checkout?id=${cart.id}`,
+                              'payment_auth_page'
+                           )
+                        }
+                     }
+                     setOverlayMessage(messages['SUCCEEDED'])
+                     addToast(messages['SUCCEEDED'], { appearance: 'success' })
+                     navigate(`/subscription/placing-order?id=${cart.id}`)
+                  } else if (status === 'PAYMENT_FAILED') {
+                     toggleOverlay(false)
+                     addToast(messages['PAYMENT_FAILED'], {
+                        appearance: 'error',
+                     })
                   }
+               } catch (error) {
+                  console.log('on succeeded -> error -> ', error)
                }
-               setOverlayMessage(messages['SUCCEEDED'])
-               addToast(messages['SUCCEEDED'], { appearance: 'success' })
-               navigate(`/subscription/placing-order?id=${cart.id}`)
-            } else if (status === 'PAYMENT_FAILED') {
-               toggleOverlay(false)
-               addToast(messages['PAYMENT_FAILED'], {
-                  appearance: 'error',
-               })
-            }
-         } catch (error) {
-            console.log('on succeeded -> error -> ', error)
+            })()
          }
-      })()
-   }, [cart.paymentStatus])
+      }
+   }, [loading, cart.paymentStatus])
 
    const [updateCart] = useMutation(QUERIES.UPDATE_CART, {
       onError: error => {

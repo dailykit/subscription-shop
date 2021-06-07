@@ -1,5 +1,6 @@
 import React from 'react'
 import moment from 'moment'
+import { isEmpty } from 'lodash'
 import { navigate } from 'gatsby'
 import tw, { styled, css } from 'twin.macro'
 import { useSubscription } from '@apollo/react-hooks'
@@ -14,7 +15,7 @@ import { PlacedOrderIllo, CartIllo, PaymentIllo } from '../../../assets/icons'
 
 const PlacingOrder = () => {
    const { configOf } = useConfig()
-   const { isAuthenticated } = useUser()
+   const { user, isAuthenticated } = useUser()
    const { loading, data: { cart = {} } = {} } = useSubscription(CART_STATUS, {
       skip: !isClient,
       variables: {
@@ -27,6 +28,16 @@ const PlacingOrder = () => {
          navigate('/subscription/get-started/register')
       }
    }, [isAuthenticated])
+
+   React.useEffect(() => {
+      if (
+         !loading &&
+         !isEmpty(cart) &&
+         cart?.customerKeycloakId !== user?.keycloakId
+      ) {
+         navigate('/subscription/menu')
+      }
+   }, [loading, cart])
 
    const gotoMenu = () => {
       isClient && window.localStorage.removeItem('plan')

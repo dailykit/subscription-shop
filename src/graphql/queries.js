@@ -434,6 +434,7 @@ export const CART_SUBSCRIPTION = gql`
          transactionRemark
          stripeInvoiceId
          stripeInvoiceDetails
+         customerKeycloakId
          products: cartItems(where: { level: { _eq: 1 } }) {
             id
             isAddOn
@@ -462,6 +463,7 @@ export const CART_STATUS = gql`
          paymentStatus
          fulfillmentInfo
          billingDetails
+         customerKeycloakId
          products: cartItems(where: { level: { _eq: 1 } }) {
             id
             name: displayName
