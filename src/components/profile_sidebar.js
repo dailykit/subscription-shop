@@ -6,16 +6,23 @@ import { useConfig } from '../lib'
 export const ProfileSidebar = ({ toggle = true, logout }) => {
    const { configOf } = useConfig()
 
-   const loyaltyPointsAllowed = configOf('Loyalty Points', 'rewards')
-      ?.isAvailable
-   const walletAllowed = configOf('Wallet', 'rewards')?.isAvailable
+   const loyaltyPointsSettings = configOf('Loyalty Points', 'rewards')
+
+   const walletSettings = configOf('Wallet', 'rewards')
    const referralsAllowed = configOf('Referral', 'rewards')?.isAvailable
 
    const [menu] = useState([
       { title: 'Profile', href: '/account/profile/' },
-      { title: 'Wallet', href: '/account/wallet/' },
       {
-         title: 'Loyalty Points',
+         title: `${walletSettings?.label ? walletSettings.label : 'Wallet'}`,
+         href: '/account/wallet/',
+      },
+      {
+         title: `${
+            loyaltyPointsSettings?.label
+               ? loyaltyPointsSettings.label
+               : 'Loyalty Points'
+         }`,
          href: '/account/loyalty-points/',
       },
       { title: 'Referrals', href: '/account/referrals/' },

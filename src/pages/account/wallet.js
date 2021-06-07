@@ -34,14 +34,17 @@ const Content = () => {
    const { configOf } = useConfig()
 
    const theme = configOf('theme-color', 'Visual')
-   const walletAllowed = configOf('Wallet', 'rewards')?.isAvailable
+   const { isAvailable = false, label = 'Wallet' } = configOf(
+      'Wallet',
+      'rewards'
+   )
 
    return (
       <section tw="px-6 w-full md:w-6/12">
          <header tw="mt-6 mb-3 flex items-center justify-between">
-            <Title theme={theme}>Wallet</Title>
+            <Title theme={theme}>{label}</Title>
          </header>
-         {walletAllowed && !!user.wallet && (
+         {isAvailable && !!user.wallet && (
             <>
                <Form.Label>Balance</Form.Label>
                {formatCurrency(user.wallet.amount)}
