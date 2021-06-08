@@ -51,6 +51,7 @@ export const PLANS = gql`
          id
          title
          isDemo
+         metaDetails
          defaultServingId: defaultSubscriptionServingId
          defaultServing: defaultSubscriptionServing {
             id
@@ -79,6 +80,7 @@ export const PLANS = gql`
             id
             isDemo
             size: servingSize
+            metaDetails
             defaultItemCountId: defaultSubscriptionItemCountId
             defaultItemCount: defaultSubscriptionItemCount {
                id
@@ -96,6 +98,7 @@ export const PLANS = gql`
                count
                price
                isTaxIncluded
+               metaDetails
             }
          }
       }

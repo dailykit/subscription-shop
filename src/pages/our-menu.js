@@ -510,7 +510,7 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
    }
 
    const imageRatio = useConfig().configOf('image-aspect-ratio', 'Visual')
-   console.log(imageRatio)
+
    const openRecipe = () => navigate(`/recipes/?id=${node?.productOption?.id}`)
 
    return (
