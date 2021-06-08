@@ -7,7 +7,7 @@ import { webRenderer } from '@dailykit/web-renderer'
 
 import { useConfig } from '../../../lib'
 import { useUser } from '../../../context'
-import { BRAND, DELETE_OCCURENCE_CUSTOMER, GET_FILEID } from '../../../graphql'
+import { BRAND, GET_FILEID } from '../../../graphql'
 import { SEO, Layout, StepsNavbar, Loader, Button } from '../../../components'
 
 import {
@@ -27,6 +27,12 @@ const SelectDelivery = () => {
       }
    }, [isAuthenticated])
 
+   React.useEffect(() => {
+      if (isClient && !localStorage.getItem('plan')) {
+         navigate('/subscription/get-started/select-plan')
+      }
+   }, [])
+
    return (
       <Layout noHeader>
          <SEO title="Delivery" />
@@ -45,9 +51,6 @@ const DeliveryContent = () => {
    const { state } = useDelivery()
    const { addToast } = useToasts()
    const { brand, configOf } = useConfig()
-   const [deleteOccurenceCustomer] = useMutation(DELETE_OCCURENCE_CUSTOMER, {
-      onError: error => console.log('DELETE CART -> ERROR -> ', error),
-   })
    const { loading } = useQuery(GET_FILEID, {
       variables: {
          divId: ['select-delivery-bottom-01'],

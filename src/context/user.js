@@ -42,6 +42,13 @@ const reducers = (state, { type, payload }) => {
    }
 }
 
+const ROUTES = {
+   SELECT_PLAN: '/subscription/get-started/select-plan',
+   SELECT_DELIVERY: '/subscription/get-started/select-delivery',
+   SELECT_MENU: '/subscription/get-started/select-menu/',
+   CHECKOUT: '/subscription/get-started/checkout/',
+}
+
 export const UserProvider = ({ children }) => {
    const { brand, organization } = useConfig()
    const [isLoading, setIsLoading] = React.useState(true)
@@ -78,6 +85,27 @@ export const UserProvider = ({ children }) => {
                   brandCustomer.subscriptionOnboardStatus,
             },
          })
+         if (ROUTES?.[brandCustomer?.subscriptionOnboardStatus]) {
+            let path = ROUTES[brandCustomer?.subscriptionOnboardStatus]
+            if (path.includes('checkout') && brandCustomer.carts.length > 0) {
+               const [cart] = brandCustomer.carts
+               if (cart.id) {
+                  path += '?id=' + cart.id
+               }
+            }
+            if (
+               path.includes('select-menu') &&
+               brandCustomer.carts.length > 0
+            ) {
+               const [cart] = brandCustomer.carts
+               if (cart.occurence?.fulfillmentDate) {
+                  path += '?id=' + cart.occurence?.fulfillmentDate
+               }
+            }
+            navigate(path)
+         } else {
+            sendBackToSourceRoute()
+         }
       },
    })
    const { loading, data: { customer = {} } = {} } = useQuery(
@@ -161,7 +189,6 @@ export const UserProvider = ({ children }) => {
             const user = jwtDecode(token)
             setKeycloakId(user?.sub)
             dispatch({ type: 'SET_USER', payload: { keycloakId: user?.sub } })
-            sendBackToSourceRoute()
          } else {
             dispatch({ type: 'CLEAR_USER' })
          }
@@ -200,7 +227,6 @@ export const UserProvider = ({ children }) => {
             }
 
             dispatch({ type: 'SET_USER', payload: user })
-            sendBackToSourceRoute()
          }
       }
       setIsLoading(false)
