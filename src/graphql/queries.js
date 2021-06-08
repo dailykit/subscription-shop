@@ -709,6 +709,13 @@ export const BRAND_CUSTOMER = gql`
       brandCustomer(id: $id) {
          id
          subscriptionOnboardStatus
+         carts: subscriptionOccurences {
+            id: cartId
+            occurence: subscriptionOccurence {
+               id
+               fulfillmentDate
+            }
+         }
       }
    }
 `
