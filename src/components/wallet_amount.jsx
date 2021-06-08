@@ -5,6 +5,7 @@ import { useUser } from '../context'
 import { MUTATIONS } from '../graphql'
 import { formatCurrency } from '../utils'
 import { useConfig } from '../lib'
+import { Info } from '../assets/icons'
 
 export const WalletAmount = ({ cart }) => {
    const { user } = useUser()
@@ -44,6 +45,7 @@ export const WalletAmount = ({ cart }) => {
                      : 'Wallet'}{' '}
                   amount used:{' '}
                </Styles.Text>
+
                <Styles.Text>
                   <Styles.Cross
                      role="button"
@@ -70,12 +72,22 @@ export const WalletAmount = ({ cart }) => {
                   <Styles.InputWrapper>
                      <Styles.Label>
                         {' '}
-                        $
                         {walletSettings?.label
                            ? walletSettings.label
                            : 'Wallet'}{' '}
                         amount{' '}
                      </Styles.Label>
+                     {walletSettings?.description && (
+                        <Styles.Tooltip>
+                           <Info size={18} />
+                           <p>
+                              {walletSettings?.description
+                                 ? walletSettings.description
+                                 : 'Not Available'}
+                           </p>
+                        </Styles.Tooltip>
+                     )}
+
                      <Styles.Input
                         type="number"
                         min="0"
@@ -146,5 +158,15 @@ const Styles = {
       color: #ff5a52;
       font-size: 18px;
       cursor: pointer;
+   `,
+   Tooltip: styled.span`
+      ${tw`relative float-right ml-2 mt-1`}
+      p {
+         ${tw`hidden min-w-max bg-gray-200 p-1 absolute left-2 rounded`}
+         z-index: 1;
+      }
+      &:hover p {
+         ${tw`block`}
+      }
    `,
 }

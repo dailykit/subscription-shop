@@ -4,11 +4,15 @@ import tw, { styled } from 'twin.macro'
 import { useUser } from '../context'
 import { MUTATIONS } from '../graphql'
 import { useConfig } from '../lib'
+import { Info } from '../assets/icons'
 
 export const LoyaltyPoints = ({ cart }) => {
    const { user } = useUser()
    const { configOf } = useConfig()
-   const { label = 'Loyalty Points' } = configOf('Loyalty Points', 'rewards')
+   const { label = 'Loyalty Points', description = null } = configOf(
+      'Loyalty Points',
+      'rewards'
+   )
 
    const [points, setPoints] = React.useState(cart.loyaltyPointsUsable)
 
@@ -61,7 +65,14 @@ export const LoyaltyPoints = ({ cart }) => {
             <>
                <Styles.Form onSubmit={handleSubmit}>
                   <Styles.InputWrapper>
-                     <Styles.Label> {label} </Styles.Label>
+                     <Styles.Label>{label}</Styles.Label>
+                     {description && (
+                        <Styles.Tooltip>
+                           <Info size={18} />
+                           <p>{description}</p>
+                        </Styles.Tooltip>
+                     )}
+
                      <Styles.Input
                         type="number"
                         min="0"
@@ -131,5 +142,15 @@ const Styles = {
       color: #ff5a52;
       font-size: 18px;
       cursor: pointer;
+   `,
+   Tooltip: styled.span`
+      ${tw`relative float-right ml-2 mt-1`}
+      p {
+         ${tw`hidden min-w-max bg-gray-200 p-1 absolute left-2 rounded`}
+         z-index: 1;
+      }
+      &:hover p {
+         ${tw`block`}
+      }
    `,
 }
