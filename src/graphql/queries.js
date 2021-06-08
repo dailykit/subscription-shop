@@ -351,6 +351,7 @@ export const CART_BY_WEEK = gql`
             fulfillmentInfo
             transactionId
             paymentMethodId
+            customerKeycloakId
             products: cartItems(where: { level: { _eq: 1 } }) {
                id
                name: displayName
@@ -465,6 +466,7 @@ export const CART_STATUS = gql`
          paymentStatus
          fulfillmentInfo
          billingDetails
+         customerKeycloakId
          products: cartItems(where: { level: { _eq: 1 } }) {
             id
             name: displayName
@@ -707,6 +709,13 @@ export const BRAND_CUSTOMER = gql`
       brandCustomer(id: $id) {
          id
          subscriptionOnboardStatus
+         carts: subscriptionOccurences {
+            id: cartId
+            occurence: subscriptionOccurence {
+               id
+               fulfillmentDate
+            }
+         }
       }
    }
 `
