@@ -100,6 +100,7 @@ export const Menu = () => {
 const Product = ({ node, theme, isAdded, noProductImage, buildImageUrl }) => {
    const { addToast } = useToasts()
    const { state, methods } = useMenu()
+   const imageRatio = useConfig().configOf('image-aspect-ratio', 'Visual')
 
    const openRecipe = () => navigate(`/recipes/?id=${node?.productOption?.id}`)
 
@@ -138,6 +139,7 @@ const Product = ({ node, theme, isAdded, noProductImage, buildImageUrl }) => {
             ? node?.productOption?.product?.assets?.images[0]
             : null,
       additionalText: node?.productOption?.product?.additionalText || '',
+      tags: node?.productOption?.product?.tags || [],
    }
 
    return (
@@ -152,10 +154,7 @@ const Product = ({ node, theme, isAdded, noProductImage, buildImageUrl }) => {
                />
             </Styles.Type>
          )}
-         <div
-            tw="flex items-center justify-center aspect-w-4 aspect-h-3 bg-gray-200 mb-2 rounded overflow-hidden cursor-pointer"
-            onClick={openRecipe}
-         >
+         <ImageWrapper imageRatio={imageRatio} onClick={openRecipe}>
             {product.image ? (
                <ReactImageFallback
                   src={buildImageUrl('400x300', product.image)}
@@ -163,11 +162,17 @@ const Product = ({ node, theme, isAdded, noProductImage, buildImageUrl }) => {
                   initialImage={<Loader />}
                   alt={product.name}
                   className="image__thumbnail"
+                  css={css`
+                     aspect-ratio: ${imageRatio && imageRatio.width
+                        ? imageRatio.height / imageRatio.width
+                        : 4 / 3};
+                  `}
                />
             ) : (
                <img src={noProductImage} alt={product.name} />
             )}
-         </div>
+         </ImageWrapper>
+
          {node.addOnLabel && <Label>{node.addOnLabel}</Label>}
          <section tw="flex items-center mb-1">
             <Check
@@ -180,6 +185,13 @@ const Product = ({ node, theme, isAdded, noProductImage, buildImageUrl }) => {
             </Styles.GhostLink>
          </section>
          <p tw="mb-1">{product?.additionalText}</p>
+         {product.tags.length > 0 && (
+            <Styles.TagsList>
+               {product.tags.map(tag => (
+                  <Styles.Tags>{tag}</Styles.Tags>
+               ))}
+            </Styles.TagsList>
+         )}
          {canAdd() && (
             <Styles.Button
                theme={theme}
@@ -243,6 +255,12 @@ const Styles = {
          }
       `
    ),
+   TagsList: styled.ul`
+      ${tw`list-none text-xs leading-6 text-gray-500 mb-3`}
+   `,
+   Tags: styled.li`
+      ${tw` m-2 bg-red-50 text-gray-500 inline-block text-xs uppercase p-1`}
+   `,
 }
 
 const Products = styled.ul`
@@ -269,3 +287,11 @@ const Label = styled.span`
       text-sm uppercase font-medium tracking-wider text-white 
    `}
 `
+const ImageWrapper = styled.div(
+   ({ imageRatio }) => css`
+      ${tw`flex items-center justify-center bg-gray-200 mb-2 rounded overflow-hidden cursor-pointer`}
+      ${imageRatio && imageRatio.width
+         ? `aspect-ratio: ${imageRatio.height}/ ${imageRatio.width} }`
+         : tw`aspect-w-4 aspect-h-3`}
+   `
+)
