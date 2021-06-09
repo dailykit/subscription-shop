@@ -69,13 +69,12 @@ export const Plan = ({ cameFrom = '', plan, handlePlanClick }) => {
    if (!defaultServing) return <Loader inline />
    return (
       <li css={[tw`border rounded-lg`, `height: fit-content`]}>
-         {console.log(plan)}
          {plan.metaDetails?.coverImage && (
             <CoverImage>
                <img src={plan.metaDetails?.coverImage} tw="object-cover" />
             </CoverImage>
          )}
-         <div tw="px-8 pb-8 pt-4">
+         <div tw="px-4 pb-4 md:px-8 md:pb-8">
             <Title theme={theme}>
                {plan.title}
                {plan.metaDetails?.icon && (
@@ -86,11 +85,9 @@ export const Plan = ({ cameFrom = '', plan, handlePlanClick }) => {
                )}
             </Title>
             {plan?.metaDetails?.description && (
-               <p tw="pb-2 mb-4 border-b-2 w-4/5">
-                  {plan?.metaDetails?.description}
-               </p>
+               <p tw="pb-2 mb-4 border-b-2">{plan?.metaDetails?.description}</p>
             )}
-            <section css={tw`mb-4 flex items-center justify-between`}>
+            <section css={tw`w-full mb-4 flex items-center justify-between`}>
                {plan.servings.length === 1 ? (
                   <span
                      css={tw`uppercase tracking-wider text-gray-600 text-sm font-medium`}
@@ -101,7 +98,7 @@ export const Plan = ({ cameFrom = '', plan, handlePlanClick }) => {
                         : yieldLabel.plural}
                   </span>
                ) : (
-                  <div tw="flex flex-col justify-evenly">
+                  <div tw="w-full flex flex-col justify-evenly">
                      <span
                         css={tw`uppercase tracking-wider text-gray-600 text-sm font-medium mb-2`}
                      >
@@ -130,7 +127,9 @@ export const Plan = ({ cameFrom = '', plan, handlePlanClick }) => {
                   </div>
                )}
             </section>
-            <section css={tw`mb-4 flex items-center justify-between mt-3`}>
+            <section
+               css={tw`w-full mb-4 flex items-center justify-between mt-3`}
+            >
                {defaultServing.itemCounts.length === 1 ? (
                   <span
                      css={tw`uppercase tracking-wider text-gray-600 text-sm font-medium my-2`}
@@ -142,7 +141,7 @@ export const Plan = ({ cameFrom = '', plan, handlePlanClick }) => {
                      per week
                   </span>
                ) : (
-                  <div tw="flex flex-col justify-evenly">
+                  <div tw="w-full flex flex-col justify-evenly">
                      <span
                         css={tw`uppercase tracking-wider text-gray-600 text-sm font-medium mb-2`}
                      >
@@ -246,9 +245,11 @@ export const Plan = ({ cameFrom = '', plan, handlePlanClick }) => {
 const CoverImage = styled.div`
    height: 200px;
    width: 100%;
+   padding-bottom: 16px;
    img {
-      height: 200px;
+      height: 100%;
       width: 100%;
+      object-fit: cover;
       ${tw`rounded-t-lg`}
    }
 `
@@ -279,6 +280,7 @@ const CountList = styled.ul`
    ${tw`
       p-1
       border
+      w-full
       flex items-center justify-between 
    `}
 `
@@ -289,9 +291,8 @@ const CountListItem = styled.li`
       ${tw`text-white bg-green-600`}
    }
    min-height: 3rem;
-   min-width: 7rem;
    ${tw`
-         cursor-pointer text-sm mr-1
+         flex-1 cursor-pointer text-sm mr-1
          flex items-center justify-center 
          hover:text-white hover:bg-green-300 hover:rounded 
       `}
