@@ -78,82 +78,69 @@ const PaymentContent = () => {
 
    React.useEffect(() => {
       if (!loading) {
-         if (cart.customerKeycloakId !== user.keycloakId) {
-            navigate(`/menu`)
-         } else {
-            ;(async () => {
-               const status = cart.paymentStatus
-               const remark = cart.transactionRemark
-               const next_action = cart.transactionRemark?.next_action
-               try {
-                  if (status === 'PENDING') {
-                     setOverlayMessage(messages['PENDING'])
-                  } else if (
-                     status === 'REQUIRES_ACTION' &&
-                     !next_action?.type
-                  ) {
-                     toggleOverlay(true)
-                     setOverlayMessage(messages['REQUIRES_ACTION'])
-                  } else if (
-                     status === 'REQUIRES_ACTION' &&
-                     next_action?.type
-                  ) {
-                     toggleOverlay(true)
-                     setOverlayMessage(messages['REQUIRES_ACTION_WITH_URL'])
-                     let TAB_URL = ''
-                     let remark = remark
-                     if (next_action?.type === 'use_stripe_sdk') {
-                        TAB_URL = next_action?.use_stripe_sdk?.stripe_js
-                     } else {
-                        TAB_URL = next_action?.redirect_to_url?.url
-                     }
-                     setOtpPageUrl(TAB_URL)
-                     authTabRef.current = window.open(
-                        TAB_URL,
-                        'payment_auth_page'
-                     )
-                  } else if (
-                     status === 'REQUIRES_PAYMENT_METHOD' &&
-                     remark?.last_payment_error?.code
-                  ) {
-                     toggleOverlay(false)
-                     setOverlayMessage(messages['PENDING'])
-                     addToast(remark?.last_payment_error?.message, {
-                        appearance: 'error',
-                     })
-                  } else if (status === 'SUCCEEDED') {
-                     await updateBrandCustomer({
-                        refetchQueries: ['customer'],
-                        variables: {
-                           id: user?.brandCustomerId,
-                           _set: { subscriptionOnboardStatus: 'ONBOARDED' },
-                        },
-                     })
-                     if (authTabRef.current) {
-                        authTabRef.current.close()
-                        if (!authTabRef.current.closed) {
-                           window.open(
-                              `/get-started/checkout?id=${cart.id}`,
-                              'payment_auth_page'
-                           )
-                        }
-                     }
-                     setOverlayMessage(messages['SUCCEEDED'])
-                     addToast(messages['SUCCEEDED'], { appearance: 'success' })
-                     navigate(`/get-started/placing-order?id=${cart.id}`)
-                  } else if (status === 'PAYMENT_FAILED') {
-                     toggleOverlay(false)
-                     addToast(messages['PAYMENT_FAILED'], {
-                        appearance: 'error',
-                     })
+         ;(async () => {
+            const status = cart.paymentStatus
+            const remark = cart.transactionRemark
+            const next_action = cart.transactionRemark?.next_action
+            try {
+               if (status === 'PENDING') {
+                  setOverlayMessage(messages['PENDING'])
+               } else if (status === 'REQUIRES_ACTION' && !next_action?.type) {
+                  toggleOverlay(true)
+                  setOverlayMessage(messages['REQUIRES_ACTION'])
+               } else if (status === 'REQUIRES_ACTION' && next_action?.type) {
+                  toggleOverlay(true)
+                  setOverlayMessage(messages['REQUIRES_ACTION_WITH_URL'])
+                  let TAB_URL = ''
+                  let remark = remark
+                  if (next_action?.type === 'use_stripe_sdk') {
+                     TAB_URL = next_action?.use_stripe_sdk?.stripe_js
+                  } else {
+                     TAB_URL = next_action?.redirect_to_url?.url
                   }
-               } catch (error) {
-                  console.log('on succeeded -> error -> ', error)
+                  setOtpPageUrl(TAB_URL)
+                  authTabRef.current = window.open(TAB_URL, 'payment_auth_page')
+               } else if (
+                  status === 'REQUIRES_PAYMENT_METHOD' &&
+                  remark?.last_payment_error?.code
+               ) {
+                  toggleOverlay(false)
+                  setOverlayMessage(messages['PENDING'])
+                  addToast(remark?.last_payment_error?.message, {
+                     appearance: 'error',
+                  })
+               } else if (status === 'SUCCEEDED') {
+                  await updateBrandCustomer({
+                     refetchQueries: ['customer'],
+                     variables: {
+                        id: user?.brandCustomerId,
+                        _set: { subscriptionOnboardStatus: 'ONBOARDED' },
+                     },
+                  })
+                  if (authTabRef.current) {
+                     authTabRef.current.close()
+                     if (!authTabRef.current.closed) {
+                        window.open(
+                           `/get-started/checkout?id=${cart.id}`,
+                           'payment_auth_page'
+                        )
+                     }
+                  }
+                  setOverlayMessage(messages['SUCCEEDED'])
+                  addToast(messages['SUCCEEDED'], { appearance: 'success' })
+                  navigate(`/get-started/placing-order?id=${cart.id}`)
+               } else if (status === 'PAYMENT_FAILED') {
+                  toggleOverlay(false)
+                  addToast(messages['PAYMENT_FAILED'], {
+                     appearance: 'error',
+                  })
                }
-            })()
-         }
+            } catch (error) {
+               console.log('on succeeded -> error -> ', error)
+            }
+         })()
       }
-   }, [cart.paymentStatus, cart.transactionRemark])
+   }, [loading, cart.paymentStatus, cart.transactionRemark])
 
    const [updateCustomerReferralRecord] = useMutation(
       QUERIES.MUTATIONS.CUSTOMER_REFERRAL.UPDATE,
