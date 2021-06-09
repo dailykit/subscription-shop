@@ -95,18 +95,7 @@ export const Header = () => {
                      </button>
                   </>
                ) : (
-                  <Login
-                     onClick={() => {
-                        if (isClient) {
-                           localStorage.setItem(
-                              'source-route',
-                              window.location.pathname
-                           )
-                        }
-                        navigate('/login')
-                     }}
-                     bg={theme?.accent}
-                  >
+                  <Login onClick={() => navigate('/login')} bg={theme?.accent}>
                      Log In
                   </Login>
                )}
