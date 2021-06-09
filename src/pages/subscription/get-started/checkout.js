@@ -123,27 +123,18 @@ const PaymentContent = () => {
                         appearance: 'error',
                      })
                   } else if (status === 'SUCCEEDED') {
-                     await updateBrandCustomer({
-                        refetchQueries: ['customer'],
-                        variables: {
-                           id: user?.brandCustomerId,
-                           _set: { subscriptionOnboardStatus: 'ONBOARDED' },
-                        },
-                     })
                      if (authTabRef.current) {
                         authTabRef.current.close()
                         if (!authTabRef.current.closed) {
                            window.open(
-                              `/subscription/get-started/checkout?id=${cart.id}`,
+                              `/subscription/checkout?id=${cart.id}`,
                               'payment_auth_page'
                            )
                         }
                      }
                      setOverlayMessage(messages['SUCCEEDED'])
                      addToast(messages['SUCCEEDED'], { appearance: 'success' })
-                     navigate(
-                        `/subscription/get-started/placing-order?id=${cart.id}`
-                     )
+                     navigate(`/subscription/placing-order?id=${cart.id}`)
                   } else if (status === 'PAYMENT_FAILED') {
                      toggleOverlay(false)
                      addToast(messages['PAYMENT_FAILED'], {
