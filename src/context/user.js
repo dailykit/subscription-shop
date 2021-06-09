@@ -47,6 +47,7 @@ const ROUTES = {
    SELECT_DELIVERY: '/subscription/get-started/select-delivery',
    SELECT_MENU: '/subscription/get-started/select-menu/',
    CHECKOUT: '/subscription/get-started/checkout/',
+   ONBOARDED: '/subscription/menu',
 }
 
 export const UserProvider = ({ children }) => {
@@ -103,8 +104,6 @@ export const UserProvider = ({ children }) => {
                }
             }
             navigate(path)
-         } else {
-            sendBackToSourceRoute()
          }
       },
    })
@@ -173,14 +172,6 @@ export const UserProvider = ({ children }) => {
          }
       },
    })
-
-   const sendBackToSourceRoute = () => {
-      const redirectRoute = localStorage.getItem('source-route')
-      if (redirectRoute) {
-         localStorage.removeItem('source-route')
-         navigate(redirectRoute)
-      }
-   }
 
    React.useEffect(() => {
       if (isClient) {

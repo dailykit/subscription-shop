@@ -99,15 +99,7 @@ export const Header = () => {
                   </>
                ) : (
                   <Login
-                     onClick={() => {
-                        if (isClient) {
-                           localStorage.setItem(
-                              'source-route',
-                              window.location.pathname
-                           )
-                        }
-                        navigate('/subscription/login')
-                     }}
+                     onClick={() => navigate('/subscription/login')}
                      bg={theme?.accent}
                   >
                      Log In
