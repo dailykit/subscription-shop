@@ -47,7 +47,6 @@ const ROUTES = {
    SELECT_DELIVERY: '/subscription/get-started/select-delivery',
    SELECT_MENU: '/subscription/get-started/select-menu/',
    CHECKOUT: '/subscription/get-started/checkout/',
-   ONBOARDED: '/subscription/menu',
 }
 
 export const UserProvider = ({ children }) => {
