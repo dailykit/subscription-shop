@@ -91,7 +91,7 @@ const Recipe = () => {
             <h1 tw="py-4 text-2xl md:text-3xl tracking-wide text-teal-900">
                {recipe.name}
             </h1>
-            <div tw="grid grid-flow-col gap-2">
+            <div tw="md:grid grid-flow-col gap-2">
                <div tw="col-start-1 col-end-4">
                   {!!recipe.description && (
                      <div>
@@ -215,14 +215,10 @@ const Recipe = () => {
                               <span tw="text-lg font-medium text-gray-700">
                                  {set.title}
                               </span>
-                              <div tw="flex flex-wrap justify-evenly items-stretch">
+                              <div tw="flex md:flex-row flex-col flex-wrap justify-evenly items-stretch">
                                  {set.instructionSteps.map(step =>
                                     step.isVisible ? (
-                                       <li
-                                          key={step.title}
-                                          tw=" mb-4 mx-2 mt-2 inline-block"
-                                          css={[`width: 30%`]}
-                                       >
+                                       <Step key={step.title}>
                                           <StepImage>
                                              {step.assets.images.length > 0 ? (
                                                 <img
@@ -254,7 +250,7 @@ const Recipe = () => {
                                           <p tw="mt-1 text-gray-600">
                                              {step.description}
                                           </p>
-                                       </li>
+                                       </Step>
                                     ) : (
                                        <li
                                           key={step.title}
@@ -294,6 +290,14 @@ const RecipeImage = styled.div`
    margin: 20px 0;
    @media (max-width: 567px) {
       height: 240px;
+   }
+`
+
+const Step = styled.li`
+   ${tw` mb-4 mx-2 mt-2 inline-block`},
+   width: 100%;
+   @media (min-width: 420px) {
+      width: 30%;
    }
 `
 
