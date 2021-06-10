@@ -4,7 +4,7 @@ import tw, { styled, css } from 'twin.macro'
 import { useConfig } from '../../../lib'
 import { useUser } from '../../../context'
 import { SEO, Layout, ProfileSidebar, Form } from '../../../components'
-import { formatCurrency } from '../../../utils'
+import { formatCurrency, isClient } from '../../../utils'
 import * as moment from 'moment'
 
 const Wallet = () => {
@@ -12,6 +12,7 @@ const Wallet = () => {
 
    React.useEffect(() => {
       if (!isAuthenticated) {
+         isClient && localStorage.setItem('landed_on', location.href)
          navigate('/subscription/get-started/register')
       }
    }, [isAuthenticated])

@@ -5,12 +5,14 @@ import { useConfig } from '../../../lib'
 import { useUser } from '../../../context'
 import { SEO, Layout, ProfileSidebar, Form } from '../../../components'
 import * as moment from 'moment'
+import { isClient } from '../../../utils'
 
 const LoyaltyPoints = () => {
    const { isAuthenticated } = useUser()
 
    React.useEffect(() => {
       if (!isAuthenticated) {
+         isClient && localStorage.setItem('landed_on', location.href)
          navigate('/subscription/get-started/register')
       }
    }, [isAuthenticated])

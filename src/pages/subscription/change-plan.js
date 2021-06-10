@@ -15,6 +15,7 @@ import {
 } from '../../sections/select-delivery'
 import { BRAND } from '../../graphql'
 import { useMutation } from '@apollo/react-hooks'
+import { isClient } from '../../utils'
 
 const ChangePlan = () => {
    const { user, isAuthenticated } = useUser()
@@ -28,6 +29,7 @@ const ChangePlan = () => {
 
    React.useEffect(() => {
       if (!isAuthenticated) {
+         isClient && localStorage.setItem('landed_on', location.href)
          navigate('/subscription/get-started/register')
       }
    }, [isAuthenticated])

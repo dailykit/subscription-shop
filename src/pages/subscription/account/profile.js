@@ -22,6 +22,7 @@ const Profile = () => {
 
    React.useEffect(() => {
       if (!isAuthenticated) {
+         isClient && localStorage.setItem('landed_on', location.href)
          navigate('/subscription/get-started/register')
       }
    }, [isAuthenticated])

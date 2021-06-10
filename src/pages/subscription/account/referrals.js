@@ -15,12 +15,14 @@ import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { useToasts } from 'react-toast-notifications'
 import { useQuery } from '@apollo/react-hooks'
 import { CUSTOMERS_REFERRED } from '../../../graphql'
+import { isClient } from '../../../utils'
 
 const Referrals = () => {
    const { isAuthenticated } = useUser()
 
    React.useEffect(() => {
       if (!isAuthenticated) {
+         isClient && localStorage.setItem('landed_on', location.href)
          navigate('/subscription/get-started/register')
       }
    }, [isAuthenticated])
