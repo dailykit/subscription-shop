@@ -1,29 +1,127 @@
 import React from 'react'
-
+import { isEmpty } from 'lodash'
+import { navigate } from 'gatsby'
+import jwtDecode from 'jwt-decode'
 import tw, { styled, css } from 'twin.macro'
 import { useToasts } from 'react-toast-notifications'
+import { useMutation, useLazyQuery } from '@apollo/react-hooks'
 
+import { useUser } from '../../context'
+import { useConfig, auth } from '../../lib'
+import { isClient, processUser } from '../../utils'
 import { SEO, Layout, Loader } from '../../components'
-import { isClient } from '../../utils'
-import { useMutation } from '@apollo/react-hooks'
-import { RESET_PASSWORD, VERIFY_RESET_PASSWORD_TOKEN } from '../../graphql'
-import { useConfig } from '../../lib'
 import { useQueryParams } from '../../utils/useQueryParams'
-import { navigate } from 'gatsby-link'
+import {
+   MUTATIONS,
+   BRAND,
+   CUSTOMER,
+   RESET_PASSWORD,
+   VERIFY_RESET_PASSWORD_TOKEN,
+} from '../../graphql'
 
 const ResetPassword = () => {
-   const { addToast } = useToasts()
-   const { configOf } = useConfig()
    const params = useQueryParams()
+   const { addToast } = useToasts()
+   const { dispatch } = useUser()
+   const { brand, configOf, organization } = useConfig()
 
    const theme = configOf('theme-color', 'Visual')
 
    const [token, setToken] = React.useState(null)
+   const [type, setType] = React.useState('reset_password')
    const [isVerified, setIsVerified] = React.useState(false)
    const [error, setError] = React.useState('')
    const [form, setForm] = React.useState({
       password: '',
       confirmPassword: '',
+   })
+
+   const [create_brand_customer] = useMutation(BRAND.CUSTOMER.CREATE, {
+      refetchQueries: ['customer'],
+      onCompleted: () => {
+         if (isClient) {
+            window.location.href =
+               window.location.origin + '/subscription/get-started/select-plan'
+         }
+      },
+      onError: error => {
+         console.log(error)
+      },
+   })
+   const [create] = useMutation(MUTATIONS.CUSTOMER.CREATE, {
+      refetchQueries: ['customer'],
+      onCompleted: () => {
+         dispatch({ type: 'SET_USER', payload: {} })
+         if (isClient) {
+            window.location.href =
+               window.location.origin + '/subscription/get-started/select-plan'
+         }
+      },
+      onError: () =>
+         addToast('Something went wrong!', {
+            appearance: 'error',
+         }),
+   })
+   const [customer] = useLazyQuery(CUSTOMER.DETAILS, {
+      onCompleted: async ({ customer = {} }) => {
+         const { email = '', keycloakId = '' } = jwtDecode(token)
+         if (isEmpty(customer)) {
+            console.log('CUSTOMER DOESNT EXISTS')
+            create({
+               variables: {
+                  object: {
+                     email,
+                     keycloakId,
+                     source: 'subscription',
+                     sourceBrandId: brand.id,
+                     clientId: isClient && window._env_.GATSBY_CLIENTID,
+                     brandCustomers: { data: { brandId: brand.id } },
+                  },
+               },
+            })
+            return
+         }
+         console.log('CUSTOMER EXISTS')
+
+         const user = await processUser(
+            customer,
+            organization?.stripeAccountType
+         )
+         dispatch({ type: 'SET_USER', payload: user })
+
+         const { brandCustomers = {} } = customer
+         if (isEmpty(brandCustomers)) {
+            console.log('BRAND_CUSTOMER DOESNT EXISTS')
+            create_brand_customer({
+               variables: {
+                  object: { keycloakId, brandId: brand.id },
+               },
+            })
+         } else if (customer.isSubscriber && brandCustomers[0].isSubscriber) {
+            console.log('BRAND_CUSTOMER EXISTS & CUSTOMER IS SUBSCRIBED')
+            isClient && localStorage.removeItem('plan')
+            const landedOn = isClient ? localStorage.getItem('landed_on') : null
+            if (isClient && landedOn) {
+               localStorage.removeItem('landed_on')
+               window.location.href = landedOn
+            } else {
+               navigate('/subscription/menu')
+            }
+         } else {
+            console.log('CUSTOMER ISNT SUBSCRIBED')
+            if (isClient) {
+               const landedOn = localStorage.getItem('landed_on')
+               if (landedOn) {
+                  localStorage.removeItem('landed_on')
+                  window.location.href = landedOn
+               } else {
+                  window.location.href =
+                     window.location.origin +
+                     '/subscription/get-started/select-plan'
+               }
+            }
+         }
+      },
    })
 
    const isValid = form.password && form.confirmPassword
@@ -32,24 +130,44 @@ const ResetPassword = () => {
       VERIFY_RESET_PASSWORD_TOKEN,
       {
          onCompleted: data => {
-            if (data.verifyResetPasswordToken.success) {
+            if (data?.verifyResetPasswordToken?.success) {
                setIsVerified(true)
             } else {
-               addToast('Token expired or incorrect!', { appearance: 'error' })
-               // navigate('/subscription/login')
+               addToast(
+                  'Seems like token has either expired or is invalid, please try again!',
+                  { appearance: 'error' }
+               )
+               navigate('/subscription/get-started/register')
             }
          },
          onError: error => {
-            addToast(error.message, { appearance: 'error' })
-            // navigate('/subscription/login')
+            addToast(
+               'Seems like token has either expired or is invalid, please try again!',
+               { appearance: 'error' }
+            )
+            navigate('/subscription/get-started/register')
          },
       }
    )
 
    const [resetPassword, { loading }] = useMutation(RESET_PASSWORD, {
-      onCompleted: () => {
+      onCompleted: async () => {
          addToast('Password changed successfully!', { appearance: 'success' })
-         // navigate('/subscription/login')
+         const parsedToken = jwtDecode(params['token'])
+         const token = await auth.login({
+            email: parsedToken.email,
+            password: form.password,
+         })
+         if (token?.sub) {
+            customer({
+               variables: {
+                  keycloakId: token?.sub,
+                  brandId: brand.id,
+               },
+            })
+         } else {
+            navigate('/subscription/get-started/register')
+         }
       },
       onError: error => {
          addToast(error.message, { appearance: 'error' })
@@ -61,8 +179,15 @@ const ResetPassword = () => {
          const token = params['token']
          if (token) {
             setToken(token)
+            const { type = '', redirectUrl = '' } = jwtDecode(token)
+            if (type) {
+               setType(type)
+            }
+            if (isClient && redirectUrl) {
+               localStorage.setItem('landed_on', redirectUrl)
+            }
          } else {
-            // navigate('/subscription/login')
+            navigate('/subscription/get-started/register')
          }
       }
    }, [params])
@@ -110,7 +235,9 @@ const ResetPassword = () => {
       <Layout>
          <SEO title="Login" />
          <Main tw="pt-8">
-            <Title theme={theme}>Reset Password</Title>
+            <Title theme={theme}>
+               {type === 'set_password' ? 'Set' : 'Reset'} Password
+            </Title>
             {isVerified ? (
                <Panel>
                   <FieldSet>
