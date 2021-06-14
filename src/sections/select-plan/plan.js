@@ -118,7 +118,7 @@ export const Plan = ({ cameFrom = '', plan, handlePlanClick }) => {
                                     : ''
                               }`}
                            >
-                              <div tw="text-sm w-full flex justify-evenly">
+                              <div tw="text-sm w-full flex justify-evenly items-center">
                                  <div>{serving.size}</div>
                                  {serving?.metaDetails?.label && (
                                     <div>{serving?.metaDetails?.label}</div>
@@ -159,7 +159,7 @@ export const Plan = ({ cameFrom = '', plan, handlePlanClick }) => {
                                     : ''
                               }`}
                            >
-                              <div tw="w-full text-sm flex justify-evenly">
+                              <div tw="w-full text-sm flex justify-evenly items-center">
                                  <div>{item.count}</div>
                                  {item?.metaDetails?.label && (
                                     <div>{item?.metaDetails?.label}</div>
@@ -291,7 +291,7 @@ const CountListItem = styled.li`
    min-height: 3rem;
    min-width: 7rem;
    ${tw`
-         cursor-pointer text-sm
+         cursor-pointer text-sm mr-1
          flex items-center justify-center 
          hover:text-white hover:bg-green-300 hover:rounded 
       `}
