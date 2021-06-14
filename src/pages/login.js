@@ -18,7 +18,10 @@ const Login = () => {
    const { brand, organization } = useConfig()
    const [current, setCurrent] = React.useState('LOGIN')
 
-   const [create_brand_customer] = useMutation(BRAND.CUSTOMER.CREATE, {
+   const [
+      create_brand_customer,
+      { loading: creatingBrandCustomer },
+   ] = useMutation(BRAND.CUSTOMER.CREATE, {
       refetchQueries: ['customer'],
       onCompleted: () => {
          if (isClient) {
@@ -133,7 +136,11 @@ const Login = () => {
             {current === 'LOGIN' && (
                <LoginPanel
                   customer={customer}
-                  loading={loadingCustomerDetails || creatingCustomer}
+                  loading={
+                     loadingCustomerDetails ||
+                     creatingCustomer ||
+                     creatingBrandCustomer
+                  }
                />
             )}
          </Main>
