@@ -4,9 +4,12 @@ import tw, { styled } from 'twin.macro'
 import { useUser } from '../context'
 import { MUTATIONS } from '../graphql'
 import { formatCurrency } from '../utils'
+import { useConfig } from '../lib'
 
 export const WalletAmount = ({ cart }) => {
    const { user } = useUser()
+   const { configOf } = useConfig()
+   const walletSettings = configOf('Wallet', 'rewards')
 
    const [amount, setAmount] = React.useState(cart.walletAmountUsable)
 
@@ -34,7 +37,13 @@ export const WalletAmount = ({ cart }) => {
       <Styles.Wrapper>
          {cart.walletAmountUsed ? (
             <Styles.Stat>
-               <Styles.Text> Walled amount used: </Styles.Text>
+               <Styles.Text>
+                  {' '}
+                  ${walletSettings?.label
+                     ? walletSettings.label
+                     : 'Wallet'}{' '}
+                  amount used:{' '}
+               </Styles.Text>
                <Styles.Text>
                   <Styles.Cross
                      role="button"
@@ -59,7 +68,14 @@ export const WalletAmount = ({ cart }) => {
             <>
                <Styles.Form onSubmit={handleSubmit}>
                   <Styles.InputWrapper>
-                     <Styles.Label> Wallet amount </Styles.Label>
+                     <Styles.Label>
+                        {' '}
+                        $
+                        {walletSettings?.label
+                           ? walletSettings.label
+                           : 'Wallet'}{' '}
+                        amount{' '}
+                     </Styles.Label>
                      <Styles.Input
                         type="number"
                         min="0"
