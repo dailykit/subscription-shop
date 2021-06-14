@@ -101,7 +101,7 @@ const Login = () => {
                   : null
                if (isClient && landedOn) {
                   localStorage.removeItem('landed_on')
-                  navigate(landedOn)
+                  window.location.href = landedOn
                } else {
                   navigate('/subscription/menu')
                }
@@ -111,7 +111,7 @@ const Login = () => {
                   const landedOn = localStorage.getItem('landed_on')
                   if (landedOn) {
                      localStorage.removeItem('landed_on')
-                     navigate(landedOn)
+                     window.location.href = landedOn
                   } else {
                      window.location.href =
                         window.location.origin +
