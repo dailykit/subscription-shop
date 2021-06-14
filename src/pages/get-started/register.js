@@ -139,7 +139,7 @@ export default () => {
                const landedOn = localStorage.getItem('landed_on')
                if (isClient && landedOn) {
                   localStorage.removeItem('landed_on')
-                  navigate(landedOn)
+                  window.location.href = landedOn
                } else {
                   navigate('/menu')
                }
@@ -149,7 +149,7 @@ export default () => {
                   const landedOn = localStorage.getItem('landed_on')
                   if (landedOn) {
                      localStorage.removeItem('landed_on')
-                     navigate(landedOn)
+                     window.location.href = landedOn
                   } else {
                      window.location.href =
                         window.location.origin + '/get-started/select-plan'
