@@ -518,6 +518,7 @@ export const ORDER = gql`
       ) {
          isSkipped
          validStatus
+         keycloakId
          occurrence: subscriptionOccurence {
             id
             subscription {

@@ -1,4 +1,5 @@
 import React from 'react'
+import { isEmpty } from 'lodash'
 import { navigate } from 'gatsby'
 import tw, { styled, css } from 'twin.macro'
 import { useToasts } from 'react-toast-notifications'
@@ -8,7 +9,7 @@ import { useConfig } from '../lib'
 import * as Icon from '../assets/icons'
 import OrderInfo from '../sections/OrderInfo'
 import { isClient, formatCurrency } from '../utils'
-import { SEO, Loader, Layout, Button } from '../components'
+import { SEO, Loader, Layout, Button, HelperBar } from '../components'
 import {
    usePayment,
    ProfileSection,
@@ -59,10 +60,10 @@ const PaymentContent = () => {
    const [isOverlayOpen, toggleOverlay] = React.useState(false)
    const [overlayMessage, setOverlayMessage] = React.useState('')
 
-   const { loading, data: { cart = {} } = {} } = useSubscription(
+   const { loading, error, data: { cart = {} } = {} } = useSubscription(
       QUERIES.CART_SUBSCRIPTION,
       {
-         skip: !isClient,
+         skip: !isClient || !new URLSearchParams(location.search).get('id'),
          variables: {
             id: isClient ? new URLSearchParams(location.search).get('id') : '',
          },
@@ -70,7 +71,7 @@ const PaymentContent = () => {
    )
 
    React.useEffect(() => {
-      if (!loading) {
+      if (!loading && !isEmpty(cart)) {
          ;(async () => {
             const status = cart.paymentStatus
             const remark = cart.transactionRemark
@@ -127,7 +128,7 @@ const PaymentContent = () => {
             }
          })()
       }
-   }, [loading, cart.paymentStatus, cart.transactionRemark])
+   }, [loading, cart])
 
    const [updateCart] = useMutation(QUERIES.UPDATE_CART, {
       onError: error => {
@@ -192,6 +193,71 @@ const PaymentContent = () => {
    const theme = configOf('theme-color', 'Visual')
 
    if (loading) return <Loader inline />
+   if (isClient && !new URLSearchParams(location.search).get('id')) {
+      return (
+         <Main>
+            <div tw="pt-4 w-full">
+               <HelperBar>
+                  <HelperBar.Title>
+                     Oh no! Looks like you've wandered on an unknown path, let's
+                     get you to home.
+                  </HelperBar.Title>
+                  <HelperBar.Button onClick={() => navigate('/')}>
+                     Go to Home
+                  </HelperBar.Button>
+               </HelperBar>
+            </div>
+         </Main>
+      )
+   }
+   if (error) {
+      return (
+         <Main>
+            <div tw="pt-4 w-full">
+               <HelperBar type="danger">
+                  <HelperBar.SubTitle>
+                     Looks like there was an issue fetching details, please
+                     refresh the page!
+                  </HelperBar.SubTitle>
+               </HelperBar>
+            </div>
+         </Main>
+      )
+   }
+   if (isEmpty(cart)) {
+      return (
+         <Main>
+            <div tw="pt-4 w-full">
+               <HelperBar type="info">
+                  <HelperBar.Title>
+                     Looks like the page you're requesting is not available
+                     anymore, let's get you to home.
+                  </HelperBar.Title>
+                  <HelperBar.Button onClick={() => navigate('/')}>
+                     Go to Home
+                  </HelperBar.Button>
+               </HelperBar>
+            </div>
+         </Main>
+      )
+   }
+   if (user?.keycloakId !== cart?.customerKeycloakId) {
+      return (
+         <Main>
+            <div tw="pt-4 w-full">
+               <HelperBar type="warning">
+                  <HelperBar.SubTitle>
+                     Seems like, you do not have access to this page, let's get
+                     you to home.
+                  </HelperBar.SubTitle>
+                  <HelperBar.Button onClick={() => navigate('/')}>
+                     Go to Home
+                  </HelperBar.Button>
+               </HelperBar>
+            </div>
+         </Main>
+      )
+   }
    return (
       <Main>
          <Form>
