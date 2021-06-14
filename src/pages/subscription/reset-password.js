@@ -36,12 +36,12 @@ const ResetPassword = () => {
                setIsVerified(true)
             } else {
                addToast('Token expired or incorrect!', { appearance: 'error' })
-               navigate('/subscription/login')
+               // navigate('/subscription/login')
             }
          },
          onError: error => {
             addToast(error.message, { appearance: 'error' })
-            navigate('/subscription/login')
+            // navigate('/subscription/login')
          },
       }
    )
@@ -49,7 +49,7 @@ const ResetPassword = () => {
    const [resetPassword, { loading }] = useMutation(RESET_PASSWORD, {
       onCompleted: () => {
          addToast('Password changed successfully!', { appearance: 'success' })
-         navigate('/subscription/login')
+         // navigate('/subscription/login')
       },
       onError: error => {
          addToast(error.message, { appearance: 'error' })
@@ -62,7 +62,7 @@ const ResetPassword = () => {
          if (token) {
             setToken(token)
          } else {
-            navigate('/subscription/login')
+            // navigate('/subscription/login')
          }
       }
    }, [params])
