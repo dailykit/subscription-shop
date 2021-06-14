@@ -18,7 +18,10 @@ const Login = () => {
    const { brand, organization } = useConfig()
    const [current, setCurrent] = React.useState('LOGIN')
 
-   const [create_brand_customer] = useMutation(BRAND.CUSTOMER.CREATE, {
+   const [
+      create_brand_customer,
+      { loading: creatingBrandCustomer },
+   ] = useMutation(BRAND.CUSTOMER.CREATE, {
       refetchQueries: ['customer'],
       onCompleted: () => {
          if (isClient) {
@@ -98,7 +101,7 @@ const Login = () => {
                   : null
                if (isClient && landedOn) {
                   localStorage.removeItem('landed_on')
-                  navigate(landedOn)
+                  window.location.href = landedOn
                } else {
                   navigate('/subscription/menu')
                }
@@ -108,7 +111,7 @@ const Login = () => {
                   const landedOn = localStorage.getItem('landed_on')
                   if (landedOn) {
                      localStorage.removeItem('landed_on')
-                     navigate(landedOn)
+                     window.location.href = landedOn
                   } else {
                      window.location.href =
                         window.location.origin +
@@ -135,7 +138,11 @@ const Login = () => {
             {current === 'LOGIN' && (
                <LoginPanel
                   customer={customer}
-                  loading={loadingCustomerDetails || creatingCustomer}
+                  loading={
+                     loadingCustomerDetails ||
+                     creatingCustomer ||
+                     creatingBrandCustomer
+                  }
                />
             )}
          </Main>
