@@ -33,6 +33,7 @@ const Addresses = () => {
 
    React.useEffect(() => {
       if (!isAuthenticated) {
+         isClient && localStorage.setItem('landed_on', location.href)
          navigate('/get-started/register')
       }
    }, [isAuthenticated])

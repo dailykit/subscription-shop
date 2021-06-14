@@ -13,13 +13,15 @@ import {
 } from '../sections/select-menu'
 import { useUser } from '../context'
 import { useConfig } from '../lib'
+import { isClient } from '../utils'
 
 const MenuPage = () => {
    const { isAuthenticated } = useUser()
 
    React.useEffect(() => {
       if (!isAuthenticated) {
-         navigate('/our-plans')
+         isClient && localStorage.setItem('landed_on', location.href)
+         navigate('/get-started/register')
       }
    }, [isAuthenticated])
 

@@ -2,6 +2,7 @@ import React from 'react'
 import { navigate } from 'gatsby'
 import tw, { styled, css } from 'twin.macro'
 import { useConfig } from '../../lib'
+import { isClient } from '../../utils'
 import { useUser } from '../../context'
 import {
    SEO,
@@ -21,6 +22,7 @@ const Referrals = () => {
 
    React.useEffect(() => {
       if (!isAuthenticated) {
+         isClient && localStorage.setItem('landed_on', location.href)
          navigate('/get-started/register')
       }
    }, [isAuthenticated])

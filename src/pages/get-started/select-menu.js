@@ -21,6 +21,7 @@ const SelectMenu = () => {
    const { isAuthenticated } = useUser()
    React.useEffect(() => {
       if (!isAuthenticated) {
+         isClient && localStorage.setItem('landed_on', location.href)
          navigate('/get-started/register')
       }
    }, [isAuthenticated])

@@ -91,28 +91,32 @@ const Login = () => {
                brandCustomers[0].isSubscriber
             ) {
                console.log('BRAND_CUSTOMER EXISTS & CUSTOMER IS SUBSCRIBED')
-               navigate('/menu')
                isClient && localStorage.removeItem('plan')
+               const landedOn = isClient
+                  ? localStorage.getItem('landed_on')
+                  : null
+               if (isClient && landedOn) {
+                  localStorage.removeItem('landed_on')
+                  navigate(landedOn)
+               } else {
+                  navigate('/menu')
+               }
             } else {
                console.log('CUSTOMER ISNT SUBSCRIBED')
                if (isClient) {
-                  window.location.href =
-                     window.location.origin + '/get-started/select-plan'
+                  const landedOn = localStorage.getItem('landed_on')
+                  if (landedOn) {
+                     localStorage.removeItem('landed_on')
+                     navigate(landedOn)
+                  } else {
+                     window.location.href =
+                        window.location.origin + '/get-started/select-plan'
+                  }
                }
             }
          },
       }
    )
-
-   React.useEffect(() => {
-      if (user?.keycloakId) {
-         if (user?.isSubscriber) navigate('/menu')
-         else if (isClient) {
-            window.location.href =
-               window.location.origin + '/get-started/select-plan'
-         }
-      }
-   }, [user])
 
    return (
       <Layout>
