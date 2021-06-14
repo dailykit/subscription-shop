@@ -35,15 +35,17 @@ const Content = () => {
    const { configOf } = useConfig()
 
    const theme = configOf('theme-color', 'Visual')
-   const loyaltyPointsAllowed = configOf('Loyalty Points', 'rewards')
-      ?.isAvailable
+   const { isAvailable = false, label = 'Loyalty Points' } = configOf(
+      'Loyalty Points',
+      'rewards'
+   )
 
    return (
       <section tw="px-6 w-full md:w-6/12">
          <header tw="mt-6 mb-3 flex items-center justify-between">
-            <Title theme={theme}>Loyalty Points</Title>
+            <Title theme={theme}>{label}</Title>
          </header>
-         {loyaltyPointsAllowed && !!user.loyaltyPoint && (
+         {isAvailable && !!user.loyaltyPoint && (
             <>
                <Form.Label>Balance</Form.Label>
                {user.loyaltyPoint.points}

@@ -3,9 +3,12 @@ import React from 'react'
 import tw, { styled } from 'twin.macro'
 import { useUser } from '../context'
 import { MUTATIONS } from '../graphql'
+import { useConfig } from '../lib'
 
 export const LoyaltyPoints = ({ cart }) => {
    const { user } = useUser()
+   const { configOf } = useConfig()
+   const { label = 'Loyalty Points' } = configOf('Loyalty Points', 'rewards')
 
    const [points, setPoints] = React.useState(cart.loyaltyPointsUsable)
 
@@ -33,7 +36,7 @@ export const LoyaltyPoints = ({ cart }) => {
       <Styles.Wrapper>
          {cart.loyaltyPointsUsed ? (
             <Styles.Stat>
-               <Styles.Text> Loyalty points used: </Styles.Text>
+               <Styles.Text> {label} used: </Styles.Text>
                <Styles.Text>
                   <Styles.Cross
                      role="button"
@@ -58,7 +61,7 @@ export const LoyaltyPoints = ({ cart }) => {
             <>
                <Styles.Form onSubmit={handleSubmit}>
                   <Styles.InputWrapper>
-                     <Styles.Label> Loyalty points </Styles.Label>
+                     <Styles.Label> {label} </Styles.Label>
                      <Styles.Input
                         type="number"
                         min="0"
