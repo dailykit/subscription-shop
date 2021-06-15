@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import tw, { styled, css } from 'twin.macro'
 
-import { useConfig } from '../lib'
 import { useUser } from '../context'
 import { isClient, getInitials } from '../utils'
 import MenuIcon from '../assets/icons/Menu'
@@ -11,10 +10,9 @@ import MenuIcon from '../assets/icons/Menu'
 import { ProfileSidebar } from './profile_sidebar'
 import { CrossIcon } from '../assets/icons'
 
-export const Header = () => {
+export const Header = ({ settings }) => {
    const router = useRouter()
    const { isAuthenticated, user } = useUser()
-   const { configOf } = useConfig()
    const logout = () => {
       isClient && localStorage.removeItem('token')
       if (isClient) {
@@ -22,8 +20,8 @@ export const Header = () => {
       }
    }
 
-   const brand = configOf('theme-brand', 'brand')
-   const theme = configOf('theme-color', 'Visual')
+   const brand = settings['brand']['theme-brand']
+   const theme = settings['Visual']['theme-color']
 
    const [toggle, setToggle] = React.useState(true)
    const [isMobileNavVisible, setIsMobileNavVisible] = React.useState(false)

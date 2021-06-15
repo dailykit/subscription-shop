@@ -4,7 +4,7 @@ export const useQueryParams = () => {
    const [params, setParams] = React.useState(null)
 
    React.useEffect(() => {
-      if (window.location.search) {
+      if (window?.location?.search) {
          const str = window.location.search.slice(1)
          const paramsFound = {}
          str.split('&').forEach(param => {
@@ -13,7 +13,7 @@ export const useQueryParams = () => {
          })
          setParams(paramsFound)
       }
-   }, [window.location.search, setParams])
+   }, [window?.location?.search, setParams])
 
    return params
 }

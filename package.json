@@ -5,7 +5,7 @@
    "scripts": {
       "dev": "next dev",
       "build": "next build",
-      "start": "next start -p 80",
+      "start": "next start",
       "export": "next export",
       "init:config": "chmod +x \"./script.sh\" && \"./script.sh\" && cp env-config.js \"./public\""
    },
@@ -30,6 +30,7 @@
       "babel-runtime": "^6.26.0",
       "core-js": "2.6.5",
       "deepmerge": "^4.2.2",
+      "express": "^4.17.1",
       "graphql": "^15.4.0",
       "graphql-request": "^3.4.0",
       "graphql-tag": "^2.11.0",
@@ -50,6 +51,7 @@
       "react-html-parser": "^2.0.2",
       "react-image-fallback": "^8.0.0",
       "react-toast-notifications": "^2.4.0",
+      "request": "^2.88.2",
       "rrule": "^2.6.6",
       "styled-components": "^5.3.0",
       "subscriptions-transport-ws": "^0.9.18",

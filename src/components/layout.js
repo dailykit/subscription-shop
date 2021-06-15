@@ -5,23 +5,29 @@ import tw, { styled, css } from 'twin.macro'
 import { Header } from './header'
 import { useUser } from '../context'
 import { normalizeAddress } from '../utils'
-import { useConfig } from '../lib/config'
 import { MailIcon, PhoneIcon } from '../assets/icons'
 
-export const Layout = ({ children, noHeader }) => {
+export const Layout = ({ children, noHeader, settings }) => {
    const { isAuthenticated, user } = useUser()
-   const { hasConfig, configOf } = useConfig()
 
-   const brand = configOf('theme-brand', 'brand')
+   if (!settings) return null
+
+   const brand = settings['brand']['theme-brand']
+
    const {
       isPrivacyPolicyAvailable,
       isRefundPolicyAvailable,
       isTermsAndConditionsAvailable,
-   } = configOf('Policy Availability', 'brand')
-   const store = configOf('Store Availability', 'availability')
+   } = settings['brand']['Policy Availability']
+
+   const store = settings['availability']['Store Availability']
+   const location = settings['availability']['Location']
+
+   const theme = settings['Visual']['theme-color']
+
    return (
       <>
-         {!noHeader && <Header />}
+         {!noHeader && <Header settings={settings} />}
          {children}
          <div tw="p-2 bg-gray-200 text-gray-700 w-full flex flex-col items-center justify-center gap-2">
             {(user?.isTest === true || store?.isStoreLive === false) && (
@@ -29,32 +35,26 @@ export const Layout = ({ children, noHeader }) => {
             )}
             {user?.isDemo && <p>Logged in user is in demo mode.</p>}
          </div>
-         <Footer theme={configOf('theme-color', 'Visual')}>
+         <Footer theme={theme}>
             <div>
                <section>
                   <h2 tw="text-3xl">{brand?.name || 'Subscription Shop'}</h2>
-                  {hasConfig('Location', 'availability') && (
-                     <p tw="mt-2">
-                        {normalizeAddress(configOf('Location', 'availability'))}
-                     </p>
-                  )}
+                  {location && <p tw="mt-2">{normalizeAddress(location)}</p>}
 
-                  {hasConfig('Contact', 'brand') && (
+                  {brand['Contact'] && (
                      <>
                         <span tw="mt-4 flex items-center">
                            <MailIcon size={18} tw="stroke-current mr-2" />
                            <a
-                              href={`mailto:${
-                                 configOf('Contact', 'brand')?.email
-                              }`}
+                              href={`mailto:${brand['Contact'].email}`}
                               tw="underline"
                            >
-                              {configOf('Contact', 'brand')?.email}
+                              {brand['Contact'].email}
                            </a>
                         </span>
                         <span tw="mt-4 flex items-center">
                            <PhoneIcon size={18} tw="stroke-current mr-2" />
-                           {configOf('Contact', 'brand')?.phoneNo}
+                           {brand['Contact'].phoneNo}
                         </span>
                      </>
                   )}

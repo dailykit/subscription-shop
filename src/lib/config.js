@@ -84,7 +84,7 @@ export const ConfigProvider = ({ children }) => {
       return `${server_url}/http://${bucket}.s3-website.us-east-2.amazonaws.com\\${size}\\${name}`
    }, [])
 
-   if (isLoading) return <PageLoader />
+   if (false) return <PageLoader />
    return (
       <ConfigContext.Provider
          value={{

@@ -37,7 +37,7 @@ export const SEO = ({ description, title, image, richresult, children }) => {
    const metaImage =
       image ||
       seo[path]?.image ||
-      seo['/'].image ||
+      seo['/']?.image ||
       'https://dailykit-133-test.s3.amazonaws.com/images/1596121558382.png'
 
    return (

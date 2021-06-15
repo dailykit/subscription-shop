@@ -26,14 +26,17 @@ export const fetchReferrer = async (brandId, code) => {
 }
 
 export const getStoredReferralCode = defaultValue => {
+   if (typeof localStorage === 'undefined') return defaultValue
    return localStorage.getItem('code') ?? defaultValue
 }
 
 export const setStoredReferralCode = value => {
+   if (typeof localStorage === 'undefined') return
    return localStorage.setItem('code', value)
 }
 
 export const deleteStoredReferralCode = () => {
+   if (typeof localStorage === 'undefined') return
    return localStorage.removeItem('code')
 }
 

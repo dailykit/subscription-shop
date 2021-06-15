@@ -308,6 +308,20 @@ export const RECIPE_DETAILS = gql`
    }
 `
 
+export const PRODUCT_OPTION_WITH_RECIPES = gql`
+   query ProductOptionsWithRecipes {
+      productOptions(
+         where: {
+            isArchived: { _eq: false }
+            simpleRecipeYieldId: { _neq: null }
+            product: { isArchived: { _eq: false }, isPublished: { _eq: true } }
+         }
+      ) {
+         id
+      }
+   }
+`
+
 export const INVENTORY_DETAILS = gql`
    query inventoryProduct(
       $id: Int!
@@ -807,6 +821,34 @@ export const GET_FILEID = gql`
       }
    }
 `
+
+export const GET_FILES = gql`
+   query GET_FILES($divId: [String!]!) {
+      content_subscriptionDivIds(where: { id: { _in: $divId } }) {
+         id
+         fileId
+         subscriptionDivFileId {
+            id
+            path
+            linkedCssFiles {
+               id
+               cssFile {
+                  id
+                  path
+               }
+            }
+            linkedJsFiles {
+               id
+               jsFile {
+                  id
+                  path
+               }
+            }
+         }
+      }
+   }
+`
+
 export const COUPONS = gql`
    subscription Coupons($params: jsonb, $brandId: Int!) {
       coupons(

@@ -10,7 +10,7 @@ import { CouponsList } from './coupons_list'
 import { Loader } from './loader'
 import { Tunnel } from './tunnel'
 
-export const Coupon = () => {
+export const Coupon = ({}) => {
    const { state } = useMenu()
    const { user } = useUser()
    const { addToast } = useToasts()
@@ -18,6 +18,7 @@ export const Coupon = () => {
    const { id } = state?.occurenceCustomer?.cart
 
    const theme = configOf('theme-color', 'visual')
+   // const theme = settings['visual']['theme-color']
 
    const [isCouponListOpen, setIsCouponListOpen] = React.useState(false)
    const [isCouponFormOpen, setIsCouponFormOpen] = React.useState(false)
