@@ -1,12 +1,19 @@
 import React from 'react'
-import { Link } from 'gatsby'
+import moment from 'moment'
+import gql from 'graphql-tag'
+import { navigate, Link } from 'gatsby'
 import tw, { styled, css } from 'twin.macro'
+import { useSubscription } from '@apollo/react-hooks'
 
+import { Loader } from './loader'
+import { Tunnel } from './tunnel'
+import { Button } from './button'
 import { Header } from './header'
 import { useUser } from '../context'
-import { normalizeAddress } from '../utils'
+import { HelperBar } from './helper_bar'
 import { useConfig } from '../lib/config'
-import { MailIcon, PhoneIcon } from '../assets/icons'
+import { normalizeAddress, formatCurrency } from '../utils'
+import { CloseIcon, MailIcon, PhoneIcon } from '../assets/icons'
 
 export const Layout = ({ children, noHeader }) => {
    const { isAuthenticated, user } = useUser()
@@ -117,9 +124,138 @@ export const Layout = ({ children, noHeader }) => {
                )}
             </div>
          </Footer>
+         {isAuthenticated && user?.keycloakId && <FloatingBar />}
       </>
    )
 }
+
+const FloatingBar = () => {
+   const { brand } = useConfig()
+   const { user } = useUser()
+   const [isOpen, setIsOpen] = React.useState(false)
+   const { loading, error, data: { carts = {} } = {} } = useSubscription(
+      CARTS_AGGREGATE,
+      {
+         skip: !brand?.id || !user.keycloakId,
+         variables: {
+            where: {
+               brandId: { _eq: brand?.id },
+               customerKeycloakId: { _eq: user?.keycloakId },
+               paymentStatus: { _nin: ['PENDING', 'SUCCEEDED'] },
+               order: {
+                  _or: [
+                     { isRejected: { _eq: false } },
+                     { isRejected: { _is_null: true } },
+                  ],
+               },
+            },
+         },
+      }
+   )
+
+   if (loading) return null
+   if (error) return null
+   if (carts?.aggregate?.count === 0) return null
+   return (
+      <>
+         <section tw="fixed bottom-0 right-0 left-0 mb-24 md:mb-3 px-3 md:px-0">
+            <div tw="pl-3 pr-2 flex items-center justify-between mx-auto rounded bg-red-400 text-white border-white h-14 border w-full md:w-5/12">
+               <span>Incomplete Payments: {carts?.aggregate?.count || 0}</span>
+               <button
+                  onClick={() => setIsOpen(!isOpen)}
+                  tw="bg-red-600 text-white rounded px-3 py-2"
+               >
+                  View
+               </button>
+            </div>
+         </section>
+         <Tunnel isOpen={isOpen} toggleTunnel={setIsOpen} size="md">
+            <Tunnel.Header title="Incomplete Payments">
+               <Button size="sm" onClick={() => setIsOpen(false)}>
+                  <CloseIcon size={20} tw="stroke-current" />
+               </Button>
+            </Tunnel.Header>
+            <Tunnel.Body>
+               {loading ? (
+                  <Loader inline />
+               ) : (
+                  <>
+                     {carts?.aggregate?.count === 0 ? (
+                        <HelperBar type="success">
+                           <HelperBar.SubTitle>
+                              No Incomplete payments
+                           </HelperBar.SubTitle>
+                        </HelperBar>
+                     ) : (
+                        <ul tw="space-y-3">
+                           {carts.nodes.map(cart => (
+                              <li
+                                 key={cart.id}
+                                 tw="p-3 border border-gray-200 rounded"
+                              >
+                                 <section tw="flex items-center justify-between">
+                                    <span>
+                                       Delivery on:&nbsp;
+                                       {cart.subscriptionOccurence
+                                          ?.fulfillmentDate
+                                          ? moment(
+                                               cart.subscriptionOccurence
+                                                  ?.fulfillmentDate
+                                            ).format('MMM DD, YYYY')
+                                          : 'N/A'}
+                                    </span>
+                                    <button
+                                       tw="uppercase rounded px-3 py-2 hover:bg-green-100 text-green-700"
+                                       onClick={() => {
+                                          navigate(
+                                             '/subscription/checkout/?id=' +
+                                                cart.id
+                                          )
+                                          setIsOpen(false)
+                                       }}
+                                    >
+                                       Pay{' '}
+                                       {formatCurrency(
+                                          Number(cart?.totalPrice) || 0
+                                       )}
+                                    </button>
+                                 </section>
+                                 <span>
+                                    Payment Status: {cart.paymentStatus}
+                                 </span>
+                              </li>
+                           ))}
+                        </ul>
+                     )}
+                  </>
+               )}
+            </Tunnel.Body>
+         </Tunnel>
+      </>
+   )
+}
+
+const CARTS_AGGREGATE = gql`
+   subscription carts($where: order_cart_bool_exp = {}) {
+      carts: cartsAggregate(
+         where: $where
+         order_by: { subscriptionOccurence: { fulfillmentDate: asc } }
+      ) {
+         aggregate {
+            count
+         }
+         nodes {
+            id
+            totalPrice
+            paymentStatus
+            subscriptionOccurence {
+               id
+               fulfillmentDate
+            }
+         }
+      }
+   }
+`
 
 const Footer = styled.footer(
    ({ theme }) => css`

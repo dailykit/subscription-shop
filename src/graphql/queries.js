@@ -726,6 +726,7 @@ export const CUSTOMER = {
                id
                paymentStatus
                subscriptionOccurence {
+                  id
                   fulfillmentDate
                }
             }
@@ -745,7 +746,9 @@ export const CUSTOMER = {
                subscriptionPaymentMethodId
                subscriptionOnboardStatus
                subscription {
+                  id
                   recipes: subscriptionItemCount {
+                     id
                      count
                      price
                      tax
