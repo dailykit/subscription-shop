@@ -712,6 +712,26 @@ export const SETTINGS = gql`
    }
 `
 
+export const SETTINGS_QUERY = gql`
+   query settings($domain: String) {
+      settings: brands_brand_subscriptionStoreSetting(
+         where: {
+            brand: {
+               _or: [{ domain: { _eq: $domain } }, { isDefault: { _eq: true } }]
+            }
+         }
+      ) {
+         value
+         brandId
+         meta: subscriptionStoreSetting {
+            id
+            type
+            identifier
+         }
+      }
+   }
+`
+
 export const BRAND_CUSTOMER = gql`
    subscription brandCustomer($id: Int!) {
       brandCustomer(id: $id) {

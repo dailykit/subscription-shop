@@ -1,17 +1,15 @@
-import { SETTINGS } from '../graphql'
+import { SETTINGS_QUERY } from '../graphql'
 import { graphQLClient } from '../lib'
 
 export const getSettings = async (domain, path = '/') => {
-   const data = await graphQLClient.request(SETTINGS, {
-      variables: {
-         domain,
-      },
+   const data = await graphQLClient.request(SETTINGS_QUERY, {
+      domain,
    })
 
    if (data) {
       const settings = {}
 
-      data.data.settings.forEach(setting => {
+      data.settings.forEach(setting => {
          if (settings[setting.meta.type]) {
             settings[setting.meta.type][setting.meta.identifier] = setting.value
          } else {

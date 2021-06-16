@@ -59,9 +59,10 @@ const Index = props => {
          <SEO title="Home" />
          <Main>
             <div id="home-bottom-01">
-               {ReactHtmlParser(
-                  data.find(fold => fold.id === 'home-bottom-01').content
-               )}
+               {Boolean(data.length) &&
+                  ReactHtmlParser(
+                     data.find(fold => fold.id === 'home-bottom-01')?.content
+                  )}
             </div>
          </Main>
       </Layout>
@@ -75,11 +76,11 @@ export async function getStaticProps({ params }) {
       divId: ['home-bottom-01'],
    })
 
-   const domain =
-      process.env.NODE_ENV !== 'production'
-         ? params.domain
-         : 'test.dailykit.org'
-
+   // const domain =
+   //    process.env.NODE_ENV === 'production'
+   //       ? params.domain
+   //       : 'test.dailykit.org'
+   const domain = 'test.dailykit.org'
    const { seo, settings } = await getSettings(domain, '/')
 
    console.log(settings)
