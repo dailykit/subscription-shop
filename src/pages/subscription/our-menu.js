@@ -12,7 +12,12 @@ import { webRenderer } from '@dailykit/web-renderer'
 
 import { useConfig } from '../../lib'
 import { formatDate, isClient } from '../../utils'
-import { ArrowLeftIcon, ArrowRightIcon } from '../../assets/icons'
+import {
+   ArrowLeftIcon,
+   ArrowRightIcon,
+   ChevronLeft,
+   ChevronRight,
+} from '../../assets/icons'
 import { Layout, SEO, Form, HelperBar, Loader, Spacer } from '../../components'
 import {
    OUR_MENU,
@@ -497,13 +502,15 @@ const Content = () => {
 
 const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
    console.log(node)
+   const [activeIdx, setActiveIdx] = React.useState(0)
+
    const product = {
       name: node?.productOption?.product?.name || '',
       label: node?.productOption?.label || '',
       type: node?.productOption?.simpleRecipeYield?.simpleRecipe?.type,
-      image:
+      images:
          node?.productOption?.product?.assets?.images?.length > 0
-            ? node?.productOption?.product?.assets?.images[0]
+            ? node?.productOption?.product?.assets?.images
             : null,
       additionalText: node?.productOption?.product?.additionalText || '',
       tags: node?.productOption?.product?.tags || [],
@@ -512,6 +519,20 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
    const imageRatio = useConfig().configOf('image-aspect-ratio', 'Visual')
    const openRecipe = () =>
       navigate(`/subscription/recipes/?id=${node?.productOption?.id}`)
+
+   const nextClick = () => {
+      setActiveIdx(prevIdx => {
+         if (prevIdx === product.images?.length - 1) return 0
+         return prevIdx + 1
+      })
+   }
+
+   const prevClick = () => {
+      setActiveIdx(prevIdx => {
+         if (prevIdx === 0) return product.images?.length - 1
+         return prevIdx - 1
+      })
+   }
 
    return (
       <Styles.Product>
@@ -525,11 +546,20 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
                />
             </Styles.Type>
          )}
-         <ImageWrapper imageRatio={imageRatio} onClick={openRecipe}>
-            {product.image ? (
+         <ImageWrapper imageRatio={imageRatio}>
+            {product.images?.length > 1 && (
+               <button
+                  onClick={prevClick}
+                  tw="absolute left-0.5 z-10 focus:outline-none"
+               >
+                  <ChevronLeft size={60} />
+               </button>
+            )}
+
+            {product.images?.length > 0 ? (
                <ReactImageFallback
-                  src={buildImageUrl('400x300', product.image)}
-                  fallbackImage={product.image}
+                  src={buildImageUrl('400x300', product.images[activeIdx])}
+                  fallbackImage={product.images[activeIdx]}
                   initialImage={<Loader />}
                   alt={product.name}
                   className="image__thumbnail"
@@ -538,9 +568,22 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
                         ? imageRatio.height / imageRatio.width
                         : 4 / 3};
                   `}
+                  onClick={openRecipe}
                />
             ) : (
-               <img src={noProductImage} alt={product.name} />
+               <img
+                  src={noProductImage}
+                  alt={product.name}
+                  onClick={openRecipe}
+               />
+            )}
+            {product.images?.length > 1 && (
+               <button
+                  onClick={nextClick}
+                  tw="absolute right-0.5 z-10 focus:outline-none"
+               >
+                  <ChevronRight size={60} />
+               </button>
             )}
          </ImageWrapper>
          {node?.addOnLabel && <Label>{node?.addOnLabel}</Label>}
