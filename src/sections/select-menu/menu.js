@@ -10,7 +10,7 @@ import { useMenu } from './state'
 import { useConfig } from '../../lib'
 import { useUser } from '../../context'
 import { HelperBar, Loader } from '../../components'
-import { formatCurrency } from '../../utils'
+import { debounce, formatCurrency } from '../../utils'
 import { SkeletonProduct } from './skeletons'
 import { CheckIcon } from '../../assets/icons'
 import { OCCURENCE_PRODUCTS_BY_CATEGORIES } from '../../graphql'
@@ -104,7 +104,7 @@ const Product = ({ node, theme, isAdded, noProductImage, buildImageUrl }) => {
    const openRecipe = () =>
       navigate(`/subscription/recipes/?id=${node?.productOption?.id}`)
 
-   const add = item => {
+   const add = debounce(function (item, node) {
       if (state.occurenceCustomer?.betweenPause) {
          return addToast('You have paused your plan!', {
             appearance: 'warning',
@@ -116,8 +116,8 @@ const Product = ({ node, theme, isAdded, noProductImage, buildImageUrl }) => {
          })
          return
       }
-      methods.products.add(item)
-   }
+      methods.products.add(item, node?.productOption?.product)
+   }, 500)
 
    const canAdd = () => {
       const conditions = [!node.isSingleSelect, state?.week?.isValid, !isActive]
@@ -185,7 +185,7 @@ const Product = ({ node, theme, isAdded, noProductImage, buildImageUrl }) => {
             <Styles.Button
                theme={theme}
                disabled={!node.isAvailable}
-               onClick={() => add(node.cartItem)}
+               onClick={() => add(node.cartItem, node)}
                title={
                   node.isAvailable
                      ? 'Add product'
