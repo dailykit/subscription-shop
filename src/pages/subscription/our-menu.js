@@ -550,9 +550,9 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
             {product.images?.length > 1 && (
                <button
                   onClick={prevClick}
-                  tw="absolute left-0.5 z-10 focus:outline-none"
+                  tw="absolute left-0.5 z-10 focus:outline-none hidden"
                >
-                  <ChevronLeft size={60} />
+                  <ChevronLeft size={60} color="#ffff" />
                </button>
             )}
 
@@ -567,6 +567,7 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
                      aspect-ratio: ${imageRatio && imageRatio.width
                         ? imageRatio.height / imageRatio.width
                         : 4 / 3};
+                     ${tw`absolute top-0 left-0`}
                   `}
                   onClick={openRecipe}
                />
@@ -580,9 +581,9 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
             {product.images?.length > 1 && (
                <button
                   onClick={nextClick}
-                  tw="absolute right-0.5 z-10 focus:outline-none"
+                  tw="absolute right-0.5 z-10 focus:outline-none hidden"
                >
-                  <ChevronRight size={60} />
+                  <ChevronRight size={60} color="#ffff" />
                </button>
             )}
          </ImageWrapper>
@@ -735,9 +736,15 @@ const Label = styled.span`
 `
 const ImageWrapper = styled.div(
    ({ imageRatio }) => css`
-      ${tw`flex items-center justify-center bg-gray-200 mb-2 rounded overflow-hidden cursor-pointer `}
+      ${tw`flex items-center justify-center bg-gray-200 mb-2 rounded overflow-hidden cursor-pointer relative`}
       ${imageRatio && imageRatio.width
          ? `aspect-ratio: ${imageRatio.height}/ ${imageRatio.width} }`
          : tw`aspect-w-4 aspect-h-3`}
+      button svg {
+         filter: drop-shadow(4px 4px 3px rgba(0, 0, 0, 0.7));
+      }
+      &:hover button {
+         display: inline-block;
+      }
    `
 )
