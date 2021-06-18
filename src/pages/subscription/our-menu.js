@@ -501,7 +501,7 @@ const Content = () => {
 }
 
 const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
-   console.log(node)
+   console.log(node, theme)
    const [activeIdx, setActiveIdx] = React.useState(0)
 
    const product = {
@@ -633,7 +633,7 @@ const Styles = {
       ${tw`list-none text-xs leading-6 text-gray-500 mb-3`}
    `,
    Tags: styled.li`
-      ${tw` m-2 bg-red-50 text-gray-500 inline-block text-xs uppercase p-1`}
+      ${tw` m-2 text-white bg-gray-500 inline-block text-xs uppercase p-1 rounded`}
    `,
 }
 
