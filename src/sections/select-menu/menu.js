@@ -12,7 +12,7 @@ import { useUser } from '../../context'
 import { HelperBar, Loader } from '../../components'
 import { formatCurrency } from '../../utils'
 import { SkeletonProduct } from './skeletons'
-import { CheckIcon } from '../../assets/icons'
+import { CheckIcon, ChevronLeft, ChevronRight } from '../../assets/icons'
 import { OCCURENCE_PRODUCTS_BY_CATEGORIES } from '../../graphql'
 import VegIcon from '../../assets/imgs/veg.png'
 import NonVegIcon from '../../assets/imgs/non-veg.png'
@@ -100,7 +100,9 @@ export const Menu = () => {
 const Product = ({ node, theme, isAdded, noProductImage, buildImageUrl }) => {
    const { addToast } = useToasts()
    const { state, methods } = useMenu()
+   const [activeIdx, setActiveIdx] = React.useState(0)
 
+   const imageRatio = useConfig().configOf('image-aspect-ratio', 'Visual')
    const openRecipe = () =>
       navigate(`/subscription/recipes/?id=${node?.productOption?.id}`)
 
@@ -129,16 +131,31 @@ const Product = ({ node, theme, isAdded, noProductImage, buildImageUrl }) => {
       )
    }
 
+   const nextClick = () => {
+      setActiveIdx(prevIdx => {
+         if (prevIdx === product.images?.length - 1) return 0
+         return prevIdx + 1
+      })
+   }
+
+   const prevClick = () => {
+      setActiveIdx(prevIdx => {
+         if (prevIdx === 0) return product.images?.length - 1
+         return prevIdx - 1
+      })
+   }
+
    const isActive = isAdded(node?.cartItem?.subscriptionOccurenceProductId)
    const product = {
       name: node?.productOption?.product?.name || '',
       label: node?.productOption?.label || '',
       type: node?.productOption?.simpleRecipeYield?.simpleRecipe?.type,
-      image:
+      images:
          node?.productOption?.product?.assets?.images?.length > 0
-            ? node?.productOption?.product?.assets?.images[0]
+            ? node?.productOption?.product?.assets?.images
             : null,
       additionalText: node?.productOption?.product?.additionalText || '',
+      tags: node?.productOption?.product?.tags || [],
    }
 
    return (
@@ -153,22 +170,46 @@ const Product = ({ node, theme, isAdded, noProductImage, buildImageUrl }) => {
                />
             </Styles.Type>
          )}
-         <div
-            tw="flex items-center justify-center aspect-w-4 aspect-h-3 bg-gray-200 mb-2 rounded overflow-hidden cursor-pointer"
-            onClick={openRecipe}
-         >
-            {product.image ? (
+         <ImageWrapper imageRatio={imageRatio}>
+            {product.images?.length > 1 && (
+               <button
+                  onClick={prevClick}
+                  tw="absolute left-0.5 z-10 focus:outline-none hidden"
+               >
+                  <ChevronLeft size={60} color="#ffff" />
+               </button>
+            )}
+            {product.images?.length > 0 ? (
                <ReactImageFallback
-                  src={buildImageUrl('400x300', product.image)}
-                  fallbackImage={product.image}
+                  src={buildImageUrl('400x300', product.images[activeIdx])}
+                  fallbackImage={product.images[activeIdx]}
                   initialImage={<Loader />}
                   alt={product.name}
                   className="image__thumbnail"
+                  css={css`
+                     aspect-ratio: ${imageRatio && imageRatio.width
+                        ? imageRatio.height / imageRatio.width
+                        : 4 / 3};
+                     ${tw`absolute top-0 left-0`}
+                  `}
+                  onClick={openRecipe}
                />
             ) : (
-               <img src={noProductImage} alt={product.name} />
+               <img
+                  src={noProductImage}
+                  alt={product.name}
+                  onClick={openRecipe}
+               />
             )}
-         </div>
+            {product.images?.length > 1 && (
+               <button
+                  onClick={nextClick}
+                  tw="absolute right-0.5 z-10 focus:outline-none hidden"
+               >
+                  <ChevronRight size={60} color="#ffff" />
+               </button>
+            )}
+         </ImageWrapper>
          {node.addOnLabel && <Label>{node.addOnLabel}</Label>}
          <section tw="flex items-center mb-1">
             <Check
@@ -181,6 +222,13 @@ const Product = ({ node, theme, isAdded, noProductImage, buildImageUrl }) => {
             </Styles.GhostLink>
          </section>
          <p tw="mb-1">{product?.additionalText}</p>
+         {product.tags.length > 0 && (
+            <Styles.TagsList>
+               {product.tags.map(tag => (
+                  <Styles.Tags>{tag}</Styles.Tags>
+               ))}
+            </Styles.TagsList>
+         )}
          {canAdd() && (
             <Styles.Button
                theme={theme}
@@ -244,6 +292,12 @@ const Styles = {
          }
       `
    ),
+   TagsList: styled.ul`
+      ${tw`list-none text-xs leading-6 text-gray-500 mb-3`}
+   `,
+   Tags: styled.li`
+      ${tw` m-2 text-white bg-gray-500 inline-block text-xs uppercase p-1 rounded`}
+   `,
 }
 
 const Products = styled.ul`
@@ -270,3 +324,17 @@ const Label = styled.span`
       text-sm uppercase font-medium tracking-wider text-white 
    `}
 `
+const ImageWrapper = styled.div(
+   ({ imageRatio }) => css`
+      ${tw`flex items-center justify-center bg-gray-200 mb-2 rounded overflow-hidden cursor-pointer relative`}
+      ${imageRatio && imageRatio.width
+         ? `aspect-ratio: ${imageRatio.height}/ ${imageRatio.width} }`
+         : tw`aspect-w-4 aspect-h-3`}
+      button svg {
+         filter: drop-shadow(4px 4px 3px rgba(0, 0, 0, 0.7));
+      }
+      &:hover button {
+         display: inline-block;
+      }
+   `
+)
