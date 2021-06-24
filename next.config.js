@@ -1,7 +1,6 @@
 'use strict'
 
 module.exports = {
-   basePath: '/subscription',
    pageExtensions: ['js', 'jsx'],
    webpack: (config, { isServer }) => {
       // Fixes npm packages that depend on `fs` module

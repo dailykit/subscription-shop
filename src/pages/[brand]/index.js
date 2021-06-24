@@ -4,15 +4,16 @@ import 'regenerator-runtime'
 import tw, { styled, css } from 'twin.macro'
 import ReactHtmlParser from 'react-html-parser'
 
+import { promises as fs } from 'fs'
+
 import { GET_FILES } from '../../graphql'
 import { SEO, Layout, PageLoader } from '../../components'
-import { useQueryParams } from '../../utils/useQueryParams'
 import { graphQLClient } from '../../lib'
 import { fileParser, getSettings } from '../../utils'
 
 const Index = props => {
    console.log({ props })
-   const { data, settings } = props
+   const { data, settings, random, isPreview, revalidate } = props
    // const params = useQueryParams()
    // const [loading, setLoading] = React.useState(false)
 
@@ -58,6 +59,12 @@ const Index = props => {
       <Layout settings={settings}>
          <SEO title="Home" />
          <Main>
+            <div style={{ height: 260, display: 'grid', placeItems: 'center' }}>
+               {isPreview && <h1>PREVIEW</h1>}
+               <h1>
+                  {random} - {revalidate}
+               </h1>
+            </div>
             <div id="home-bottom-01">
                {Boolean(data.length) &&
                   ReactHtmlParser(
@@ -71,7 +78,9 @@ const Index = props => {
 
 export default Index
 
-export async function getStaticProps({ params }) {
+export async function getStaticProps(ctx) {
+   console.log({ ctx })
+
    const data = await graphQLClient.request(GET_FILES, {
       divId: ['home-bottom-01'],
    })
@@ -83,13 +92,17 @@ export async function getStaticProps({ params }) {
    const domain = 'test.dailykit.org'
    const { seo, settings } = await getSettings(domain, '/')
 
-   console.log(settings)
-
    const parsedData = await fileParser(data.content_subscriptionDivIds)
 
    return {
-      props: { data: parsedData, seo, settings },
-      revalidate: 60, // will be passed to the page component as props
+      props: {
+         data: parsedData,
+         seo,
+         settings,
+         random: Math.floor(Math.random() * 1000 + 1),
+         isPreview,
+      },
+      revalidate: 1,
    }
 }
 

@@ -18,8 +18,6 @@ export const getSettings = async (domain, path = '/') => {
          }
       })
 
-      console.log(settings)
-
       const seoSetting = settings['App']['seo']
 
       if (seoSetting) {
