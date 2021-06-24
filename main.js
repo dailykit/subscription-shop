@@ -1,40 +1,49 @@
 const express = require('express')
 const request = require('request')
+const fs = require('fs')
+const path = require('path')
 
 const app = express()
 
-const RESTRICTED_FILES = ['env-config.js', 'favicon']
+const RESTRICTED_FILES = ['env-config.js', 'favicon', '.next', '_next']
 
-app.use('/subscription/_next', express.static('.next'))
-// app.use("/", express.static("public"));
+app.use('/:path(*)', async (req, res, next) => {
+   //     Browser <-> Express <-> NextJS
 
-app.use('/:path(*)', async (req, res) => {
-   try {
-      /*
-    Browser <-> Express <-> NextJS
-    */
-      const { path } = req.params
-      const { host } = req.headers
+   const { path: routePath } = req.params
+   const { host } = req.headers
+   const brand = host.replace(':', '')
 
-      console.log(path)
-
-      const url = RESTRICTED_FILES.some(file => path.includes(file))
-         ? 'http://localhost:3000/' + path
-         : 'http://localhost:3000/subscription/' +
-           host.replace(':', '') +
-           '/' +
-           path.replace('subscription/', '')
-      console.log(url)
-
-      request(url, function (error, _, body) {
-         if (error) {
-            console.log(error)
-         } else {
-            res.send(body)
-         }
-      })
-   } catch (err) {
-      console.log(err)
+   const isAllowed = !RESTRICTED_FILES.some(file => routePath.includes(file))
+   if (isAllowed) {
+      console.log(routePath)
+      const filePath =
+         routePath === ''
+            ? path.join(__dirname, `./.next/server/pages/${brand}.html`)
+            : path.join(
+                 __dirname,
+                 `./.next/server/pages/${brand}/${routePath}.html`
+              )
+      if (fs.existsSync(filePath)) {
+         res.sendFile(filePath)
+      } else {
+         const url = RESTRICTED_FILES.some(file => routePath.includes(file))
+            ? 'http://localhost:3000/' + routePath
+            : 'http://localhost:3000/' + brand + '/' + routePath
+         request(url, function (error, _, body) {
+            if (error) {
+               console.log(error)
+            } else {
+               res.send(body)
+            }
+         })
+      }
+   } else {
+      if (routePath.includes('env-config.js')) {
+         res.sendFile(path.join(__dirname, 'public/env-config.js'))
+      } else {
+         res.sendFile(path.join(__dirname, routePath.replace('_next', '.next')))
+      }
    }
 })
 

@@ -5,14 +5,14 @@ import tw, { styled, css } from 'twin.macro'
 import ReactHtmlParser from 'react-html-parser'
 
 import { GET_FILES, NAVIGATION_MENU } from '../../graphql'
+
 import { SEO, Layout, PageLoader } from '../../components'
-import { useQueryParams } from '../../utils/useQueryParams'
 import { graphQLClient } from '../../lib'
 import { fileParser, getSettings } from '../../utils'
 
 const Index = props => {
    console.log({ props })
-   const { data, settings, navigationMenus } = props
+   const { data, settings, random, revalidate, navigationMenus } = props
    // const params = useQueryParams()
    // const [loading, setLoading] = React.useState(false)
    console.log('navigaiton from index', navigationMenus)
@@ -58,6 +58,11 @@ const Index = props => {
       <Layout settings={settings} navigationMenus={navigationMenus}>
          <SEO title="Home" />
          <Main>
+            <div style={{ height: 260, display: 'grid', placeItems: 'center' }}>
+               <h1>
+                  {random} - {revalidate}
+               </h1>
+            </div>
             <div id="home-bottom-01">
                {Boolean(data.length) &&
                   ReactHtmlParser(
@@ -71,7 +76,9 @@ const Index = props => {
 
 export default Index
 
-export async function getStaticProps({ params }) {
+export async function getStaticProps(ctx) {
+   console.log({ ctx })
+
    const data = await graphQLClient.request(GET_FILES, {
       divId: ['home-bottom-01'],
    })
@@ -89,8 +96,14 @@ export async function getStaticProps({ params }) {
    const parsedData = await fileParser(data.content_subscriptionDivIds)
    const navigationMenus = navigationMenu.website_navigationMenuItem
    return {
-      props: { data: parsedData, seo, settings, navigationMenus },
-      revalidate: 60, // will be passed to the page component as props
+      props: {
+         data: parsedData,
+         seo,
+         settings,
+         random: Math.floor(Math.random() * 1000 + 1),
+         navigationMenus,
+      },
+      revalidate: 1,
    }
 }
 
