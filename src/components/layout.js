@@ -7,7 +7,12 @@ import { useUser } from '../context'
 import { normalizeAddress } from '../utils'
 import { MailIcon, PhoneIcon } from '../assets/icons'
 
-export const Layout = ({ children, noHeader, settings }) => {
+export const Layout = ({
+   children,
+   noHeader,
+   settings,
+   navigationMenus = [],
+}) => {
    const { isAuthenticated, user } = useUser()
 
    if (!settings) return null
@@ -27,7 +32,9 @@ export const Layout = ({ children, noHeader, settings }) => {
 
    return (
       <>
-         {!noHeader && <Header settings={settings} />}
+         {!noHeader && (
+            <Header settings={settings} navigationMenus={navigationMenus} />
+         )}
          {children}
          <div tw="p-2 bg-gray-200 text-gray-700 w-full flex flex-col items-center justify-center gap-2">
             {(user?.isTest === true || store?.isStoreLive === false) && (

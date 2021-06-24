@@ -214,6 +214,7 @@ export const UserProvider = ({ children }) => {
             isAuthenticated: state.isAuthenticated,
             user: state.user,
             dispatch,
+            isLoading,
          }}
       >
          {children}

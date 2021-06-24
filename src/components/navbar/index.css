@@ -1,43 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap');
-
-*,
 body {
-   font-family: 'Inter', sans-serif;
-}
-
-body {
-   padding-top: 64px;
-}
-
-h1,
-h2 {
-   font-family: 'DM Serif Display', serif;
-}
-
-.react-toast-notifications__container {
-   -ms-overflow-style: none;
-   scrollbar-width: none;
-}
-
-.react-toast-notifications__container::-webkit-scrollbar {
-   display: none;
-}
-
-.image__thumbnail {
-   width: 100%;
-   height: 100%;
-   object-fit: cover;
-}
-
-/* navbar css */
-/* body {
    margin: 0;
    background: #151616;
    font-family: roboto;
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale;
-} */
+}
 
 code {
    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
@@ -60,12 +27,12 @@ code {
    padding: 0;
 }
 
-.link-class {
+link-class {
    color: var(--text-color);
    text-decoration: none;
 }
 
-.span-class {
+span {
    color: var(--text-color);
    text-decoration: none;
 }
@@ -78,7 +45,6 @@ code {
    background-color: var(--bg);
    padding: 0 1rem;
    border-bottom: var(--border);
-   width: 100%;
 }
 
 /* <ul> */
@@ -125,7 +91,7 @@ code {
 
 /* Dropdown Menu */
 
-.nav-dropdown {
+.dropdown {
    position: absolute;
    top: 58px;
    width: 300px;
@@ -198,18 +164,18 @@ code {
    transition: all var(--speed) ease;
 }
 
-.redirect_svg__svg-icon {
+.svg-icon {
    width: 1.8em;
    height: 1.8em;
 }
 
-.redirect_svg__svg-icon path,
-.redirect_svg__svg-icon polygon,
-.redirect_svg__svg-icon rect {
+.svg-icon path,
+.svg-icon polygon,
+.svg-icon rect {
    fill: #4691f6;
 }
 
-.redirect_svg__svg-icon circle {
+.svg-icon circle {
    stroke: #327e1b;
    stroke-width: 1;
 }

@@ -4,7 +4,7 @@ import 'regenerator-runtime'
 import tw, { styled, css } from 'twin.macro'
 import ReactHtmlParser from 'react-html-parser'
 
-import { GET_FILES } from '../../graphql'
+import { GET_FILES, NAVIGATION_MENU } from '../../graphql'
 import { SEO, Layout, PageLoader } from '../../components'
 import { useQueryParams } from '../../utils/useQueryParams'
 import { graphQLClient } from '../../lib'
@@ -12,10 +12,10 @@ import { fileParser, getSettings } from '../../utils'
 
 const Index = props => {
    console.log({ props })
-   const { data, settings } = props
+   const { data, settings, navigationMenus } = props
    // const params = useQueryParams()
    // const [loading, setLoading] = React.useState(false)
-
+   console.log('navigaiton from index', navigationMenus)
    React.useEffect(() => {
       try {
          if (data.length && typeof document !== 'undefined') {
@@ -35,7 +35,7 @@ const Index = props => {
          console.log('Failed to render page: ', err)
       }
    }, [data])
-
+   console.log('this is main page setting', settings)
    // React.useEffect(() => {
    //    if (params) {
    //       const code = params['invite-code']
@@ -55,7 +55,7 @@ const Index = props => {
    // if (loading) return <PageLoader />
 
    return (
-      <Layout settings={settings}>
+      <Layout settings={settings} navigationMenus={navigationMenus}>
          <SEO title="Home" />
          <Main>
             <div id="home-bottom-01">
@@ -75,6 +75,9 @@ export async function getStaticProps({ params }) {
    const data = await graphQLClient.request(GET_FILES, {
       divId: ['home-bottom-01'],
    })
+   const navigationMenu = await graphQLClient.request(NAVIGATION_MENU, {
+      navigationMenuId: 1014,
+   })
 
    // const domain =
    //    process.env.NODE_ENV === 'production'
@@ -82,13 +85,11 @@ export async function getStaticProps({ params }) {
    //       : 'test.dailykit.org'
    const domain = 'test.dailykit.org'
    const { seo, settings } = await getSettings(domain, '/')
-
    console.log(settings)
-
    const parsedData = await fileParser(data.content_subscriptionDivIds)
-
+   const navigationMenus = navigationMenu.website_navigationMenuItem
    return {
-      props: { data: parsedData, seo, settings },
+      props: { data: parsedData, seo, settings, navigationMenus },
       revalidate: 60, // will be passed to the page component as props
    }
 }

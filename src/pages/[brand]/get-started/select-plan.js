@@ -4,14 +4,16 @@ import tw, { styled } from 'twin.macro'
 import { useQuery } from '@apollo/react-hooks'
 import { webRenderer } from '@dailykit/web-renderer'
 
-import { isClient } from '../../../utils'
-import { GET_FILEID } from '../../../graphql'
+import { fileParser, getSettings, isClient } from '../../../utils'
+import { GET_FILEID, GET_FILES } from '../../../graphql'
 import { Plans } from '../../../sections/select-plan'
 import { SEO, Layout, StepsNavbar } from '../../../components'
+import { graphQLClient } from '../../../lib'
+import ReactHtmlParser from 'react-html-parser'
 
-const SelectPlan = () => {
+const SelectPlan = props => {
    const router = useRouter()
-
+   const { data, settings } = props
    React.useEffect(() => {
       if (isClient) {
          const plan = localStorage.getItem('plan')
@@ -21,87 +23,117 @@ const SelectPlan = () => {
       }
    }, [])
 
-   useQuery(GET_FILEID, {
-      variables: {
-         divId: ['select-plan-top-01', 'select-plan-bottom-01'],
-      },
-      onCompleted: ({ content_subscriptionDivIds: fileData }) => {
-         if (fileData.length) {
-            fileData.forEach(data => {
-               if (data?.fileId) {
-                  const fileIdsForTop = []
-                  const fileIdsForBottom = []
-                  let cssPathForTop = []
-                  let cssPathForBottom = []
-                  let jsPathForTop = []
-                  let jsPathForBottom = []
-                  if (data?.id === 'select-plan-top-01') {
-                     fileIdsForTop.push(data.fileId)
-                     cssPathForTop =
-                        data?.subscriptionDivFileId?.linkedCssFiles.map(
-                           file => {
-                              return file?.cssFile?.path
-                           }
-                        )
-                     jsPathForTop =
-                        data?.subscriptionDivFileId?.linkedJsFiles.map(file => {
-                           return file?.jsFile?.path
-                        })
-                  } else if (data?.id === 'select-plan-bottom-01') {
-                     fileIdsForBottom.push(data.fileId)
-                     cssPathForBottom =
-                        data?.subscriptionDivFileId?.linkedCssFiles.map(
-                           file => {
-                              return file?.cssFile?.path
-                           }
-                        )
-                     jsPathForBottom =
-                        data?.subscriptionDivFileId?.linkedJsFiles.map(file => {
-                           return file?.jsFile?.path
-                        })
-                  }
+   // useQuery(GET_FILEID, {
+   //    variables: {
+   //       divId: ['select-plan-top-01', 'select-plan-bottom-01'],
+   //    },
+   //    onCompleted: ({ content_subscriptionDivIds: fileData }) => {
+   //       if (fileData.length) {
+   //          fileData.forEach(data => {
+   //             if (data?.fileId) {
+   //                const fileIdsForTop = []
+   //                const fileIdsForBottom = []
+   //                let cssPathForTop = []
+   //                let cssPathForBottom = []
+   //                let jsPathForTop = []
+   //                let jsPathForBottom = []
+   //                if (data?.id === 'select-plan-top-01') {
+   //                   fileIdsForTop.push(data.fileId)
+   //                   cssPathForTop =
+   //                      data?.subscriptionDivFileId?.linkedCssFiles.map(
+   //                         file => {
+   //                            return file?.cssFile?.path
+   //                         }
+   //                      )
+   //                   jsPathForTop =
+   //                      data?.subscriptionDivFileId?.linkedJsFiles.map(file => {
+   //                         return file?.jsFile?.path
+   //                      })
+   //                } else if (data?.id === 'select-plan-bottom-01') {
+   //                   fileIdsForBottom.push(data.fileId)
+   //                   cssPathForBottom =
+   //                      data?.subscriptionDivFileId?.linkedCssFiles.map(
+   //                         file => {
+   //                            return file?.cssFile?.path
+   //                         }
+   //                      )
+   //                   jsPathForBottom =
+   //                      data?.subscriptionDivFileId?.linkedJsFiles.map(file => {
+   //                         return file?.jsFile?.path
+   //                      })
+   //                }
 
-                  webRenderer({
-                     type: 'file',
-                     config: {
-                        uri: isClient && window._env_.DATA_HUB_HTTPS,
-                        adminSecret: isClient && window._env_.ADMIN_SECRET,
-                        expressUrl: isClient && window._env_.EXPRESS_URL,
-                     },
-                     fileDetails: [
-                        {
-                           elementId: 'select-plan-top-01',
-                           fileId: fileIdsForTop,
-                           cssPath: cssPathForTop,
-                           jsPath: jsPathForTop,
-                        },
-                        {
-                           elementId: 'select-plan-bottom-01',
-                           fileId: fileIdsForBottom,
-                           cssPath: cssPathForBottom,
-                           jsPath: jsPathForBottom,
-                        },
-                     ],
-                  })
-               }
+   //                webRenderer({
+   //                   type: 'file',
+   //                   config: {
+   //                      uri: isClient && window._env_.DATA_HUB_HTTPS,
+   //                      adminSecret: isClient && window._env_.ADMIN_SECRET,
+   //                      expressUrl: isClient && window._env_.EXPRESS_URL,
+   //                   },
+   //                   fileDetails: [
+   //                      {
+   //                         elementId: 'select-plan-top-01',
+   //                         fileId: fileIdsForTop,
+   //                         cssPath: cssPathForTop,
+   //                         jsPath: jsPathForTop,
+   //                      },
+   //                      {
+   //                         elementId: 'select-plan-bottom-01',
+   //                         fileId: fileIdsForBottom,
+   //                         cssPath: cssPathForBottom,
+   //                         jsPath: jsPathForBottom,
+   //                      },
+   //                   ],
+   //                })
+   //             }
+   //          })
+   //       }
+   //    },
+
+   //    onError: error => {
+   //       console.error(error)
+   //    },
+   // })
+   React.useEffect(() => {
+      try {
+         if (data.length && typeof document !== 'undefined') {
+            const scripts = data.flatMap(fold => fold.scripts)
+            const fragment = document.createDocumentFragment()
+
+            scripts.forEach(script => {
+               const s = document.createElement('script')
+               s.setAttribute('type', 'text/javascript')
+               s.setAttribute('src', script)
+               fragment.appendChild(s)
             })
+
+            document.body.appendChild(fragment)
          }
-      },
-
-      onError: error => {
-         console.error(error)
-      },
-   })
-
+      } catch (err) {
+         console.log('Failed to render page: ', err)
+      }
+   }, [data])
    return (
-      <Layout noHeader>
+      <Layout settings={settings}>
          <SEO title="Plans" />
          <StepsNavbar />
          <Main>
-            <div id="select-plan-top-01"></div>
+            <div id="select-plan-top-01">
+               {Boolean(data.length) &&
+                  ReactHtmlParser(
+                     data.find(fold => fold.id === 'select-plan-top-01')
+                        ?.content
+                  )}
+            </div>
             <Plans />
          </Main>
-         <div id="select-plan-bottom-01"></div>
+         <div id="select-plan-bottom-01">
+            {Boolean(data.length) &&
+               ReactHtmlParser(
+                  data.find(fold => fold.id === 'select-plan-bottom-01')
+                     ?.content
+               )}
+         </div>
       </Layout>
    )
 }
@@ -134,3 +166,24 @@ const Header = styled.header`
       ${tw`bg-black opacity-25`}
    }
 `
+export const getStaticProps = async () => {
+   const data = await graphQLClient.request(GET_FILES, {
+      divId: ['select-plan-top-01', 'select-plan-bottom-01'],
+   })
+   const domain = 'test.dailykit.org'
+   const { seo, settings } = await getSettings(
+      domain,
+      '/get-started/select-plan'
+   )
+   const parsedData = await fileParser(data.content_subscriptionDivIds)
+   return {
+      props: { data: parsedData, seo, settings },
+      revalidate: 60,
+   }
+}
+export const getStaticPaths = () => {
+   return {
+      paths: [],
+      fallback: 'blocking',
+   }
+}

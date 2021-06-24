@@ -1040,3 +1040,92 @@ export const SUBSCRIPTION_PLAN = gql`
       }
    }
 `
+export const NAVIGATION_MENU = gql`
+   query NAVIGATION_MENU($navigationMenuId: Int!) {
+      website_navigationMenuItem(
+         where: { navigationMenuId: { _eq: $navigationMenuId } }
+      ) {
+         created_at
+         id
+         label
+         navigationMenuId
+         openInNewTab
+         position
+         updated_at
+         url
+         parentNavigationMenuItemId
+      }
+   }
+`
+export const WEBSITE_PAGE = gql`
+   query WEBSITE_PAGE($domain: String!, $route: String!) {
+      website_websitePage(
+         where: {
+            route: { _eq: $route }
+            website: {
+               brand: {
+                  _or: [
+                     { isDefault: { _eq: true } }
+                     { domain: { _eq: $domain } }
+                  ]
+               }
+            }
+         }
+      ) {
+         id
+         internalPageName
+         isArchived
+         published
+         route
+         linkedNavigationMenuId
+         websitePageModules(order_by: { position: desc_nulls_last }) {
+            fileId
+            id
+            position
+            subscriptionDivFileId: file {
+               path
+               linkedCssFiles {
+                  id
+                  cssFile {
+                     id
+                     path
+                  }
+               }
+               linkedJsFiles {
+                  id
+                  jsFile {
+                     id
+                     path
+                  }
+               }
+            }
+         }
+      }
+   }
+`
+
+// query MyQuery($navigationMenuId: Int!) {
+//    website_navigationMenuItem(
+//       where: {
+//          navigationMenuId: { _eq: $navigationMenuId }
+//          parentNavigationMenuItemId: { _is_null: true }
+//       }
+//       order_by: { position: desc_nulls_last }
+//    ) {
+//       id
+//       position
+//       url
+//       label
+//       openInNewTab
+//       parentNavigationMenuItemId
+//       navigationMenuId
+//       childNavigationMenuItems(order_by: { position: desc_nulls_last }) {
+//          id
+//          label
+//          navigationMenuId
+//          url
+//          position
+//          parentNavigationMenuItemId
+//       }
+//    }
+// }

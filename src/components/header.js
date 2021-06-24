@@ -9,10 +9,12 @@ import MenuIcon from '../assets/icons/Menu'
 
 import { ProfileSidebar } from './profile_sidebar'
 import { CrossIcon } from '../assets/icons'
-
-export const Header = ({ settings }) => {
+import { Loader } from './loader'
+import NavigationBar from './navbar'
+export const Header = ({ settings, navigationMenus }) => {
    const router = useRouter()
-   const { isAuthenticated, user } = useUser()
+   const { isAuthenticated, user, isLoading } = useUser()
+   // console.log('this is navigation menu', navigationMenus)
    const logout = () => {
       isClient && localStorage.removeItem('token')
       if (isClient) {
@@ -25,6 +27,10 @@ export const Header = ({ settings }) => {
 
    const [toggle, setToggle] = React.useState(true)
    const [isMobileNavVisible, setIsMobileNavVisible] = React.useState(false)
+
+   console.log('this is route name', router)
+
+   const newNavigationMenus = DataWithChildNodes(navigationMenus)
 
    return (
       <>
@@ -45,13 +51,13 @@ export const Header = ({ settings }) => {
                </Brand>
             </Link>
             <section tw="flex items-center justify-between">
+               <NavigationBar Data={newNavigationMenus} />
                <ul tw="ml-auto px-4 flex space-x-4">
-                  <li tw="hidden md:inline-block">
-                     <Link href="/how-it-works" tw="text-gray-800">
-                        How It Works
-                     </Link>
-                  </li>
-                  {isAuthenticated && user?.isSubscriber ? (
+                  {isLoading ? (
+                     <li>
+                        <Loader inline={true} />
+                     </li>
+                  ) : isAuthenticated && user?.isSubscriber ? (
                      <li tw="text-gray-800 hidden hidden md:inline-block">
                         <Link href="/menu">Select Menu</Link>
                      </li>
@@ -68,7 +74,9 @@ export const Header = ({ settings }) => {
                </ul>
             </section>
             <section tw="px-4 ml-auto flex justify-center">
-               {isAuthenticated ? (
+               {isLoading ? (
+                  <Loader inline={true} />
+               ) : isAuthenticated ? (
                   <>
                      {user?.platform_customer?.firstName &&
                         (isClient && window.innerWidth > 786 ? (
@@ -108,11 +116,13 @@ export const Header = ({ settings }) => {
                               window.location.pathname
                            )
                         }
-                        router.push('/login')
+                        // router.push('/[brand]/login')
                      }}
                      bg={theme?.accent}
                   >
-                     Log In
+                     <Link href="/login" as="/login">
+                        Log In
+                     </Link>
                   </Login>
                )}
                <button
@@ -172,3 +182,13 @@ const Login = styled.button(
       ${bg && `background-color: ${bg};`}
    `
 )
+const DataWithChildNodes = dataList => {
+   dataList.map(each => {
+      const newFilter = dataList.filter(
+         x => x.parentNavigationMenuItemId === each.id
+      )
+      each.childNodes = newFilter
+      return each
+   })
+   return dataList
+}

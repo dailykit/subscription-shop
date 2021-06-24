@@ -1,63 +1,81 @@
 import tw from 'twin.macro'
 import { useQuery } from '@apollo/react-hooks'
 import { webRenderer } from '@dailykit/web-renderer'
+import React from 'react'
+import Link from 'next/link'
+import ReactHtmlParser from 'react-html-parser'
 
 import { isClient } from '../../utils'
 import { GET_FILEID } from '../../graphql'
+import { GET_FILES } from '../../graphql'
+import { graphQLClient } from '../../lib'
+import 'regenerator-runtime'
+import { fileParser, getSettings } from '../../utils'
 import { SEO, Layout, PageLoader } from '../../components'
 
-const HowItWorks = () => {
-   const { loading } = useQuery(GET_FILEID, {
-      variables: {
-         divId: ['how-it-works'],
-      },
-      onCompleted: ({ content_subscriptionDivIds: fileData }) => {
-         if (fileData.length) {
-            fileData.forEach(data => {
-               if (data?.fileId) {
-                  const fileId = [data?.fileId]
-                  const cssPath =
-                     data?.subscriptionDivFileId?.linkedCssFiles.map(file => {
-                        return file?.cssFile?.path
-                     })
-                  const jsPath = data?.subscriptionDivFileId?.linkedJsFiles.map(
-                     file => {
-                        return file?.jsFile?.path
-                     }
-                  )
-                  webRenderer({
-                     type: 'file',
-                     config: {
-                        uri: isClient && window._env_.DATA_HUB_HTTPS,
-                        adminSecret: isClient && window._env_.ADMIN_SECRET,
-                        expressUrl: isClient && window._env_.EXPRESS_URL,
-                     },
-                     fileDetails: [
-                        {
-                           elementId: 'how-it-works',
-                           fileId,
-                           cssPath: cssPath,
-                           jsPath: jsPath,
-                        },
-                     ],
-                  })
-               }
+const HowItWorks = props => {
+   const { data, settings } = props
+
+   React.useEffect(() => {
+      try {
+         if (data.length && typeof document !== 'undefined') {
+            const scripts = data.flatMap(fold => fold.scripts)
+            const fragment = document.createDocumentFragment()
+
+            scripts.forEach(script => {
+               const s = document.createElement('script')
+               s.setAttribute('type', 'text/javascript')
+               s.setAttribute('src', script)
+               fragment.appendChild(s)
             })
+
+            document.body.appendChild(fragment)
          }
-      },
-
-      onError: error => {
-         console.error(error)
-      },
-   })
-
-   if (loading) return <PageLoader />
+      } catch (err) {
+         console.log('Failed to render page: ', err)
+      }
+   }, [data])
+   console.log('this is how-it-works', data)
    return (
-      <Layout>
+      <Layout settings={settings}>
          <SEO title="How it works" />
-         <div id="how-it-works"></div>
+         <div id="how-it-works">
+            {Boolean(data.length) &&
+               ReactHtmlParser(
+                  data.find(fold => fold.id === 'how-it-works')?.content
+               )}
+         </div>
       </Layout>
    )
 }
 
 export default HowItWorks
+
+export async function getStaticProps({ params }) {
+   const data = await graphQLClient.request(GET_FILES, {
+      divId: ['how-it-works'],
+   })
+
+   // const domain =
+   //    process.env.NODE_ENV === 'production'
+   //       ? params.domain
+   //       : 'test.dailykit.org'
+   const domain = 'test.dailykit.org'
+   const { seo, settings } = await getSettings(domain, '/')
+
+   console.log(settings)
+
+   const parsedData = await fileParser(data.content_subscriptionDivIds)
+
+   return {
+      props: { data: parsedData, seo, settings },
+      revalidate: 60, // will be passed to the page component as props
+   }
+}
+
+export async function getStaticPaths() {
+   return {
+      paths: [],
+      fallback: 'blocking', // true -> build page if missing, false -> serve 404
+   }
+}

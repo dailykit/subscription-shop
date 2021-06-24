@@ -2,6 +2,7 @@ const axios = require('axios')
 
 const fetchFile = fold => {
    return new Promise(async (resolve, reject) => {
+      console.log('this is fold', fold)
       const { path, linkedCssFiles, linkedJsFiles } = fold.subscriptionDivFileId
 
       const { data } = await axios.get(

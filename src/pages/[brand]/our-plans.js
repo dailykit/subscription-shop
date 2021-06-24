@@ -7,88 +7,56 @@ import { isClient } from '../../utils'
 import { GET_FILEID } from '../../graphql'
 import { Plans } from '../../sections/select-plan'
 import { SEO, Layout } from '../../components'
+import { GET_FILES } from '../../graphql'
+import { graphQLClient } from '../../lib'
+import 'regenerator-runtime'
+import { fileParser, getSettings } from '../../utils'
+import ReactHtmlParser from 'react-html-parser'
 
-const SelectPlan = () => {
-   useQuery(GET_FILEID, {
-      variables: {
-         divId: ['select-plan-top-01', 'select-plan-bottom-01'],
-      },
-      onCompleted: ({ content_subscriptionDivIds: fileData }) => {
-         if (fileData.length) {
-            fileData.forEach(data => {
-               if (data?.fileId) {
-                  const fileIdsForTop = []
-                  const fileIdsForBottom = []
-                  let cssPathForTop = []
-                  let cssPathForBottom = []
-                  let jsPathForTop = []
-                  let jsPathForBottom = []
-                  if (data?.id === 'select-plan-top-01') {
-                     fileIdsForTop.push(data.fileId)
-                     cssPathForTop =
-                        data?.subscriptionDivFileId?.linkedCssFiles.map(
-                           file => {
-                              return file?.cssFile?.path
-                           }
-                        )
-                     jsPathForTop =
-                        data?.subscriptionDivFileId?.linkedJsFiles.map(file => {
-                           return file?.jsFile?.path
-                        })
-                  } else if (data?.id === 'select-plan-bottom-01') {
-                     fileIdsForBottom.push(data.fileId)
-                     cssPathForBottom =
-                        data?.subscriptionDivFileId?.linkedCssFiles.map(
-                           file => {
-                              return file?.cssFile?.path
-                           }
-                        )
-                     jsPathForBottom =
-                        data?.subscriptionDivFileId?.linkedJsFiles.map(file => {
-                           return file?.jsFile?.path
-                        })
-                  }
+const SelectPlan = props => {
+   const { data, settings } = props
 
-                  webRenderer({
-                     type: 'file',
-                     config: {
-                        uri: isClient && window._env_.DATA_HUB_HTTPS,
-                        adminSecret: isClient && window._env_.ADMIN_SECRET,
-                        expressUrl: isClient && window._env_.EXPRESS_URL,
-                     },
-                     fileDetails: [
-                        {
-                           elementId: 'select-plan-top-01',
-                           fileId: fileIdsForTop,
-                           cssPath: cssPathForTop,
-                           jsPath: jsPathForTop,
-                        },
-                        {
-                           elementId: 'select-plan-bottom-01',
-                           fileId: fileIdsForBottom,
-                           cssPath: cssPathForBottom,
-                           jsPath: jsPathForBottom,
-                        },
-                     ],
-                  })
-               }
+   React.useEffect(() => {
+      try {
+         if (data.length && typeof document !== 'undefined') {
+            const scripts = data.flatMap(fold => fold.scripts)
+            const fragment = document.createDocumentFragment()
+
+            scripts.forEach(script => {
+               const s = document.createElement('script')
+               s.setAttribute('type', 'text/javascript')
+               s.setAttribute('src', script)
+               fragment.appendChild(s)
             })
+
+            document.body.appendChild(fragment)
          }
-      },
+      } catch (err) {
+         console.log('Failed to render page: ', err)
+      }
+   }, [data])
 
-      onError: error => {
-         console.error(error)
-      },
-   })
-
+   console.log('This is data', data)
    return (
-      <Layout>
+      <Layout settings={settings}>
          <SEO title="Plans" />
          <Main>
-            <div id="select-plan-top-01"></div>
+            <div id="select-plan-top-01">
+               {Boolean(data.length) &&
+                  ReactHtmlParser(
+                     data.find(fold => fold.id === 'select-plan-top-01')
+                        ?.content
+                  )}
+            </div>
             <Plans cameFrom="our-plans" />
          </Main>
-         <div id="select-plan-bottom-01"></div>
+         <div id="select-plan-bottom-01">
+            {Boolean(data.length) &&
+               ReactHtmlParser(
+                  data.find(fold => fold.id === 'select-plan-bottom-01')
+                     ?.content
+               )}
+         </div>
       </Layout>
    )
 }
@@ -121,3 +89,29 @@ const Header = styled.header`
       ${tw`bg-black opacity-25`}
    }
 `
+export const getStaticProps = async () => {
+   const data = await graphQLClient.request(GET_FILES, {
+      divId: ['select-plan-top-01', 'select-plan-bottom-01'],
+   })
+   // const domain =
+   //    process.env.NODE_ENV === 'production'
+   //       ? params.domain
+   //       : 'test.dailykit.org'
+   const domain = 'test.dailykit.org'
+   const { seo, settings } = await getSettings(domain, '/our-plans')
+
+   console.log(settings)
+
+   const parsedData = await fileParser(data.content_subscriptionDivIds)
+
+   return {
+      props: { data: parsedData, seo, settings },
+      revalidate: 60, // will be passed to the page component as props
+   }
+}
+export async function getStaticPaths() {
+   return {
+      paths: [],
+      fallback: 'blocking', // true -> build page if missing, false -> serve 404
+   }
+}

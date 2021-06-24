@@ -21,9 +21,10 @@ import {
    HelperBar,
    Loader,
 } from '../../../components'
-import { isClient } from '../../../utils'
+import { getSettings, isClient } from '../../../utils'
 
-const SelectMenu = () => {
+const SelectMenu = props => {
+   const { settings } = props
    const router = useRouter()
    const { isAuthenticated } = useUser()
    React.useEffect(() => {
@@ -37,7 +38,7 @@ const SelectMenu = () => {
 
    return (
       <MenuProvider isCheckout>
-         <Layout noHeader>
+         <Layout settings={settings}>
             <SEO title="Select Menu" />
             <StepsNavbar />
             <Main>
@@ -179,3 +180,25 @@ const Content = styled.section`
       grid-template-columns: 1fr;
    }
 `
+export async function getStaticProps({ params }) {
+   // const domain =
+   //    process.env.NODE_ENV === 'production'
+   //       ? params.domain
+   //       : 'test.dailykit.org'
+   const domain = 'test.dailykit.org'
+   const { seo, settings } = await getSettings(domain, '/')
+
+   console.log(settings)
+
+   return {
+      props: { seo, settings },
+      revalidate: 60, // will be passed to the page component as props
+   }
+}
+
+export async function getStaticPaths() {
+   return {
+      paths: [],
+      fallback: 'blocking', // true -> build page if missing, false -> serve 404
+   }
+}

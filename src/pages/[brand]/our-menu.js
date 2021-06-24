@@ -19,20 +19,27 @@ import {
    OUR_MENU,
    GET_FILEID,
    OCCURENCE_PRODUCTS_BY_CATEGORIES,
+   NAVIGATION_MENU,
 } from '../../graphql'
+import { GET_FILES } from '../../graphql'
+import { graphQLClient } from '../../lib'
+import 'regenerator-runtime'
+import { fileParser, getSettings } from '../../utils'
 
-const OurMenu = () => {
+const OurMenu = props => {
+   const { data, settings, navigationMenus } = props
+
    return (
-      <Layout>
+      <Layout settings={settings} navigationMenus={navigationMenus}>
          <SEO title="Our Menu" />
-         <Content />
+         <Content data={data} />
       </Layout>
    )
 }
 
 export default OurMenu
 
-const Content = () => {
+const Content = ({ data }) => {
    const [current, setCurrent] = React.useState(0)
    const [occurences, setOccurences] = React.useState([])
    const [categories, setCategories] = React.useState([])
@@ -166,6 +173,26 @@ const Content = () => {
       }
    }, [fetchTitles, brand.id])
 
+   React.useEffect(() => {
+      try {
+         if (data.length && typeof document !== 'undefined') {
+            const scripts = data.flatMap(fold => fold.scripts)
+            const fragment = document.createDocumentFragment()
+
+            scripts.forEach(script => {
+               const s = document.createElement('script')
+               s.setAttribute('type', 'text/javascript')
+               s.setAttribute('src', script)
+               fragment.appendChild(s)
+            })
+
+            document.body.appendChild(fragment)
+         }
+      } catch (err) {
+         console.log('Failed to render page: ', err)
+      }
+   }, [data])
+
    const next = () => {
       if (current === occurences.length - 1) return
       const nextOne = current + 1
@@ -190,49 +217,49 @@ const Content = () => {
       })
    }
 
-   const { loading: contentLoading } = useQuery(GET_FILEID, {
-      variables: {
-         divId: ['our-menu-bottom-01'],
-      },
-      onCompleted: ({ content_subscriptionDivIds: fileData }) => {
-         if (fileData.length) {
-            fileData.forEach(data => {
-               if (data?.fileId) {
-                  const fileId = [data?.fileId]
-                  const cssPath =
-                     data?.subscriptionDivFileId?.linkedCssFiles.map(file => {
-                        return file?.cssFile?.path
-                     })
-                  const jsPath = data?.subscriptionDivFileId?.linkedJsFiles.map(
-                     file => {
-                        return file?.jsFile?.path
-                     }
-                  )
-                  webRenderer({
-                     type: 'file',
-                     config: {
-                        uri: isClient && window._env_.DATA_HUB_HTTPS,
-                        adminSecret: isClient && window._env_.ADMIN_SECRET,
-                        expressUrl: isClient && window._env_.EXPRESS_URL,
-                     },
-                     fileDetails: [
-                        {
-                           elementId: 'our-menu-bottom-01',
-                           fileId,
-                           cssPath: cssPath,
-                           jsPath: jsPath,
-                        },
-                     ],
-                  })
-               }
-            })
-         }
-      },
+   // const { loading: contentLoading } = useQuery(GET_FILEID, {
+   //    variables: {
+   //       divId: ['our-menu-bottom-01'],
+   //    },
+   //    onCompleted: ({ content_subscriptionDivIds: fileData }) => {
+   //       if (fileData.length) {
+   //          fileData.forEach(data => {
+   //             if (data?.fileId) {
+   //                const fileId = [data?.fileId]
+   //                const cssPath =
+   //                   data?.subscriptionDivFileId?.linkedCssFiles.map(file => {
+   //                      return file?.cssFile?.path
+   //                   })
+   //                const jsPath = data?.subscriptionDivFileId?.linkedJsFiles.map(
+   //                   file => {
+   //                      return file?.jsFile?.path
+   //                   }
+   //                )
+   //                webRenderer({
+   //                   type: 'file',
+   //                   config: {
+   //                      uri: isClient && window._env_.DATA_HUB_HTTPS,
+   //                      adminSecret: isClient && window._env_.ADMIN_SECRET,
+   //                      expressUrl: isClient && window._env_.EXPRESS_URL,
+   //                   },
+   //                   fileDetails: [
+   //                      {
+   //                         elementId: 'our-menu-bottom-01',
+   //                         fileId,
+   //                         cssPath: cssPath,
+   //                         jsPath: jsPath,
+   //                      },
+   //                   ],
+   //                })
+   //             }
+   //          })
+   //       }
+   //    },
 
-      onError: error => {
-         console.error(error)
-      },
-   })
+   //    onError: error => {
+   //       console.error(error)
+   //    },
+   // })
 
    const config = configOf('primary-labels')
    const theme = configOf('theme-color', 'Visual')
@@ -245,12 +272,12 @@ const Content = () => {
       singular: config?.itemLabel?.singular || 'recipe',
       plural: config?.itemLabel?.singular || 'recipes',
    }
-   if (loading)
-      return (
-         <Main>
-            <Loader inline />
-         </Main>
-      )
+   // if (loading)
+   //    return (
+   //       <Main>
+   //          <Loader inline />
+   //       </Main>
+   //    )
    if (isEmpty(titles))
       return (
          <Main>
@@ -478,11 +505,17 @@ const Content = () => {
                </main>
             </>
          )}
-         {contentLoading ? (
+         {/* {contentLoading ? (
             <Loader inline />
          ) : (
             <div id="our-menu-bottom-01"></div>
-         )}
+         )} */}
+         <div id="our-menu-bottom-01">
+            {Boolean(data.length) &&
+               ReactHtmlParser(
+                  data.find(fold => fold.id === 'Our Menu')?.content
+               )}
+         </div>
       </Main>
    )
 }
@@ -666,3 +699,34 @@ const Label = styled.span`
       text-sm uppercase font-medium tracking-wider text-white 
    `}
 `
+export async function getStaticProps({ params }) {
+   const data = await graphQLClient.request(GET_FILES, {
+      divId: ['our-menu-bottom-01'],
+   })
+   const navigationMenu = await graphQLClient.request(NAVIGATION_MENU, {
+      navigationMenuId: 1014,
+   })
+   // const domain =
+   //    process.env.NODE_ENV === 'production'
+   //       ? params.domain
+   //       : 'test.dailykit.org'
+   const domain = 'test.dailykit.org'
+   const { seo, settings } = await getSettings(domain, '/')
+
+   console.log(settings)
+   console.log('this is dara', data)
+   const parsedData = await fileParser(data.content_subscriptionDivIds)
+   const navigationMenus = navigationMenu.website_navigationMenuItem
+
+   return {
+      props: { data: parsedData, seo, settings, navigationMenus },
+      revalidate: 60, // will be passed to the page component as props
+   }
+}
+
+export async function getStaticPaths() {
+   return {
+      paths: [],
+      fallback: 'blocking', // true -> build page if missing, false -> serve 404
+   }
+}

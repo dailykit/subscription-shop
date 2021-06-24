@@ -9,7 +9,7 @@ import { useLazyQuery, useMutation } from '@apollo/react-hooks'
 
 import { useUser } from '../../../context'
 import { useConfig, auth } from '../../../lib'
-import { isClient, processUser } from '../../../utils'
+import { getSettings, isClient, processUser } from '../../../utils'
 import { SEO, Layout, StepsNavbar } from '../../../components'
 import { BRAND, CUSTOMER, MUTATIONS } from '../../../graphql'
 import {
@@ -19,13 +19,13 @@ import {
    setStoredReferralCode,
 } from '../../../utils/referrals'
 
-export default () => {
+export default props => {
    const router = useRouter()
    const { addToast } = useToasts()
    const { user, dispatch } = useUser()
    const { brand, organization } = useConfig()
    const [current, setCurrent] = React.useState('REGISTER')
-
+   const { settings } = props
    const [create_brand_customer] = useMutation(BRAND.CUSTOMER.CREATE, {
       refetchQueries: ['customer'],
       onCompleted: () => {
@@ -160,7 +160,7 @@ export default () => {
    }, [user])
 
    return (
-      <Layout noHeader>
+      <Layout settings={settings}>
          <SEO title="Register" />
          <StepsNavbar />
          <Main tw="pt-8">
@@ -528,3 +528,18 @@ const Submit = styled.button`
       ${tw`cursor-not-allowed bg-gray-300 text-gray-700`}
    }
 `
+export const getStaticProps = async () => {
+   const domain = 'test.dailykit.org'
+   const { seo, settings } = await getSettings(domain, '/get-started/register')
+   return {
+      props: { seo, settings },
+      revalidate: 60,
+   }
+}
+
+export const getStaticPaths = () => {
+   return {
+      paths: [],
+      fallback: 'blocking',
+   }
+}

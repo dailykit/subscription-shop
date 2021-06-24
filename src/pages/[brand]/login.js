@@ -11,14 +11,18 @@ import { useConfig, auth } from '../../lib'
 import { SEO, Layout } from '../../components'
 import { isClient, processUser } from '../../utils'
 import { BRAND, CUSTOMER, MUTATIONS } from '../../graphql'
-
-const Login = () => {
+import { GET_FILES } from '../../graphql'
+import { graphQLClient } from '../../lib'
+import 'regenerator-runtime'
+import { fileParser, getSettings } from '../../utils'
+import ReactHtmlParser from 'react-html-parser'
+const Login = props => {
+   const { settings } = props
    const router = useRouter()
    const { addToast } = useToasts()
    const { user, dispatch } = useUser()
    const { brand, organization } = useConfig()
    const [current, setCurrent] = React.useState('LOGIN')
-
    const [create_brand_customer] = useMutation(BRAND.CUSTOMER.CREATE, {
       refetchQueries: ['customer'],
       onCompleted: () => {
@@ -116,7 +120,7 @@ const Login = () => {
    }, [user])
 
    return (
-      <Layout>
+      <Layout settings={settings}>
          <SEO title="Login" />
          <Main tw="pt-8">
             <TabList>
@@ -273,3 +277,31 @@ const Submit = styled.button`
       ${tw`cursor-not-allowed bg-gray-300 text-gray-700`}
    }
 `
+export async function getStaticProps({ params }) {
+   // const data = await graphQLClient.request(GET_FILES, {
+   //    divId: ['home-bottom-01'],
+   // })
+
+   // const domain =
+   //    process.env.NODE_ENV === 'production'
+   //       ? params.domain
+   //       : 'test.dailykit.org'
+   const domain = 'test.dailykit.org'
+   const { seo, settings } = await getSettings(domain, '/login')
+
+   console.log(settings)
+
+   // const parsedData = await fileParser(data.content_subscriptionDivIds)
+
+   return {
+      props: { seo, settings },
+      revalidate: 60, // will be passed to the page component as props
+   }
+}
+
+export async function getStaticPaths() {
+   return {
+      paths: [],
+      fallback: 'blocking', // true -> build page if missing, false -> serve 404
+   }
+}
