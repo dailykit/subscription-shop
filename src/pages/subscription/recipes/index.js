@@ -1,4 +1,5 @@
 import React from 'react'
+import Masonry from 'react-masonry-css'
 import tw, { styled } from 'twin.macro'
 import { useLocation } from '@reach/router'
 import { useLazyQuery } from '@apollo/react-hooks'
@@ -215,12 +216,24 @@ const Recipe = () => {
                               <span tw="text-lg font-medium text-gray-700">
                                  {set.title}
                               </span>
-                              <div tw="flex md:flex-row flex-col flex-wrap justify-evenly items-stretch">
+
+                              <Masonry
+                                 breakpointCols={2}
+                                 css={[`display: flex`]}
+                              >
                                  {set.instructionSteps.map(step =>
                                     step.isVisible ? (
                                        <Step key={step.title}>
+                                          {step.title && (
+                                             <span tw="text-gray-800 ">
+                                                {step.title}
+                                             </span>
+                                          )}
+                                          <p tw="mt-1 text-gray-600">
+                                             {step.description}
+                                          </p>
                                           <StepImage>
-                                             {step.assets.images.length > 0 ? (
+                                             {step.assets.images.length > 0 && (
                                                 <img
                                                    src={
                                                       step.assets.images[0].url
@@ -235,33 +248,27 @@ const Recipe = () => {
                                                    }
                                                    tw="w-24 h-24 "
                                                 />
-                                             ) : (
-                                                <img
-                                                   src={noProductImage}
-                                                   tw="w-24 h-24 "
-                                                />
                                              )}
                                           </StepImage>
-                                          {step.title && (
-                                             <span tw="text-gray-800 ">
-                                                {step.title}
-                                             </span>
-                                          )}
-                                          <p tw="mt-1 text-gray-600">
-                                             {step.description}
-                                          </p>
                                        </Step>
                                     ) : (
                                        <li
                                           key={step.title}
-                                          tw="h-auto mb-4 mx-2 mt-2 inline-block flex justify-center"
-                                          css={[`width: 30%`]}
+                                          tw="h-auto mb-4 mx-2 mt-2 ml-8 inline-block 
+                                             flex-col justify-center items-center
+                                          "
+                                          css={[`width: 90%`]}
                                        >
-                                          <LockIcon size="50" />
+                                          <div
+                                             tw="flex justify-center items-center border border-2"
+                                             css={[`height: 200px`]}
+                                          >
+                                             <LockIcon size="100" />
+                                          </div>
                                        </li>
                                     )
                                  )}
-                              </div>
+                              </Masonry>
                            </ol>
                         </li>
                      ))}
@@ -292,17 +299,20 @@ const RecipeImage = styled.div`
       height: 240px;
    }
 `
+const LockStep = styled.li`
+   ${tw`h-auto mb-4 mx-2 mt-2 inline-block flex justify-center`},
+   width: 30%
+`
 
 const Step = styled.li`
-   ${tw` mb-4 mx-2 mt-2 inline-block`},
+   ${tw` mb-4 mx-2 mt-2 inline-block pl-7`},
    width: 100%;
-   @media (min-width: 420px) {
-      width: 30%;
-   }
 `
 
 const StepImage = styled.div`
-   max-width: 340px;
+    {
+      /* max-width: 340px; */
+   }
    ${tw`my-2`}
    img {
       width: 100%;
