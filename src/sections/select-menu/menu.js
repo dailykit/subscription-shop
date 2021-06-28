@@ -1,4 +1,5 @@
 import React from 'react'
+import Masonry from 'react-masonry-css'
 import { Link, navigate } from 'gatsby'
 import { isEmpty, uniqBy } from 'lodash'
 import tw, { styled, css } from 'twin.macro'
@@ -74,7 +75,11 @@ export const Menu = () => {
                   }
                   )
                </h4>
-               <Products>
+               <Masonry
+                  breakpointCols={3}
+                  tw="grid gap-3"
+                  css={[`display: flex`]}
+               >
                   {uniqBy(category.productsAggregate.nodes, v =>
                      [
                         v?.cartItem?.productId,
@@ -90,7 +95,7 @@ export const Menu = () => {
                         noProductImage={noProductImage}
                      />
                   ))}
-               </Products>
+               </Masonry>
             </section>
          ))}
       </main>
@@ -262,16 +267,11 @@ const Styles = {
    `,
    Tags: styled.li(
       ({ theme }) => css`
-         ${tw` ml-1 text-gray-500 inline-block text-xs uppercase p-1`},
+         ${tw` ml-1 text-gray-700 inline-block text-xs uppercase p-1`},
          background-color: ${theme?.highlight}
       `
    ),
 }
-
-const Products = styled.ul`
-   ${tw`grid gap-3`}
-   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-`
 
 const Check = styled(CheckIcon)(
    () => css`

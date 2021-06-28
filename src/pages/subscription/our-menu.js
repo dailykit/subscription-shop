@@ -2,6 +2,7 @@
 
 import React from 'react'
 import moment from 'moment'
+import Masonry from 'react-masonry-css'
 import { Link, navigate } from 'gatsby'
 import { rrulestr } from 'rrule'
 import tw, { styled, css } from 'twin.macro'
@@ -458,7 +459,11 @@ const Content = () => {
                               }
                               )
                            </h4>
-                           <Products>
+                           <Masonry
+                              breakpointCols={3}
+                              tw="grid gap-3"
+                              css={[`display: flex`]}
+                           >
                               {uniqBy(category.productsAggregate.nodes, v =>
                                  [
                                     v?.cartItem?.productId,
@@ -473,7 +478,7 @@ const Content = () => {
                                     noProductImage={noProductImage}
                                  />
                               ))}
-                           </Products>
+                           </Masonry>
                         </section>
                      ))
                   ) : (
@@ -564,7 +569,7 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
 
 const Styles = {
    Product: styled.li`
-      ${tw`relative border flex flex-col bg-white p-2 rounded overflow-hidden`}
+      ${tw`relative border flex flex-col bg-white p-2 rounded overflow-hidden w-full`}
       &.active {
          ${tw`border border-2 border-red-400`}
       }
@@ -591,7 +596,7 @@ const Styles = {
    `,
    Tags: styled.li(
       ({ theme }) => css`
-         ${tw` text-gray-500 inline-block text-xs uppercase p-1`},
+         ${tw`ml-1 text-gray-700 inline-block text-xs uppercase p-1`},
          background-color: ${theme?.highlight}
       `
    ),
@@ -677,11 +682,6 @@ const SliderButton = styled.button`
    :disabled {
       ${tw`cursor-not-allowed border-gray-300 text-gray-300 hover:bg-white`}
    }
-`
-
-const Products = styled.ul`
-   ${tw`grid gap-3`}
-   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 `
 
 const Label = styled.span`
