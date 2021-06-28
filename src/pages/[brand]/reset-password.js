@@ -1,6 +1,5 @@
 import React from 'react'
 import { isEmpty } from 'lodash'
-import { navigate } from 'gatsby'
 import jwtDecode from 'jwt-decode'
 
 import tw, { styled, css } from 'twin.macro'
@@ -19,6 +18,7 @@ import {
 import { useConfig } from '../../lib'
 import { useQueryParams } from '../../utils/useQueryParams'
 import { useRouter } from 'next/router'
+import { useUser } from '../../context'
 
 const ResetPassword = () => {
    const router = useRouter()
@@ -78,7 +78,7 @@ const ResetPassword = () => {
                      keycloakId,
                      source: 'subscription',
                      sourceBrandId: brand.id,
-                     clientId: isClient && window._env_.GATSBY_CLIENTID,
+                     clientId: isClient && window._env_.CLIENTID,
                      brandCustomers: { data: { brandId: brand.id } },
                   },
                },
@@ -109,7 +109,7 @@ const ResetPassword = () => {
                localStorage.removeItem('landed_on')
                window.location.href = landedOn
             } else {
-               navigate('/menu')
+               window.location.href = '/menu'
             }
          } else {
             console.log('CUSTOMER ISNT SUBSCRIBED')
@@ -138,7 +138,7 @@ const ResetPassword = () => {
                   'Seems like token has either expired or is invalid, please try again!',
                   { appearance: 'error' }
                )
-               navigate('/get-started/register')
+               router.push('/get-started/register')
             }
          },
          onError: error => {
@@ -146,7 +146,7 @@ const ResetPassword = () => {
                'Seems like token has either expired or is invalid, please try again!',
                { appearance: 'error' }
             )
-            navigate('/get-started/register')
+            router.push('/get-started/register')
          },
       }
    )
@@ -167,7 +167,7 @@ const ResetPassword = () => {
                },
             })
          } else {
-            navigate('/get-started/register')
+            router.push('/get-started/register')
          }
       },
       onError: error => {
@@ -187,7 +187,7 @@ const ResetPassword = () => {
                localStorage.setItem('landed_on', redirectUrl)
             }
          } else {
-            navigate('/get-started/register')
+            router.push('/get-started/register')
          }
       }
    }, [params])

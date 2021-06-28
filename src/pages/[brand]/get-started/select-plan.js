@@ -14,7 +14,6 @@ import { useUser } from '../../../context'
 
 const SelectPlan = props => {
    const router = useRouter()
-   const router = useRouter()
    const { data, settings } = props
    const { isAuthenticated } = useUser()
    React.useEffect(() => {

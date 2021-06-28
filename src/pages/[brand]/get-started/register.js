@@ -349,7 +349,7 @@ const RegisterPanel = ({ loading, customer, setCurrent }) => {
       if (validateEmail(value)) {
          setEmailError('')
          const url =
-            new URL(window._env_.GATSBY_DATA_HUB_HTTPS).origin +
+            new URL(window._env_.DATA_HUB_HTTPS).origin +
             '/server/api/customer/' +
             value
          const { status, data } = await axios.get(url)
