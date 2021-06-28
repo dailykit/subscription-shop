@@ -6,7 +6,7 @@ import { useToasts } from 'react-toast-notifications'
 import { webRenderer } from '@dailykit/web-renderer'
 
 import { useConfig } from '../../../lib'
-import { BRAND, DELETE_OCCURENCE_CUSTOMER, GET_FILEID } from '../../../graphql'
+import { BRAND, GET_FILEID } from '../../../graphql'
 import { useUser } from '../../../context'
 import { SEO, Layout, StepsNavbar, Loader, Button } from '../../../components'
 
@@ -24,9 +24,16 @@ const SelectDelivery = () => {
    const { isAuthenticated } = useUser()
    React.useEffect(() => {
       if (!isAuthenticated) {
-         router.push('/get-started/select-plan')
+         isClient && localStorage.setItem('landed_on', location.href)
+         router.push('/get-started/register')
       }
    }, [isAuthenticated])
+
+   React.useEffect(() => {
+      if (isClient && !localStorage.getItem('plan')) {
+         navigate('/get-started/select-plan')
+      }
+   }, [])
 
    return (
       <Layout noHeader>
@@ -47,9 +54,6 @@ const DeliveryContent = () => {
    const { state } = useDelivery()
    const { addToast } = useToasts()
    const { brand, configOf } = useConfig()
-   const [deleteOccurenceCustomer] = useMutation(DELETE_OCCURENCE_CUSTOMER, {
-      onError: error => console.log('DELETE CART -> ERROR -> ', error),
-   })
    const { loading } = useQuery(GET_FILEID, {
       variables: {
          divId: ['select-delivery-bottom-01'],

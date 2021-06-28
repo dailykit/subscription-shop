@@ -14,6 +14,7 @@ import {
 } from '../../sections/select-menu'
 import { useUser } from '../../context'
 import { useConfig } from '../../lib'
+import { isClient } from '../../utils'
 
 const MenuPage = () => {
    const router = useRouter()
@@ -21,7 +22,8 @@ const MenuPage = () => {
 
    React.useEffect(() => {
       if (!isAuthenticated) {
-         router.push('/get-started/select-plan')
+         isClient && localStorage.setItem('landed_on', location.href)
+         router.push('/get-started/register')
       }
    }, [isAuthenticated])
 

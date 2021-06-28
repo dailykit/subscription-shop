@@ -8,7 +8,7 @@ import { useConfig } from '../../lib'
 import * as Icon from '../../assets/icons'
 import OrderInfo from '../../sections/OrderInfo'
 import { isClient, formatCurrency } from '../../utils'
-import { SEO, Loader, Layout, Button } from '../../components'
+import { SEO, Loader, Layout, Button, HelperBar } from '../../components'
 import {
    usePayment,
    ProfileSection,
@@ -24,6 +24,7 @@ const Checkout = () => {
 
    React.useEffect(() => {
       if (!isAuthenticated) {
+         isClient && localStorage.setItem('landed_on', location.href)
          router.push('/get-started/select-plan')
       }
    }, [isAuthenticated])
@@ -60,70 +61,76 @@ const PaymentContent = () => {
    const [isOverlayOpen, toggleOverlay] = React.useState(false)
    const [overlayMessage, setOverlayMessage] = React.useState('')
 
-   const { loading, data: { cart = {} } = {} } = useSubscription(
-      QUERIES.CART_SUBSCRIPTION,
-      {
-         skip: !isClient,
-         variables: {
-            id: isClient ? new URLSearchParams(location.search).get('id') : '',
-         },
-      }
-   )
+   const {
+      loading,
+      error,
+      data: { cart = { paymentStatus: '', transactionRemark: {} } } = {},
+   } = useSubscription(QUERIES.CART_SUBSCRIPTION, {
+      skip: !isClient || !new URLSearchParams(location.search).get('id'),
+      variables: {
+         id: isClient ? new URLSearchParams(location.search).get('id') : '',
+      },
+   })
 
    React.useEffect(() => {
-      ;(async () => {
-         const status = cart.paymentStatus
-         const remark = cart.transactionRemark
-         const next_action = cart.transactionRemark?.next_action
+      if (!loading && !isEmpty(cart)) {
+         ;(async () => {
+            const status = cart.paymentStatus
+            const remark = cart.transactionRemark
+            const next_action = cart.transactionRemark?.next_action
 
-         try {
-            if (status === 'PENDING') {
-               setOverlayMessage(messages['PENDING'])
-            } else if (status === 'REQUIRES_ACTION' && !next_action?.type) {
-               toggleOverlay(true)
-               setOverlayMessage(messages['REQUIRES_ACTION'])
-            } else if (status === 'REQUIRES_ACTION' && next_action?.type) {
-               toggleOverlay(true)
-               setOverlayMessage(messages['REQUIRES_ACTION_WITH_URL'])
-               let TAB_URL = ''
-               let remark = remark
-               if (next_action?.type === 'use_stripe_sdk') {
-                  TAB_URL = next_action?.use_stripe_sdk?.stripe_js
-               } else {
-                  TAB_URL = next_action?.redirect_to_url?.url
-               }
-               setOtpPageUrl(TAB_URL)
-               authTabRef.current = window.open(TAB_URL, 'payment_auth_page')
-            } else if (
-               status === 'REQUIRES_PAYMENT_METHOD' &&
-               remark?.last_payment_error?.code
-            ) {
-               toggleOverlay(false)
-               setOverlayMessage(messages['PENDING'])
-               addToast(remark?.last_payment_error?.message, {
-                  appearance: 'error',
-               })
-            } else if (cart.paymentStatus === 'SUCCEEDED') {
-               if (authTabRef.current) {
-                  authTabRef.current.close()
-                  if (!authTabRef.current.closed) {
-                     window.open(`/checkout?id=${cart.id}`, 'payment_auth_page')
+            try {
+               if (status === 'PENDING') {
+                  setOverlayMessage(messages['PENDING'])
+               } else if (status === 'REQUIRES_ACTION' && !next_action?.type) {
+                  toggleOverlay(true)
+                  setOverlayMessage(messages['REQUIRES_ACTION'])
+               } else if (status === 'REQUIRES_ACTION' && next_action?.type) {
+                  toggleOverlay(true)
+                  setOverlayMessage(messages['REQUIRES_ACTION_WITH_URL'])
+                  let TAB_URL = ''
+                  let remark = remark
+                  if (next_action?.type === 'use_stripe_sdk') {
+                     TAB_URL = next_action?.use_stripe_sdk?.stripe_js
+                  } else {
+                     TAB_URL = next_action?.redirect_to_url?.url
                   }
+                  setOtpPageUrl(TAB_URL)
+                  authTabRef.current = window.open(TAB_URL, 'payment_auth_page')
+               } else if (
+                  status === 'REQUIRES_PAYMENT_METHOD' &&
+                  remark?.last_payment_error?.code
+               ) {
+                  toggleOverlay(false)
+                  setOverlayMessage(messages['PENDING'])
+                  addToast(remark?.last_payment_error?.message, {
+                     appearance: 'error',
+                  })
+               } else if (cart.paymentStatus === 'SUCCEEDED') {
+                  if (authTabRef.current) {
+                     authTabRef.current.close()
+                     if (!authTabRef.current.closed) {
+                        window.open(
+                           `/checkout?id=${cart.id}`,
+                           'payment_auth_page'
+                        )
+                     }
+                  }
+                  setOverlayMessage(messages['SUCCEEDED'])
+                  addToast(messages['SUCCEEDED'], { appearance: 'success' })
+                  navigate(`/placing-order?id=${cart.id}`)
+               } else if (status === 'PAYMENT_FAILED') {
+                  toggleOverlay(false)
+                  addToast(messages['PAYMENT_FAILED'], {
+                     appearance: 'error',
+                  })
                }
-               setOverlayMessage(messages['SUCCEEDED'])
-               addToast(messages['SUCCEEDED'], { appearance: 'success' })
-               router.push(`/placing-order?id=${cart.id}`)
-            } else if (status === 'PAYMENT_FAILED') {
-               toggleOverlay(false)
-               addToast(messages['PAYMENT_FAILED'], {
-                  appearance: 'error',
-               })
+            } catch (error) {
+               console.log('on succeeded -> error -> ', error)
             }
-         } catch (error) {
-            console.log('on succeeded -> error -> ', error)
-         }
-      })()
-   }, [cart.paymentStatus])
+         })()
+      }
+   }, [loading, cart])
 
    const [updateCart] = useMutation(QUERIES.UPDATE_CART, {
       onError: error => {
@@ -188,6 +195,71 @@ const PaymentContent = () => {
    const theme = configOf('theme-color', 'Visual')
 
    if (loading) return <Loader inline />
+   if (isClient && !new URLSearchParams(location.search).get('id')) {
+      return (
+         <Main>
+            <div tw="pt-4 w-full">
+               <HelperBar>
+                  <HelperBar.Title>
+                     Oh no! Looks like you've wandered on an unknown path, let's
+                     get you to home.
+                  </HelperBar.Title>
+                  <HelperBar.Button onClick={() => navigate('/')}>
+                     Go to Home
+                  </HelperBar.Button>
+               </HelperBar>
+            </div>
+         </Main>
+      )
+   }
+   if (error) {
+      return (
+         <Main>
+            <div tw="pt-4 w-full">
+               <HelperBar type="danger">
+                  <HelperBar.SubTitle>
+                     Looks like there was an issue fetching details, please
+                     refresh the page!
+                  </HelperBar.SubTitle>
+               </HelperBar>
+            </div>
+         </Main>
+      )
+   }
+   if (isEmpty(cart)) {
+      return (
+         <Main>
+            <div tw="pt-4 w-full">
+               <HelperBar type="info">
+                  <HelperBar.Title>
+                     Looks like the page you're requesting is not available
+                     anymore, let's get you to home.
+                  </HelperBar.Title>
+                  <HelperBar.Button onClick={() => navigate('/')}>
+                     Go to Home
+                  </HelperBar.Button>
+               </HelperBar>
+            </div>
+         </Main>
+      )
+   }
+   if (user?.keycloakId !== cart?.customerKeycloakId) {
+      return (
+         <Main>
+            <div tw="pt-4 w-full">
+               <HelperBar type="warning">
+                  <HelperBar.SubTitle>
+                     Seems like, you do not have access to this page, let's get
+                     you to home.
+                  </HelperBar.SubTitle>
+                  <HelperBar.Button onClick={() => navigate('/')}>
+                     Go to Home
+                  </HelperBar.Button>
+               </HelperBar>
+            </div>
+         </Main>
+      )
+   }
    return (
       <Main>
          <Form>

@@ -15,6 +15,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { useToasts } from 'react-toast-notifications'
 import { useQuery } from '@apollo/react-hooks'
 import { CUSTOMERS_REFERRED } from '../../../graphql'
+import { isClient } from '../../../utils'
 
 const Referrals = () => {
    const router = useRouter()
@@ -22,7 +23,8 @@ const Referrals = () => {
 
    React.useEffect(() => {
       if (!isAuthenticated) {
-         router.push('/subscription')
+         isClient && localStorage.setItem('landed_on', location.href)
+         router.push('/get-started/register')
       }
    }, [isAuthenticated])
 
@@ -70,7 +72,7 @@ const Content = () => {
                <Form.Label>Referral Code</Form.Label>
                <Flex>{user.customerReferral.referralCode}</Flex>
                <CopyToClipboard
-                  text={`${window.location.origin}/subscription?invite-code=${user.customerReferral.referralCode}`}
+                  text={`${window.location.origin}/?invite-code=${user.customerReferral.referralCode}`}
                   onCopy={() =>
                      addToast('Invite like copied!', {
                         appearance: 'success',

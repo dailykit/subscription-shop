@@ -43,9 +43,7 @@ const ForgotPassword = () => {
       try {
          setError('')
          if (isClient) {
-            const origin = window.location.pathname.includes('subscription')
-               ? window.location.origin + '/subscription'
-               : window.location.origin
+            const origin = window.location.origin
             forgotPassword({
                variables: {
                   email: form.email,

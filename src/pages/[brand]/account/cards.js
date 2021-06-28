@@ -38,7 +38,8 @@ const ManageCards = () => {
 
    React.useEffect(() => {
       if (!isAuthenticated) {
-         router.push('/subscription')
+         isClient && localStorage.setItem('landed_on', location.href)
+         router.push('/get-started/register')
       }
    }, [isAuthenticated])
 

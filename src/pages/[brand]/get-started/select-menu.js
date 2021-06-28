@@ -29,7 +29,8 @@ const SelectMenu = props => {
    const { isAuthenticated } = useUser()
    React.useEffect(() => {
       if (!isAuthenticated) {
-         router.push('/get-started/select-plan')
+         isClient && localStorage.setItem('landed_on', location.href)
+         router.push('/get-started/register')
       }
    }, [isAuthenticated])
 
