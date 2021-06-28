@@ -4,7 +4,7 @@ import tw, { styled, css } from 'twin.macro'
 import { useConfig } from '../../../lib'
 import { useUser } from '../../../context'
 import { SEO, Layout, ProfileSidebar, Form } from '../../../components'
-import { formatCurrency } from '../../../utils'
+import { formatCurrency, isClient } from '../../../utils'
 import * as moment from 'moment'
 
 const Wallet = () => {
@@ -13,7 +13,8 @@ const Wallet = () => {
 
    React.useEffect(() => {
       if (!isAuthenticated) {
-         router.push('/subscription')
+         isClient && localStorage.setItem('landed_on', location.href)
+         router.push('/get-started/register')
       }
    }, [isAuthenticated])
 
@@ -35,14 +36,16 @@ const Content = () => {
    const { configOf } = useConfig()
 
    const theme = configOf('theme-color', 'Visual')
-   const walletAllowed = configOf('Wallet', 'rewards')?.isAvailable
-
+   const { isAvailable = false, label = 'Wallet' } = configOf(
+      'Wallet',
+      'rewards'
+   )
    return (
       <section tw="px-6 w-full md:w-6/12">
          <header tw="mt-6 mb-3 flex items-center justify-between">
-            <Title theme={theme}>Wallet</Title>
+            <Title theme={theme}>{label}</Title>
          </header>
-         {walletAllowed && !!user.wallet && (
+         {isAvailable && !!user.wallet && (
             <>
                <Form.Label>Balance</Form.Label>
                {formatCurrency(user.wallet.amount)}

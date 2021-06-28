@@ -147,14 +147,6 @@ export const UserProvider = ({ children }) => {
       },
    })
 
-   const sendBackToSourceRoute = () => {
-      const redirectRoute = localStorage.getItem('source-route')
-      if (redirectRoute) {
-         localStorage.removeItem('source-route')
-         router.push(redirectRoute)
-      }
-   }
-
    React.useEffect(() => {
       if (isClient) {
          const token = localStorage.getItem('token')
@@ -162,7 +154,6 @@ export const UserProvider = ({ children }) => {
             const user = jwtDecode(token)
             setKeycloakId(user?.sub)
             dispatch({ type: 'SET_USER', payload: { keycloakId: user?.sub } })
-            sendBackToSourceRoute()
          } else {
             dispatch({ type: 'CLEAR_USER' })
          }
@@ -201,7 +192,6 @@ export const UserProvider = ({ children }) => {
             }
 
             dispatch({ type: 'SET_USER', payload: user })
-            sendBackToSourceRoute()
          }
       }
       setIsLoading(false)

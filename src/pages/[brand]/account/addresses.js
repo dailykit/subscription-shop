@@ -34,7 +34,8 @@ const Addresses = () => {
 
    React.useEffect(() => {
       if (!isAuthenticated) {
-         router.push('/subscription')
+         isClient && localStorage.setItem('landed_on', location.href)
+         router.push('/get-started/register')
       }
    }, [isAuthenticated])
 
@@ -257,16 +258,17 @@ export const AddressTunnel = ({ theme, tunnel, toggleTunnel }) => {
          const address = {
             line1: '',
             line2: input?.description,
+            searched: input?.description,
             lat: result.geometry.location.lat.toString(),
             lng: result.geometry.location.lng.toString(),
          }
 
          result.address_components.forEach(node => {
             if (node.types.includes('street_number')) {
-               address.line1 = `${node.long_name} `
+               address.line2 = `${node.long_name} `
             }
             if (node.types.includes('route')) {
-               address.line1 += node.long_name
+               address.line2 += node.long_name
             }
             if (node.types.includes('locality')) {
                address.city = node.long_name

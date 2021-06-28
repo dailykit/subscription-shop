@@ -22,10 +22,7 @@ export default () => (
       <Wrapper>
          <Heading>Oops!</Heading>
          <Text>We can't find the page that you are looking for..</Text>
-         <Link
-            href="/subscription"
-            tw="mt-4 text-blue-500 border-b border-blue-500"
-         >
+         <Link href="/" tw="mt-4 text-blue-500 border-b border-blue-500">
             Go to Home
          </Link>
       </Wrapper>

@@ -18,7 +18,7 @@ export const Header = ({ settings, navigationMenus }) => {
    const logout = () => {
       isClient && localStorage.removeItem('token')
       if (isClient) {
-         window.location.href = window.location.origin + '/subscription'
+         window.location.href = window.location.origin
       }
    }
 
@@ -109,15 +109,7 @@ export const Header = ({ settings, navigationMenus }) => {
                   </>
                ) : (
                   <Login
-                     onClick={() => {
-                        if (isClient) {
-                           localStorage.setItem(
-                              'source-route',
-                              window.location.pathname
-                           )
-                        }
-                        // router.push('/[brand]/login')
-                     }}
+                     onClick={() => router.push('/login')}
                      bg={theme?.accent}
                   >
                      <Link href="/login" as="/login">

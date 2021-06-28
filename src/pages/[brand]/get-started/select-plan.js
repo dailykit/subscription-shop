@@ -10,10 +10,20 @@ import { Plans } from '../../../sections/select-plan'
 import { SEO, Layout, StepsNavbar } from '../../../components'
 import { graphQLClient } from '../../../lib'
 import ReactHtmlParser from 'react-html-parser'
+import { useUser } from '../../../context'
 
 const SelectPlan = props => {
    const router = useRouter()
+   const router = useRouter()
    const { data, settings } = props
+   const { isAuthenticated } = useUser()
+   React.useEffect(() => {
+      if (!isAuthenticated) {
+         isClient && localStorage.setItem('landed_on', location.href)
+         router.push('/get-started/register')
+      }
+   }, [isAuthenticated])
+
    React.useEffect(() => {
       if (isClient) {
          const plan = localStorage.getItem('plan')
