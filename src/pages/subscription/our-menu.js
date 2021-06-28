@@ -552,8 +552,9 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
          <p>{product?.additionalText}</p>
          {product.tags.length > 0 && (
             <Styles.TagsList>
+               {console.log(theme)}
                {product.tags.map(tag => (
-                  <Styles.Tags>{tag}</Styles.Tags>
+                  <Styles.Tags theme={theme}>{tag}</Styles.Tags>
                ))}
             </Styles.TagsList>
          )}
@@ -588,9 +589,12 @@ const Styles = {
    TagsList: styled.ul`
       ${tw`list-none text-xs leading-6 text-gray-500 mb-3`}
    `,
-   Tags: styled.li`
-      ${tw` m-2 bg-red-50 text-gray-500 inline-block text-xs uppercase p-1`}
-   `,
+   Tags: styled.li(
+      ({ theme }) => css`
+         ${tw` text-gray-500 inline-block text-xs uppercase p-1`},
+         background-color: ${theme?.highlight}
+      `
+   ),
 }
 
 const Main = styled.main`
