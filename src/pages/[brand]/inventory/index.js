@@ -23,7 +23,6 @@ const Inventory = () => {
          })
       },
    })
-   console.log(inventory)
    React.useEffect(() => {
       let inventoryId = Number(router.query.id)
       let optionId = Number(router.query.option)

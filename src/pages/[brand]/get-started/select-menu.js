@@ -189,8 +189,6 @@ export async function getStaticProps({ params }) {
    const domain = 'test.dailykit.org'
    const { seo, settings } = await getSettings(domain, '/')
 
-   console.log(settings)
-
    return {
       props: { seo, settings },
       revalidate: 60, // will be passed to the page component as props

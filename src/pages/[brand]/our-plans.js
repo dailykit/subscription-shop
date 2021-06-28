@@ -36,7 +36,6 @@ const SelectPlan = props => {
       }
    }, [data])
 
-   console.log('This is data', data)
    return (
       <Layout settings={settings}>
          <SEO title="Plans" />
@@ -99,8 +98,6 @@ export const getStaticProps = async () => {
    //       : 'test.dailykit.org'
    const domain = 'test.dailykit.org'
    const { seo, settings } = await getSettings(domain, '/our-plans')
-
-   console.log(settings)
 
    const parsedData = await fileParser(data.content_subscriptionDivIds)
 

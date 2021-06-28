@@ -70,7 +70,6 @@ export const Plan = ({ cameFrom = '', plan, handlePlanClick }) => {
    if (!defaultServing) return <Loader inline />
    return (
       <li css={[tw`border rounded-lg`, `height: fit-content`]}>
-         {console.log(plan)}
          {plan.metaDetails?.coverImage && (
             <CoverImage>
                <img src={plan.metaDetails?.coverImage} tw="object-cover" />
@@ -194,7 +193,6 @@ export const Plan = ({ cameFrom = '', plan, handlePlanClick }) => {
                               `per ${yieldLabel.singular}`}
                         </span>
                      </Price>
-                     {console.log(priceDisplay)}
                   </section>
                )}
                {priceDisplay?.totalServing?.isVisible === true && (

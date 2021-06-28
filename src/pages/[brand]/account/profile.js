@@ -195,7 +195,6 @@ const CurrentPlan = () => {
          const start = new Date(startDate)
          const end = new Date(endDate)
          const now = moment().format('YYYY-MM-DD')
-         console.log({ startDate, endDate, now })
          if (moment(start).isBefore(now)) {
             return addToast('Start date is not valid!', { appearance: 'error' })
          } else if (moment(end).isBefore(now)) {

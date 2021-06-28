@@ -737,8 +737,6 @@ export async function getStaticProps({ params }) {
    const domain = 'test.dailykit.org'
    const { seo, settings } = await getSettings(domain, '/')
 
-   console.log(settings)
-   console.log('this is dara', data)
    const parsedData = await fileParser(data.content_subscriptionDivIds)
    const navigationMenus = navigationMenu.website_navigationMenuItem
 

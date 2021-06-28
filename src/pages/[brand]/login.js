@@ -58,7 +58,6 @@ const Login = props => {
       {
          onCompleted: async ({ customer = {} }) => {
             const token = localStorage.getItem('token')
-            console.log({ token })
             const { email = '', sub: keycloakId = '' } = jwtDecode(token)
             if (isEmpty(customer)) {
                console.log('CUSTOMER DOESNT EXISTS')
@@ -297,8 +296,6 @@ export async function getStaticProps({ params }) {
    //       : 'test.dailykit.org'
    const domain = 'test.dailykit.org'
    const { seo, settings } = await getSettings(domain, '/login')
-
-   console.log(settings)
 
    // const parsedData = await fileParser(data.content_subscriptionDivIds)
 

@@ -14,7 +14,6 @@ import NavigationBar from './navbar'
 export const Header = ({ settings, navigationMenus }) => {
    const router = useRouter()
    const { isAuthenticated, user, isLoading } = useUser()
-   // console.log('this is navigation menu', navigationMenus)
    const logout = () => {
       isClient && localStorage.removeItem('token')
       if (isClient) {
@@ -27,8 +26,6 @@ export const Header = ({ settings, navigationMenus }) => {
 
    const [toggle, setToggle] = React.useState(true)
    const [isMobileNavVisible, setIsMobileNavVisible] = React.useState(false)
-
-   console.log('this is route name', router)
 
    const newNavigationMenus = DataWithChildNodes(navigationMenus)
 

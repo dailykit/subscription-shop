@@ -68,7 +68,6 @@ function DropdownMenu({ childMenu, Data }) {
    const dropdownRef = useRef(null)
 
    useEffect(() => {
-      console.log('hello', dropdownRef?.current?.firstChild)
       setMenuHeight(dropdownRef?.current?.firstChild?.offsetHeight + 25)
    }, [])
 
@@ -130,7 +129,7 @@ function DropdownMenu({ childMenu, Data }) {
          </>
       )
    }
-   console.log('active menu', activeMenu)
+   'active menu', activeMenu
 
    return (
       <div
@@ -165,7 +164,6 @@ function DropdownMenu({ childMenu, Data }) {
                            >
                               <h2
                                  onClick={() => {
-                                    console.log('hello world')
                                     if (lastRender.length > 1) {
                                        const newRen = [...lastRender]
                                        newRen.pop()

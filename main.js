@@ -16,7 +16,6 @@ app.use('/:path(*)', async (req, res, next) => {
 
    const isAllowed = !RESTRICTED_FILES.some(file => routePath.includes(file))
    if (isAllowed) {
-      console.log(routePath)
       const filePath =
          routePath === ''
             ? path.join(__dirname, `./.next/server/pages/${brand}.html`)

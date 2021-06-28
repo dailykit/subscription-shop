@@ -196,7 +196,6 @@ const Content = () => {
                   </AddressList>
                ) : (
                   <HelperBar type="info">
-                     {console.log('called')}
                      <HelperBar.SubTitle>
                         Let's start with adding an address
                      </HelperBar.SubTitle>
