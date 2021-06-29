@@ -14,7 +14,9 @@ import NavigationBar from './navbar'
 export const Header = ({ settings, navigationMenus }) => {
    const router = useRouter()
    const { isAuthenticated, user, isLoading } = useUser()
+   // const [isAuthenticated, user, isLoading] = [false, {}, false]
    // console.log('this is navigation menu', navigationMenus)
+   console.log('this is user', user)
    const logout = () => {
       isClient && localStorage.removeItem('token')
       if (isClient) {
@@ -31,7 +33,8 @@ export const Header = ({ settings, navigationMenus }) => {
    console.log('this is route name', router)
 
    const newNavigationMenus = DataWithChildNodes(navigationMenus)
-
+   console.log('this is loading', isLoading)
+   console.log('this is authenticate', isAuthenticated)
    return (
       <>
          <Wrapper>
@@ -42,7 +45,7 @@ export const Header = ({ settings, navigationMenus }) => {
                <Brand>
                   {brand?.logo?.logoMark && (
                      <img
-                        tw="h-auto md:h-12"
+                        tw="h-12 md:h-12"
                         src={brand?.logo?.logoMark}
                         alt={brand?.name || 'Subscription Shop'}
                      />
@@ -50,30 +53,31 @@ export const Header = ({ settings, navigationMenus }) => {
                   {brand?.name && <span tw="ml-2">{brand?.name}</span>}
                </Brand>
             </Link>
-            <section tw="flex items-center justify-between">
-               <NavigationBar Data={newNavigationMenus} />
-               <ul tw="ml-auto px-4 flex space-x-4">
+            <section tw="hidden md:flex items-center justify-between">
+               <NavigationBar Data={newNavigationMenus}>
+                  {/* <ul tw="ml-auto px-4 flex space-x-4"> */}
                   {isLoading ? (
                      <li>
                         <Loader inline={true} />
                      </li>
                   ) : isAuthenticated && user?.isSubscriber ? (
-                     <li tw="text-gray-800 hidden hidden md:inline-block">
+                     <li tw="pl-2 text-gray-800 hidden hidden md:flex items-center">
                         <Link href="/menu">Select Menu</Link>
                      </li>
                   ) : (
-                     <li tw="text-gray-800 hidden md:inline-block">
+                     <li tw="pl-2 text-gray-800 hidden md:flex items-center">
                         <Link href="/our-menu">Our Menu</Link>
                      </li>
                   )}
                   {!user?.isSubscriber && (
-                     <li tw="hidden md:inline-block">
+                     <li tw="pl-2 hidden md:flex items-center ">
                         <Link href="/our-plans">Get Started</Link>
                      </li>
                   )}
-               </ul>
+                  {/* </ul> */}
+               </NavigationBar>
             </section>
-            <section tw="px-4 ml-auto flex justify-center">
+            <section tw="px-2 ml-auto flex justify-center md:px-4">
                {isLoading ? (
                   <Loader inline={true} />
                ) : isAuthenticated ? (
@@ -137,24 +141,23 @@ export const Header = ({ settings, navigationMenus }) => {
                </button>
             </section>
             {isMobileNavVisible && (
-               <section tw="absolute block md:hidden bg-white px-4 w-full top-16 list-none transition-all duration-200 ease-in-out">
-                  <li tw="text-gray-800 py-2">
-                     <Link href="/how-it-works/">How It Works</Link>
-                  </li>
-                  {isAuthenticated && user?.isSubscriber ? (
-                     <li tw="text-gray-800 py-2">
-                        <Link href="/menu">Select Menu</Link>
-                     </li>
-                  ) : (
-                     <li tw="text-gray-800 py-2">
-                        <Link href="/our-menu">Our Menu</Link>
-                     </li>
-                  )}
-                  {!user?.isSubscriber && (
-                     <li tw="text-gray-800 py-2">
-                        <Link href="/our-plans">Get Started</Link>
-                     </li>
-                  )}
+               <section tw="absolute block px-0 md:hidden bg-white px-4 w-full top-16 list-none transition-all duration-200 ease-in-out">
+                  <NavigationBar Data={newNavigationMenus}>
+                     {isAuthenticated && user?.isSubscriber ? (
+                        <li tw="text-gray-800 py-2">
+                           <Link href="/menu">Select Menu</Link>
+                        </li>
+                     ) : (
+                        <li tw="text-gray-800 py-2">
+                           <Link href="/our-menu">Our Menu</Link>
+                        </li>
+                     )}
+                     {!user?.isSubscriber && (
+                        <li tw="text-gray-800 py-2">
+                           <Link href="/our-plans">Get Started</Link>
+                        </li>
+                     )}
+                  </NavigationBar>
                </section>
             )}
          </Wrapper>
@@ -173,12 +176,12 @@ const Wrapper = styled.header`
 `
 
 const Brand = styled.div`
-   ${tw`h-full px-6 flex items-center border-r`}
+   ${tw`h-full px-2 flex items-center border-r md:px-6`}
 `
 
 const Login = styled.button(
    ({ bg }) => css`
-      ${tw`bg-blue-600 text-white rounded px-2 py-1`}
+      ${tw`bg-blue-600 text-white rounded px-2 py-1 w-16 md:w-auto`}
       ${bg && `background-color: ${bg};`}
    `
 )

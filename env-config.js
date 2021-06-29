@@ -10,4 +10,5 @@ window._env_ = {
   ADMIN_SECRET: "60ea76ab-5ab6-4f09-ad44-efeb00f978ce",
   ADMIN_SECRET1: "61fc40e1-e13a-4a63-80bb-4796292f0d9f",
   EXPRESS_URL: "https://test.dailykit.org",
+  INTERVAL: "15",
 }

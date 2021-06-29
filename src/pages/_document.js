@@ -9,7 +9,7 @@ class MyDocument extends Document {
       return (
          <Html lang="en">
             <Head>
-               <script src="/subscription/env-config.js"></script>
+               <script src="/env-config.js"></script>
             </Head>
             <body>
                <div id="portal" />
