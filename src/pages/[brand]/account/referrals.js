@@ -1,7 +1,7 @@
 import React from 'react'
 import { useRouter } from 'next/router'
 import tw, { styled, css } from 'twin.macro'
-import { useConfig } from '../../../lib'
+import { graphQLClient, useConfig } from '../../../lib'
 import { useUser } from '../../../context'
 import {
    SEO,
@@ -14,20 +14,25 @@ import {
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { useToasts } from 'react-toast-notifications'
 import { useQuery } from '@apollo/react-hooks'
-import { CUSTOMERS_REFERRED } from '../../../graphql'
+import {
+   CUSTOMERS_REFERRED,
+   NAVIGATION_MENU,
+   WEBSITE_PAGE,
+} from '../../../graphql'
+import { getSettings } from '../../../utils'
 
-const Referrals = () => {
+const Referrals = props => {
    const router = useRouter()
-   const { isAuthenticated } = useUser()
-
+   const { isAuthenticated, isLoading } = useUser()
+   const { seo, settings, navigationMenus } = props
    React.useEffect(() => {
-      if (!isAuthenticated) {
+      if (!isAuthenticated && !isLoading) {
          router.push('/subscription')
       }
-   }, [isAuthenticated])
+   }, [isAuthenticated, isLoading])
 
    return (
-      <Layout>
+      <Layout settings={settings} navigationMenus={navigationMenus}>
          <SEO title="Referrals" />
          <Main>
             <ProfileSidebar />
@@ -35,6 +40,39 @@ const Referrals = () => {
          </Main>
       </Layout>
    )
+}
+
+export const getStaticProps = async ({ params }) => {
+   const dataByRoute = await graphQLClient.request(WEBSITE_PAGE, {
+      domain: params.brand,
+      route: '/account/referrals',
+   })
+   // const domain =
+   //    process.env.NODE_ENV === 'production'
+   //       ? params.domain
+   //       : 'test.dailykit.org'
+   const domain = 'test.dailykit.org'
+   const { seo, settings } = await getSettings(domain, '/account/referrals')
+   //navigation menu
+   const navigationMenu = await graphQLClient.request(NAVIGATION_MENU, {
+      navigationMenuId:
+         dataByRoute.website_websitePage[0]['website']['navigationMenuId'],
+   })
+   const navigationMenus = navigationMenu.website_navigationMenuItem
+   return {
+      props: {
+         seo,
+         settings,
+         navigationMenus,
+      },
+      revalidate: 1,
+   }
+}
+export async function getStaticPaths() {
+   return {
+      paths: [],
+      fallback: 'blocking', // true -> build page if missing, false -> serve 404
+   }
 }
 
 export default Referrals

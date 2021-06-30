@@ -10,14 +10,20 @@ import { useUser } from '../../context'
 import { useConfig, auth } from '../../lib'
 import { SEO, Layout } from '../../components'
 import { isClient, processUser } from '../../utils'
-import { BRAND, CUSTOMER, MUTATIONS } from '../../graphql'
+import {
+   BRAND,
+   CUSTOMER,
+   MUTATIONS,
+   NAVIGATION_MENU,
+   WEBSITE_PAGE,
+} from '../../graphql'
 import { GET_FILES } from '../../graphql'
 import { graphQLClient } from '../../lib'
 import 'regenerator-runtime'
 import { fileParser, getSettings } from '../../utils'
 import ReactHtmlParser from 'react-html-parser'
 const Login = props => {
-   const { settings } = props
+   const { settings, navigationMenus } = props
    const router = useRouter()
    const { addToast } = useToasts()
    const { user, dispatch } = useUser()
@@ -120,7 +126,7 @@ const Login = props => {
    }, [user])
 
    return (
-      <Layout settings={settings}>
+      <Layout settings={settings} navigationMenus={navigationMenus}>
          <SEO title="Login" />
          <Main tw="pt-8">
             <TabList>
@@ -281,7 +287,10 @@ export async function getStaticProps({ params }) {
    // const data = await graphQLClient.request(GET_FILES, {
    //    divId: ['home-bottom-01'],
    // })
-
+   const dataByRoute = await graphQLClient.request(WEBSITE_PAGE, {
+      domain: params.brand,
+      route: '/login',
+   })
    // const domain =
    //    process.env.NODE_ENV === 'production'
    //       ? params.domain
@@ -289,12 +298,16 @@ export async function getStaticProps({ params }) {
    const domain = 'test.dailykit.org'
    const { seo, settings } = await getSettings(domain, '/login')
 
+   //navigation menu
+   const navigationMenu = await graphQLClient.request(NAVIGATION_MENU, {
+      navigationMenuId:
+         dataByRoute.website_websitePage[0]['website']['navigationMenuId'],
+   })
+   const navigationMenus = navigationMenu.website_navigationMenuItem
    console.log(settings)
 
-   // const parsedData = await fileParser(data.content_subscriptionDivIds)
-
    return {
-      props: { seo, settings },
+      props: { seo, settings, navigationMenus },
       revalidate: 60, // will be passed to the page component as props
    }
 }

@@ -13,21 +13,23 @@ import {
    useMenu,
 } from '../../sections/select-menu'
 import { useUser } from '../../context'
-import { useConfig } from '../../lib'
+import { graphQLClient, useConfig } from '../../lib'
+import { NAVIGATION_MENU, WEBSITE_PAGE } from '../../graphql'
+import { getSettings } from '../../utils'
 
-const MenuPage = () => {
+const MenuPage = props => {
    const router = useRouter()
-   const { isAuthenticated } = useUser()
-
+   const { isAuthenticated, isLoading } = useUser()
+   const { seo, settings, navigationMenus } = props
    React.useEffect(() => {
-      if (!isAuthenticated) {
+      if (!isAuthenticated && !isLoading) {
          router.push('/get-started/select-plan')
       }
-   }, [isAuthenticated])
+   }, [isAuthenticated, isLoading])
 
    return (
       <MenuProvider>
-         <Layout>
+         <Layout settings={settings} navigationMenus={navigationMenus}>
             <SEO title="Select Menu" />
             <MenuContent />
          </Layout>
@@ -115,6 +117,37 @@ const MenuContent = () => {
          </div>
       </Main>
    )
+}
+
+export const getStaticProps = async ({ params }) => {
+   const dataByRoute = await graphQLClient.request(WEBSITE_PAGE, {
+      domain: params.brand,
+      route: '/menu',
+   })
+
+   // const domain =
+   //    process.env.NODE_ENV === 'production'
+   //       ? params.domain
+   //       : 'test.dailykit.org'
+   const domain = 'test.dailykit.org'
+   const { seo, settings } = await getSettings(domain, '/menu')
+   //navigation menu
+   const navigationMenu = await graphQLClient.request(NAVIGATION_MENU, {
+      navigationMenuId:
+         dataByRoute.website_websitePage[0]['website']['navigationMenuId'],
+   })
+   const navigationMenus = navigationMenu.website_navigationMenuItem
+   return {
+      props: { seo, settings, navigationMenus },
+      revalidate: 60, // will be passed to the page component as props
+   }
+}
+
+export async function getStaticPaths() {
+   return {
+      paths: [],
+      fallback: 'blocking', // true -> build page if missing, false -> serve 404
+   }
 }
 
 const Main = styled.main`

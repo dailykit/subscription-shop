@@ -8,7 +8,7 @@ import { useConfig } from '../../../lib'
 import * as QUERIES from '../../../graphql'
 import * as Icon from '../../../assets/icons'
 import OrderInfo from '../../../sections/OrderInfo'
-import { isClient, formatCurrency } from '../../../utils'
+import { isClient, formatCurrency, getSettings } from '../../../utils'
 import { SEO, Loader, Layout, StepsNavbar, Button } from '../../../components'
 import {
    usePayment,
@@ -19,10 +19,10 @@ import {
 import { useUser } from '../../../context'
 import { UPDATE_BRAND_CUSTOMER } from '../../../graphql'
 
-const Checkout = () => {
+const Checkout = props => {
    const router = useRouter()
    const { isAuthenticated } = useUser()
-
+   const { seo, settings } = props
    React.useEffect(() => {
       if (!isAuthenticated) {
          router.push('/get-started/select-plan')
@@ -30,7 +30,7 @@ const Checkout = () => {
    }, [isAuthenticated])
 
    return (
-      <Layout noHeader>
+      <Layout noHeader settings={settings}>
          <SEO title="Checkout" />
          <StepsNavbar />
          <PaymentProvider>
@@ -345,6 +345,28 @@ const PaymentContent = () => {
          )}
       </Main>
    )
+}
+
+export const getStaticProps = async () => {
+   // const domain =
+   //    process.env.NODE_ENV === 'production'
+   //       ? params.domain
+   //       : 'test.dailykit.org'
+   const domain = 'test.dailykit.org'
+   const { seo, settings } = await getSettings(domain, '/checkout')
+   return {
+      props: {
+         seo,
+         settings,
+      },
+      revalidate: 1,
+   }
+}
+export async function getStaticPaths() {
+   return {
+      paths: [],
+      fallback: 'blocking', // true -> build page if missing, false -> serve 404
+   }
 }
 
 export default Checkout

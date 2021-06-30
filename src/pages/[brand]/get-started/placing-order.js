@@ -4,14 +4,16 @@ import tw, { styled, css } from 'twin.macro'
 import { useSubscription } from '@apollo/react-hooks'
 
 import { useConfig } from '../../../lib'
-import { isClient } from '../../../utils'
+import { getSettings, isClient } from '../../../utils'
 import { CART_STATUS } from '../../../graphql'
 import OrderInfo from '../../../sections/OrderInfo'
 import { Layout, SEO, Loader, HelperBar } from '../../../components'
 import { PlacedOrderIllo, CartIllo, PaymentIllo } from '../../../assets/icons'
 
-const PlacingOrder = () => {
+const PlacingOrder = props => {
    const { configOf } = useConfig()
+   const { seo, settings } = props
+
    const { loading, data: { cart = {} } = {} } = useSubscription(CART_STATUS, {
       skip: !isClient,
       variables: {
@@ -32,7 +34,7 @@ const PlacingOrder = () => {
    const theme = configOf('theme-color', 'Visual')
 
    return (
-      <Layout>
+      <Layout settings={settings}>
          <SEO title="Placing Order" />
          <Wrapper>
             <Main tw="pt-4">
@@ -118,6 +120,28 @@ const PlacingOrder = () => {
          </Wrapper>
       </Layout>
    )
+}
+
+export const getStaticProps = async () => {
+   // const domain =
+   //    process.env.NODE_ENV === 'production'
+   //       ? params.domain
+   //       : 'test.dailykit.org'
+   const domain = 'test.dailykit.org'
+   const { seo, settings } = await getSettings(domain, '/placing-order')
+   return {
+      props: {
+         seo,
+         settings,
+      },
+      revalidate: 1,
+   }
+}
+export async function getStaticPaths() {
+   return {
+      paths: [],
+      fallback: 'blocking', // true -> build page if missing, false -> serve 404
+   }
 }
 
 export default PlacingOrder

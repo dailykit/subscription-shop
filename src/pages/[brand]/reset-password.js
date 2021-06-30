@@ -4,19 +4,24 @@ import tw, { styled, css } from 'twin.macro'
 import { useToasts } from 'react-toast-notifications'
 
 import { SEO, Layout, Loader } from '../../components'
-import { isClient } from '../../utils'
+import { getSettings, isClient } from '../../utils'
 import { useMutation } from '@apollo/react-hooks'
-import { RESET_PASSWORD, VERIFY_RESET_PASSWORD_TOKEN } from '../../graphql'
-import { useConfig } from '../../lib'
+import {
+   NAVIGATION_MENU,
+   RESET_PASSWORD,
+   VERIFY_RESET_PASSWORD_TOKEN,
+   WEBSITE_PAGE,
+} from '../../graphql'
+import { graphQLClient, useConfig } from '../../lib'
 import { useQueryParams } from '../../utils/useQueryParams'
 import { useRouter } from 'next/router'
 
-const ResetPassword = () => {
+const ResetPassword = props => {
    const router = useRouter()
    const { addToast } = useToasts()
    const { configOf } = useConfig()
    const params = { token: '' }
-
+   const { seo, settings, navigationMenus } = props
    const theme = configOf('theme-color', 'Visual')
 
    const [token, setToken] = React.useState(null)
@@ -108,7 +113,7 @@ const ResetPassword = () => {
 
    if (verifying) return <Loader />
    return (
-      <Layout>
+      <Layout settings={settings} navigationMenus={navigationMenus}>
          <SEO title="Login" />
          <Main tw="pt-8">
             <Title theme={theme}>Reset Password</Title>
@@ -154,6 +159,39 @@ const ResetPassword = () => {
          </Main>
       </Layout>
    )
+}
+
+export const getStaticProps = async ({ params }) => {
+   const dataByRoute = await graphQLClient.request(WEBSITE_PAGE, {
+      domain: params.brand,
+      route: '/reset-password',
+   })
+   // const domain =
+   //    process.env.NODE_ENV === 'production'
+   //       ? params.domain
+   //       : 'test.dailykit.org'
+   const domain = 'test.dailykit.org'
+   const { settings, seo } = await getSettings(domain, '/reset-password')
+   //navigation menu
+   const navigationMenu = await graphQLClient.request(NAVIGATION_MENU, {
+      navigationMenuId:
+         dataByRoute.website_websitePage[0]['website']['navigationMenuId'],
+   })
+   const navigationMenus = navigationMenu.website_navigationMenuItem
+   return {
+      props: {
+         settings,
+         seo,
+         navigationMenus,
+      },
+      revalidate: 1,
+   }
+}
+export async function getStaticPaths() {
+   return {
+      paths: [],
+      fallback: 'blocking', // true -> build page if missing, false -> serve 404
+   }
 }
 
 export default ResetPassword

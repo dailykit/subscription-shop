@@ -20,6 +20,7 @@ import {
    GET_FILEID,
    OCCURENCE_PRODUCTS_BY_CATEGORIES,
    NAVIGATION_MENU,
+   WEBSITE_PAGE,
 } from '../../graphql'
 import { GET_FILES } from '../../graphql'
 import { graphQLClient } from '../../lib'
@@ -703,8 +704,9 @@ export async function getStaticProps({ params }) {
    const data = await graphQLClient.request(GET_FILES, {
       divId: ['our-menu-bottom-01'],
    })
-   const navigationMenu = await graphQLClient.request(NAVIGATION_MENU, {
-      navigationMenuId: 1014,
+   const dataByRoute = await graphQLClient.request(WEBSITE_PAGE, {
+      domain: params.brand,
+      route: '/our-menu',
    })
    // const domain =
    //    process.env.NODE_ENV === 'production'
@@ -712,6 +714,12 @@ export async function getStaticProps({ params }) {
    //       : 'test.dailykit.org'
    const domain = 'test.dailykit.org'
    const { seo, settings } = await getSettings(domain, '/')
+
+   //navigation menu
+   const navigationMenu = await graphQLClient.request(NAVIGATION_MENU, {
+      navigationMenuId:
+         dataByRoute.website_websitePage[0]['website']['navigationMenuId'],
+   })
 
    console.log(settings)
    console.log('this is dara', data)

@@ -3,15 +3,16 @@ import moment from 'moment'
 import tw, { styled, css } from 'twin.macro'
 import { useSubscription } from '@apollo/react-hooks'
 
-import { useConfig } from '../../lib'
-import { isClient } from '../../utils'
-import { CART_STATUS } from '../../graphql'
+import { graphQLClient, useConfig } from '../../lib'
+import { getSettings, isClient } from '../../utils'
+import { CART_STATUS, NAVIGATION_MENU, WEBSITE_PAGE } from '../../graphql'
 import OrderInfo from '../../sections/OrderInfo'
 import { Layout, SEO, Loader, HelperBar } from '../../components'
 import { PlacedOrderIllo, CartIllo, PaymentIllo } from '../../assets/icons'
 
-const PlacingOrder = () => {
+const PlacingOrder = props => {
    const { configOf } = useConfig()
+   const { seo, settings, navigationMenus } = props
    const { loading, data: { cart = {} } = {} } = useSubscription(CART_STATUS, {
       skip: !isClient,
       variables: {
@@ -32,7 +33,7 @@ const PlacingOrder = () => {
    const theme = configOf('theme-color', 'Visual')
 
    return (
-      <Layout>
+      <Layout settings={settings} navigationMenus={navigationMenus}>
          <SEO title="Placing Order" />
          <Wrapper>
             <Main tw="pt-4">
@@ -118,6 +119,39 @@ const PlacingOrder = () => {
          </Wrapper>
       </Layout>
    )
+}
+
+export const getStaticProps = async ({ params }) => {
+   const dataByRoute = await graphQLClient.request(WEBSITE_PAGE, {
+      domain: params.brand,
+      route: '/placing-order',
+   })
+   // const domain =
+   //    process.env.NODE_ENV === 'production'
+   //       ? params.domain
+   //       : 'test.dailykit.org'
+   const domain = 'test.dailykit.org'
+   const { seo, settings } = await getSettings(domain, '/placing-order')
+   //navigation menu
+   const navigationMenu = await graphQLClient.request(NAVIGATION_MENU, {
+      navigationMenuId:
+         dataByRoute.website_websitePage[0]['website']['navigationMenuId'],
+   })
+   const navigationMenus = navigationMenu.website_navigationMenuItem
+   return {
+      props: {
+         seo,
+         settings,
+         navigationMenus,
+      },
+      revalidate: 1,
+   }
+}
+export async function getStaticPaths() {
+   return {
+      paths: [],
+      fallback: 'blocking', // true -> build page if missing, false -> serve 404
+   }
 }
 
 export default PlacingOrder
