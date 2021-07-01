@@ -3,10 +3,15 @@ import { useRouter } from 'next/router'
 import tw, { styled, css } from 'twin.macro'
 import { useSubscription } from '@apollo/react-hooks'
 
-import { useConfig } from '../../../lib'
+import { graphQLClient, useConfig } from '../../../lib'
 import { useUser } from '../../../context'
-import { formatDate, isClient } from '../../../utils'
-import { ORDER_HISTORY, ORDER } from '../../../graphql'
+import { formatDate, getSettings, isClient } from '../../../utils'
+import {
+   ORDER_HISTORY,
+   ORDER,
+   NAVIGATION_MENU,
+   WEBSITE_PAGE,
+} from '../../../graphql'
 import {
    SEO,
    Layout,
@@ -17,19 +22,20 @@ import {
 import OrderInfo from '../../../sections/OrderInfo'
 import { route } from 'next/dist/next-server/server/router'
 
-const Orders = () => {
+const Orders = props => {
    const router = useRouter()
-   const { isAuthenticated } = useUser()
-
+   console.log('this is router', router)
+   const { isAuthenticated, isLoading } = useUser()
+   const { seo, settings, navigationMenus } = props
+   console.log('this is in orders', isAuthenticated, isLoading)
    React.useEffect(() => {
-      if (!isAuthenticated) {
+      if (!isAuthenticated && !isLoading) {
          isClient && localStorage.setItem('landed_on', location.href)
          router.push('/get-started/register')
       }
-   }, [isAuthenticated])
-
+   }, [isAuthenticated, isLoading])
    return (
-      <Layout>
+      <Layout settings={settings} navigationMenus={navigationMenus}>
          <SEO title="Order History" />
          <Main>
             <ProfileSidebar />
@@ -65,8 +71,12 @@ const Listing = () => {
             subscriptionData: { data: { orders = {} } = {} } = {},
          }) => {
             if (orders.aggregate.count > 0) {
-               const [node] = orders.nodes
-               router.push(`/account/orders?id=${node.occurenceId}`)
+               const queryId = new URL(location.href).searchParams.get('id')
+               console.log('this is queryId', queryId)
+               if (!queryId) {
+                  const [node] = orders.nodes
+                  router.push(`/account/orders?id=${node.occurenceId}`)
+               }
             }
          },
       }
@@ -214,6 +224,39 @@ const Details = () => {
          </section>
       </main>
    )
+}
+
+export const getStaticProps = async ({ params }) => {
+   const dataByRoute = await graphQLClient.request(WEBSITE_PAGE, {
+      domain: params.brand,
+      route: '/account/orders',
+   })
+   // const domain =
+   //    process.env.NODE_ENV === 'production'
+   //       ? params.domain
+   //       : 'test.dailykit.org'
+   const domain = 'test.dailykit.org'
+   const { seo, settings } = await getSettings(domain, '/account/orders')
+   //navigation menu
+   const navigationMenu = await graphQLClient.request(NAVIGATION_MENU, {
+      navigationMenuId:
+         dataByRoute.website_websitePage[0]['website']['navigationMenuId'],
+   })
+   const navigationMenus = navigationMenu.website_navigationMenuItem
+   return {
+      props: {
+         seo,
+         settings,
+         navigationMenus,
+      },
+      revalidate: 1,
+   }
+}
+export async function getStaticPaths() {
+   return {
+      paths: [],
+      fallback: 'blocking', // true -> build page if missing, false -> serve 404
+   }
 }
 
 const Main = styled.main`

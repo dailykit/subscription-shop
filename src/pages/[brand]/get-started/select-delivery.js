@@ -17,11 +17,12 @@ import {
    DeliveryProvider,
    DeliveryDateSection,
 } from '../../../sections/select-delivery'
-import { isClient } from '../../../utils'
+import { getSettings, isClient } from '../../../utils'
 
-const SelectDelivery = () => {
+const SelectDelivery = props => {
    const router = useRouter()
    const { isAuthenticated } = useUser()
+   const { seo, settings } = props
    React.useEffect(() => {
       if (!isAuthenticated) {
          isClient && localStorage.setItem('landed_on', location.href)
@@ -36,7 +37,7 @@ const SelectDelivery = () => {
    }, [])
 
    return (
-      <Layout noHeader>
+      <Layout noHeader settings={settings}>
          <SEO title="Delivery" />
          <StepsNavbar />
          <DeliveryProvider>
@@ -45,7 +46,27 @@ const SelectDelivery = () => {
       </Layout>
    )
 }
-
+export const getStaticProps = async () => {
+   // const domain =
+   //    process.env.NODE_ENV === 'production'
+   //       ? params.domain
+   //       : 'test.dailykit.org'
+   const domain = 'test.dailykit.org'
+   const { seo, settings } = await getSettings(domain, '/select-delivery')
+   return {
+      props: {
+         seo,
+         settings,
+      },
+      revalidate: 1,
+   }
+}
+export async function getStaticPaths() {
+   return {
+      paths: [],
+      fallback: 'blocking', // true -> build page if missing, false -> serve 404
+   }
+}
 export default SelectDelivery
 
 const DeliveryContent = () => {

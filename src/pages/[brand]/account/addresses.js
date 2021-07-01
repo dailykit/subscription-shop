@@ -5,15 +5,17 @@ import tw, { styled, css } from 'twin.macro'
 import { useToasts } from 'react-toast-notifications'
 import { useMutation, useLazyQuery } from '@apollo/react-hooks'
 
-import { useConfig } from '../../../lib'
+import { graphQLClient, useConfig } from '../../../lib'
 import { useUser } from '../../../context'
 import { CloseIcon, DeleteIcon } from '../../../assets/icons'
-import { useScript, isClient } from '../../../utils'
+import { useScript, isClient, getSettings } from '../../../utils'
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete'
 import {
    BRAND,
    DELETE_CUSTOMER_ADDRESS,
    MUTATIONS,
+   NAVIGATION_MENU,
+   WEBSITE_PAGE,
    ZIPCODE_AVAILABILITY,
 } from '../../../graphql'
 import {
@@ -28,19 +30,20 @@ import {
    Loader,
 } from '../../../components'
 
-const Addresses = () => {
+const Addresses = props => {
    const router = useRouter()
-   const { isAuthenticated } = useUser()
+   const { isAuthenticated, isLoading } = useUser()
+   const { seo, settings, navigationMenus } = props
 
    React.useEffect(() => {
-      if (!isAuthenticated) {
+      if (!isAuthenticated && !isLoading) {
          isClient && localStorage.setItem('landed_on', location.href)
          router.push('/get-started/register')
       }
-   }, [isAuthenticated])
+   }, [isAuthenticated, isLoading])
 
    return (
-      <Layout>
+      <Layout settings={settings} navigationMenus={navigationMenus}>
          <SEO title="Addresses" />
          <Main>
             <ProfileSidebar />
@@ -419,6 +422,39 @@ export const AddressTunnel = ({ theme, tunnel, toggleTunnel }) => {
          </Tunnel.Body>
       </Tunnel>
    )
+}
+
+export const getStaticProps = async ({ params }) => {
+   const dataByRoute = await graphQLClient.request(WEBSITE_PAGE, {
+      domain: params.brand,
+      route: '/account/addresses',
+   })
+   // const domain =
+   //    process.env.NODE_ENV === 'production'
+   //       ? params.domain
+   //       : 'test.dailykit.org'
+   const domain = 'test.dailykit.org'
+   const { seo, settings } = await getSettings(domain, '/account/addresses')
+   //navigation menu
+   const navigationMenu = await graphQLClient.request(NAVIGATION_MENU, {
+      navigationMenuId:
+         dataByRoute.website_websitePage[0]['website']['navigationMenuId'],
+   })
+   const navigationMenus = navigationMenu.website_navigationMenuItem
+   return {
+      props: {
+         seo,
+         settings,
+         navigationMenus,
+      },
+      revalidate: 1,
+   }
+}
+export async function getStaticPaths() {
+   return {
+      paths: [],
+      fallback: 'blocking', // true -> build page if missing, false -> serve 404
+   }
 }
 
 const Main = styled.main`

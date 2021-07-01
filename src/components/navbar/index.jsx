@@ -1,9 +1,10 @@
 import MessengerIcon from './icons/redirect.svg'
+import LeftArrow from './icons/leftArrow.svg'
 import React, { useState, useEffect, useRef } from 'react'
 import { CSSTransition } from 'react-transition-group'
 import Link from 'next/link'
 
-function NavigationBar({ Data }) {
+function NavigationBar({ children, Data }) {
    return (
       <>
          <Navbar>
@@ -23,6 +24,7 @@ function NavigationBar({ Data }) {
                   </>
                )
             })}
+            {children}
          </Navbar>
       </>
    )
@@ -47,11 +49,19 @@ function NavItem({ children, menu }) {
    return (
       <li className="nav-item">
          {menu.childNodes.length > 0 ? (
-            <span className="span-class" onClick={() => setOpen(!open)}>
+            <span
+               className="span-class"
+               onClick={() => setOpen(!open)}
+               style={{ cursor: 'pointer' }}
+            >
                {menu.label}
             </span>
          ) : (
-            <Link href={menu.url} className="icon-button link-class">
+            <Link
+               href={menu.url}
+               className="icon-button link-class"
+               style={{ cursor: 'pointer' }}
+            >
                {menu.label}
             </Link>
          )}
@@ -93,30 +103,36 @@ function DropdownMenu({ childMenu, Data }) {
                   childMenu.childNodes &&
                   childMenu.childNodes.length > 0 ? (
                      <div
-                        style={{ color: '#dadce1', width: '80%' }}
+                        style={{
+                           color: 'inherit',
+                           width: '80%',
+                           cursor: 'pointer',
+                        }}
                         className="menu-item"
                         onClick={() => {
                            setLastRender(prevState => [...prevState, goToMenu])
                            return goToMenu && setActiveMenu(goToMenu)
                         }}
                      >
-                        <span
-                           className="span-class"
-                           style={{ cursor: 'pointer' }}
-                        >
-                           {children}{' '}
-                        </span>
+                        <span className="span-class">{children} </span>
                      </div>
                   ) : (
                      <span
-                        style={{ color: '#dadce1', width: '80%' }}
+                        style={{
+                           color: 'inherit',
+                           width: '80%',
+                           cursor: 'pointer',
+                        }}
                         className="menu-item link-class"
                      >
                         <Link href={childMenu.url}>{children}</Link>
                      </span>
                   )}
 
-                  <div style={{ width: '20%' }} className="menu-item">
+                  <div
+                     style={{ width: '20%', cursor: 'pointer' }}
+                     className="menu-item"
+                  >
                      <Link
                         href={childMenu.url}
                         className="menu-item link-class"
@@ -134,7 +150,7 @@ function DropdownMenu({ childMenu, Data }) {
    return (
       <div
          className="nav-dropdown"
-         style={{ height: menuHeight }}
+         style={{ height: menuHeight + 25 }}
          ref={dropdownRef}
       >
          {Data.map((menu, index) => {
@@ -158,11 +174,10 @@ function DropdownMenu({ childMenu, Data }) {
                               alignItems: 'center',
                            }}
                         >
-                           <div
-                              style={{ color: '#dadce1', width: '80%' }}
-                              className="menu-item"
-                           >
-                              <h2
+                           {lastRender.length > 1 && (
+                              <div
+                                 style={{ width: '10%', cursor: 'pointer' }}
+                                 className="menu-item"
                                  onClick={() => {
                                     if (lastRender.length > 1) {
                                        const newRen = [...lastRender]
@@ -172,10 +187,29 @@ function DropdownMenu({ childMenu, Data }) {
                                     }
                                  }}
                               >
+                                 <span style={{ width: '100%' }}>
+                                    <LeftArrow />
+                                 </span>
+                              </div>
+                           )}
+                           <div
+                              style={{ color: 'inherit', width: '60%' }}
+                              className="menu-item"
+                           >
+                              {/* <h3>{menu.label}</h3> */}
+                              <span
+                                 style={{
+                                    fontSize: '1.5rem',
+                                    fontWeight: '600',
+                                 }}
+                              >
                                  {menu.label}
-                              </h2>
+                              </span>
                            </div>
-                           <div style={{ width: '20%' }} className="menu-item">
+                           <div
+                              style={{ width: '20%', cursor: 'pointer' }}
+                              className="menu-item"
+                           >
                               <Link
                                  href={menu.url}
                                  className="menu-item link-class"

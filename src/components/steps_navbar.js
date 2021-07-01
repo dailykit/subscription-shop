@@ -98,7 +98,7 @@ export const StepsNavbar = () => {
             <Brand>
                {brand?.logo?.logoMark && (
                   <img
-                     tw="h-auto md:h-12"
+                     tw="h-12 md:h-12"
                      src={brand?.logo?.logoMark}
                      alt={brand?.name || 'Subscription Shop'}
                   />

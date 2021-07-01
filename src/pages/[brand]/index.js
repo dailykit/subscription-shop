@@ -4,7 +4,7 @@ import 'regenerator-runtime'
 import tw, { styled, css } from 'twin.macro'
 import ReactHtmlParser from 'react-html-parser'
 
-import { GET_FILES, NAVIGATION_MENU } from '../../graphql'
+import { GET_FILES, NAVIGATION_MENU, WEBSITE_PAGE } from '../../graphql'
 
 import { SEO, Layout, PageLoader } from '../../components'
 import { graphQLClient } from '../../lib'
@@ -74,11 +74,17 @@ const Index = props => {
 export default Index
 
 export async function getStaticProps(ctx) {
+   const params = ctx.params
    const data = await graphQLClient.request(GET_FILES, {
       divId: ['home-bottom-01'],
    })
+   const dataByRoute = await graphQLClient.request(WEBSITE_PAGE, {
+      domain: params.brand,
+      route: '/',
+   })
    const navigationMenu = await graphQLClient.request(NAVIGATION_MENU, {
-      navigationMenuId: 1014,
+      navigationMenuId:
+         dataByRoute.website_websitePage[0]['website']['navigationMenuId'],
    })
 
    // const domain =

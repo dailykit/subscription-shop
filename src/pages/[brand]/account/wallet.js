@@ -1,25 +1,26 @@
 import React from 'react'
 import { useRouter } from 'next/router'
 import tw, { styled, css } from 'twin.macro'
-import { useConfig } from '../../../lib'
+import { graphQLClient, useConfig } from '../../../lib'
 import { useUser } from '../../../context'
 import { SEO, Layout, ProfileSidebar, Form } from '../../../components'
-import { formatCurrency, isClient } from '../../../utils'
+import { formatCurrency, getSettings, isClient } from '../../../utils'
 import * as moment from 'moment'
+import { NAVIGATION_MENU, WEBSITE_PAGE } from '../../../graphql'
 
-const Wallet = () => {
+const Wallet = props => {
    const router = useRouter()
-   const { isAuthenticated } = useUser()
-
+   const { isAuthenticated, isLoading } = useUser()
+   const { seo, settings, navigationMenus } = props
    React.useEffect(() => {
-      if (!isAuthenticated) {
+      if (!isAuthenticated && !isLoading) {
          isClient && localStorage.setItem('landed_on', location.href)
          router.push('/get-started/register')
       }
-   }, [isAuthenticated])
+   }, [isAuthenticated, isLoading])
 
    return (
-      <Layout>
+      <Layout settings={settings} navigationMenus={navigationMenus}>
          <SEO title="Wallet" />
          <Main>
             <ProfileSidebar />
@@ -27,6 +28,39 @@ const Wallet = () => {
          </Main>
       </Layout>
    )
+}
+
+export const getStaticProps = async ({ params }) => {
+   const dataByRoute = await graphQLClient.request(WEBSITE_PAGE, {
+      domain: params.brand,
+      route: '/account/wallet',
+   })
+   // const domain =
+   //    process.env.NODE_ENV === 'production'
+   //       ? params.domain
+   //       : 'test.dailykit.org'
+   const domain = 'test.dailykit.org'
+   const { seo, settings } = await getSettings(domain, '/account/wallet')
+   //navigation menu
+   const navigationMenu = await graphQLClient.request(NAVIGATION_MENU, {
+      navigationMenuId:
+         dataByRoute.website_websitePage[0]['website']['navigationMenuId'],
+   })
+   const navigationMenus = navigationMenu.website_navigationMenuItem
+   return {
+      props: {
+         seo,
+         settings,
+         navigationMenus,
+      },
+      revalidate: 1,
+   }
+}
+export async function getStaticPaths() {
+   return {
+      paths: [],
+      fallback: 'blocking', // true -> build page if missing, false -> serve 404
+   }
 }
 
 export default Wallet

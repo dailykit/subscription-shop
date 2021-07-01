@@ -4,27 +4,29 @@ import { isEmpty } from 'lodash'
 import tw, { styled, css } from 'twin.macro'
 import { useSubscription } from '@apollo/react-hooks'
 
-import { useConfig } from '../../lib'
-import { isClient } from '../../utils'
-import { useUser } from '../../context'
-import { CART_STATUS } from '../../graphql'
+import { graphQLClient, useConfig } from '../../lib'
+import { getSettings, isClient } from '../../utils'
+import { CART_STATUS, NAVIGATION_MENU, WEBSITE_PAGE } from '../../graphql'
+
 import OrderInfo from '../../sections/OrderInfo'
 import { Layout, SEO, Loader, HelperBar } from '../../components'
 import { PlacedOrderIllo, CartIllo, PaymentIllo } from '../../assets/icons'
-import router, { useRouter } from 'next/router'
+import { useRouter } from 'next/router'
+import { useUser } from '../../context'
 
-const PlacingOrder = () => {
-   const { isAuthenticated } = useUser()
+const PlacingOrder = props => {
+   const { seo, settings, navigationMenus } = props
+   const { isAuthenticated, isLoading } = useUser()
    const router = useRouter()
    React.useEffect(() => {
-      if (!isAuthenticated) {
+      if (!isAuthenticated && !isLoading) {
          isClient && localStorage.setItem('landed_on', location.href)
          router.push('/get-started/register')
       }
-   }, [isAuthenticated])
+   }, [isAuthenticated, isLoading])
 
    return (
-      <Layout>
+      <Layout settings={settings} navigationMenus={navigationMenus}>
          <SEO title="Placing Order" />
          <Wrapper>
             <Main tw="pt-4">
@@ -34,8 +36,6 @@ const PlacingOrder = () => {
       </Layout>
    )
 }
-
-export default PlacingOrder
 
 const ContentWrapper = () => {
    const { user } = useUser()
@@ -191,6 +191,41 @@ const ContentWrapper = () => {
       </Content>
    )
 }
+
+export const getStaticProps = async ({ params }) => {
+   const dataByRoute = await graphQLClient.request(WEBSITE_PAGE, {
+      domain: params.brand,
+      route: '/placing-order',
+   })
+   // const domain =
+   //    process.env.NODE_ENV === 'production'
+   //       ? params.domain
+   //       : 'test.dailykit.org'
+   const domain = 'test.dailykit.org'
+   const { seo, settings } = await getSettings(domain, '/placing-order')
+   //navigation menu
+   const navigationMenu = await graphQLClient.request(NAVIGATION_MENU, {
+      navigationMenuId:
+         dataByRoute.website_websitePage[0]['website']['navigationMenuId'],
+   })
+   const navigationMenus = navigationMenu.website_navigationMenuItem
+   return {
+      props: {
+         seo,
+         settings,
+         navigationMenus,
+      },
+      revalidate: 1,
+   }
+}
+export async function getStaticPaths() {
+   return {
+      paths: [],
+      fallback: 'blocking', // true -> build page if missing, false -> serve 404
+   }
+}
+
+export default PlacingOrder
 
 const Pulse = () => (
    <span tw="mt-3 flex h-3 w-3 relative">

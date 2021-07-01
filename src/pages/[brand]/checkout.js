@@ -4,10 +4,10 @@ import tw, { styled, css } from 'twin.macro'
 import { useToasts } from 'react-toast-notifications'
 import { useMutation, useSubscription } from '@apollo/react-hooks'
 
-import { useConfig } from '../../lib'
+import { graphQLClient, useConfig } from '../../lib'
 import * as Icon from '../../assets/icons'
 import OrderInfo from '../../sections/OrderInfo'
-import { isClient, formatCurrency } from '../../utils'
+import { isClient, formatCurrency, getSettings } from '../../utils'
 import { SEO, Loader, Layout, Button, HelperBar } from '../../components'
 import {
    usePayment,
@@ -17,20 +17,21 @@ import {
 } from '../../sections/checkout'
 import { useUser } from '../../context'
 import * as QUERIES from '../../graphql'
+import { NAVIGATION_MENU, WEBSITE_PAGE } from '../../graphql'
 
-const Checkout = () => {
+const Checkout = props => {
    const router = useRouter()
-   const { isAuthenticated } = useUser()
-
+   const { isAuthenticated, isLoading } = useUser()
+   const { seo, settings, navigationMenus } = props
    React.useEffect(() => {
-      if (!isAuthenticated) {
+      if (!isAuthenticated && !isLoading) {
          isClient && localStorage.setItem('landed_on', location.href)
          router.push('/get-started/select-plan')
       }
-   }, [isAuthenticated])
+   }, [isAuthenticated, isLoading])
 
    return (
-      <Layout>
+      <Layout settings={settings} navigationMenus={navigationMenus}>
          <SEO title="Checkout" />
          <PaymentProvider>
             <PaymentContent />
@@ -318,6 +319,39 @@ const PaymentContent = () => {
          )}
       </Main>
    )
+}
+
+export const getStaticProps = async ({ params }) => {
+   const dataByRoute = await graphQLClient.request(WEBSITE_PAGE, {
+      domain: params.brand,
+      route: '/checkout',
+   })
+   // const domain =
+   //    process.env.NODE_ENV === 'production'
+   //       ? params.domain
+   //       : 'test.dailykit.org'
+   const domain = 'test.dailykit.org'
+   const { settings, seo } = await getSettings(domain, '/checkout')
+   //navigation menu
+   const navigationMenu = await graphQLClient.request(NAVIGATION_MENU, {
+      navigationMenuId:
+         dataByRoute.website_websitePage[0]['website']['navigationMenuId'],
+   })
+   const navigationMenus = navigationMenu.website_navigationMenuItem
+   return {
+      props: {
+         settings,
+         seo,
+         navigationMenus,
+      },
+      revalidate: 1,
+   }
+}
+export async function getStaticPaths() {
+   return {
+      paths: [],
+      fallback: 'blocking', // true -> build page if missing, false -> serve 404
+   }
 }
 
 export default Checkout

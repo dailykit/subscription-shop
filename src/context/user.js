@@ -44,7 +44,7 @@ const reducers = (state, { type, payload }) => {
 
 export const UserProvider = ({ children }) => {
    const router = useRouter()
-   const { brand, organization } = useConfig()
+   const { brand, organization, loading: configLoading } = useConfig()
    const [isLoading, setIsLoading] = React.useState(true)
    const [keycloakId, setKeycloakId] = React.useState('')
    const [updatePlatformCustomer] = useMutation(UPDATE_DAILYKEY_CUSTOMER, {
@@ -161,7 +161,7 @@ export const UserProvider = ({ children }) => {
    }, [])
 
    React.useEffect(() => {
-      if (!loading) {
+      if (!loading && !configLoading) {
          if (customer?.id && organization?.id) {
             const user = processUser(customer, organization?.stripeAccountType)
 
@@ -193,9 +193,19 @@ export const UserProvider = ({ children }) => {
 
             dispatch({ type: 'SET_USER', payload: user })
          }
+         if (state.isAuthenticated) {
+            if (customer?.id) {
+               setIsLoading(false)
+            } else {
+               setIsLoading(true)
+            }
+         } else {
+            setIsLoading(false)
+         }
+      } else {
+         setIsLoading(true)
       }
-      setIsLoading(false)
-   }, [loading, customer, organization])
+   }, [loading, customer, organization, configLoading])
 
    if (false) return <PageLoader />
    return (
