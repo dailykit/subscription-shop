@@ -264,6 +264,7 @@ const Content = ({ data }) => {
 
    const config = configOf('primary-labels')
    const theme = configOf('theme-color', 'Visual')
+   const imageRatio = useConfig().configOf('image-aspect-ratio', 'Visual')
 
    const yieldLabel = {
       singular: config?.yieldLabel?.singular || 'serving',
@@ -533,6 +534,7 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
             ? node?.productOption?.product?.assets?.images[0]
             : null,
       additionalText: node?.productOption?.product?.additionalText || '',
+      tags: node?.productOption?.product?.tags || [],
    }
 
    const openRecipe = () => router.push(`/recipes/${node?.productOption?.id}`)
@@ -545,18 +547,15 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
                   alt="Non-Veg Icon"
                   src={
                      product.type === 'Non-vegetarian'
-                        ? '/subscription/imgs/non-veg.png'
-                        : '/subscription/imgs/veg.png'
+                        ? '/imgs/non-veg.png'
+                        : '/imgs/veg.png'
                   }
                   title={product.type}
                   tw="h-6 w-6"
                />
             </Styles.Type>
          )}
-         <div
-            tw="flex items-center justify-center aspect-w-4 aspect-h-3 bg-gray-200 mb-2 rounded overflow-hidden cursor-pointer"
-            onClick={openRecipe}
-         >
+         <ImageWrapper imageRatio={imageRatio} onClick={openRecipe}>
             {product.image ? (
                <ReactImageFallback
                   src={buildImageUrl('400x300', product.image)}
@@ -568,7 +567,7 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
             ) : (
                <img src={noProductImage} alt={product.name} />
             )}
-         </div>
+         </ImageWrapper>
          {node?.addOnLabel && <Label>{node?.addOnLabel}</Label>}
          <section>
             <Styles.GhostLink theme={theme} onClick={openRecipe}>
@@ -576,6 +575,13 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
             </Styles.GhostLink>
          </section>
          <p>{product?.additionalText}</p>
+         {product.tags.length > 0 && (
+            <Styles.TagsList>
+               {product.tags.map(tag => (
+                  <Styles.Tags>{tag}</Styles.Tags>
+               ))}
+            </Styles.TagsList>
+         )}
       </Styles.Product>
    )
 }
@@ -585,6 +591,9 @@ const Styles = {
       ${tw`relative border flex flex-col bg-white p-2 rounded overflow-hidden`}
       &.active {
          ${tw`border border-2 border-red-400`}
+      }
+      &:hover {
+         ${tw`transition-all shadow-md -top-1 border-2 border-solid border-gray-200`}
       }
    `,
    Type: styled.span`
@@ -601,7 +610,22 @@ const Styles = {
          }
       `
    ),
+   TagsList: styled.ul`
+      ${tw`list-none text-xs leading-6 text-gray-500 mb-3`}
+   `,
+   Tags: styled.li`
+      ${tw` m-2 bg-red-50 text-gray-500 inline-block text-xs uppercase p-1`}
+   `,
 }
+
+const ImageWrapper = styled.div(
+   ({ imageRatio }) => css`
+      ${tw`flex items-center justify-center bg-gray-200 mb-2 rounded overflow-hidden cursor-pointer `}
+      ${imageRatio && imageRatio.width
+         ? `aspect-ratio: ${imageRatio.height}/ ${imageRatio.width} }`
+         : tw`aspect-w-4 aspect-h-3`}
+   `
+)
 
 const Main = styled.main`
    max-width: 1180px;
@@ -721,8 +745,6 @@ export async function getStaticProps({ params }) {
          dataByRoute.website_websitePage[0]['website']['navigationMenuId'],
    })
 
-   console.log(settings)
-   console.log('this is dara', data)
    const parsedData = await fileParser(data.content_subscriptionDivIds)
    const navigationMenus = navigationMenu.website_navigationMenuItem
 

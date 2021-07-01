@@ -15,7 +15,7 @@ import {
 import { useUser } from '../../context'
 import { graphQLClient, useConfig } from '../../lib'
 import { NAVIGATION_MENU, WEBSITE_PAGE } from '../../graphql'
-import { getSettings } from '../../utils'
+import { getSettings, isClient } from '../../utils'
 
 const MenuPage = props => {
    const router = useRouter()
@@ -23,7 +23,8 @@ const MenuPage = props => {
    const { seo, settings, navigationMenus } = props
    React.useEffect(() => {
       if (!isAuthenticated && !isLoading) {
-         router.push('/get-started/select-plan')
+         isClient && localStorage.setItem('landed_on', location.href)
+         router.push('/get-started/register')
       }
    }, [isAuthenticated, isLoading])
 

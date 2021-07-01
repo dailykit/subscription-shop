@@ -19,7 +19,7 @@ import {
    NAVIGATION_MENU,
    WEBSITE_PAGE,
 } from '../../../graphql'
-import { getSettings } from '../../../utils'
+import { getSettings, isClient } from '../../../utils'
 
 const Referrals = props => {
    const router = useRouter()
@@ -27,7 +27,8 @@ const Referrals = props => {
    const { seo, settings, navigationMenus } = props
    React.useEffect(() => {
       if (!isAuthenticated && !isLoading) {
-         router.push('/subscription')
+         isClient && localStorage.setItem('landed_on', location.href)
+         router.push('/get-started/register')
       }
    }, [isAuthenticated, isLoading])
 
@@ -108,7 +109,7 @@ const Content = () => {
                <Form.Label>Referral Code</Form.Label>
                <Flex>{user.customerReferral.referralCode}</Flex>
                <CopyToClipboard
-                  text={`${window.location.origin}/subscription?invite-code=${user.customerReferral.referralCode}`}
+                  text={`${window.location.origin}/?invite-code=${user.customerReferral.referralCode}`}
                   onCopy={() =>
                      addToast('Invite like copied!', {
                         appearance: 'success',

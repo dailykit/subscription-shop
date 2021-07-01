@@ -148,8 +148,8 @@ const Product = ({ node, theme, isAdded, noProductImage, buildImageUrl }) => {
                   alt="Non-Veg Icon"
                   src={
                      product.type === 'Non-vegetarian'
-                        ? '/subscription/imgs/non-veg.png'
-                        : '/subscription/imgs/veg.png'
+                        ? '/imgs/non-veg.png'
+                        : '/imgs/veg.png'
                   }
                   title={product.type}
                   tw="h-6 w-6"

@@ -28,7 +28,8 @@ const Profile = props => {
    const { seo, settings, navigationMenus } = props
    React.useEffect(() => {
       if (!isAuthenticated && !isLoading) {
-         router.push('/subscription')
+         isClient && localStorage.setItem('landed_on', location.href)
+         router.push('/get-started/register')
       }
    }, [isAuthenticated, isLoading])
 
@@ -199,7 +200,6 @@ const CurrentPlan = () => {
          const start = new Date(startDate)
          const end = new Date(endDate)
          const now = moment().format('YYYY-MM-DD')
-         console.log({ startDate, endDate, now })
          if (moment(start).isBefore(now)) {
             return addToast('Start date is not valid!', { appearance: 'error' })
          } else if (moment(end).isBefore(now)) {

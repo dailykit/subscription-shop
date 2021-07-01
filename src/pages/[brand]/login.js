@@ -29,18 +29,19 @@ const Login = props => {
    const { user, dispatch } = useUser()
    const { brand, organization } = useConfig()
    const [current, setCurrent] = React.useState('LOGIN')
-   const [create_brand_customer] = useMutation(BRAND.CUSTOMER.CREATE, {
-      refetchQueries: ['customer'],
-      onCompleted: () => {
-         if (isClient) {
-            window.location.href =
-               window.location.origin + '/get-started/select-plan'
-         }
-      },
-      onError: error => {
-         console.log(error)
-      },
-   })
+   const [create_brand_customer, { loading: creatingBrandCustomer }] =
+      useMutation(BRAND.CUSTOMER.CREATE, {
+         refetchQueries: ['customer'],
+         onCompleted: () => {
+            if (isClient) {
+               window.location.href =
+                  window.location.origin + '/get-started/select-plan'
+            }
+         },
+         onError: error => {
+            console.log(error)
+         },
+      })
    const [create, { loading: creatingCustomer }] = useMutation(
       MUTATIONS.CUSTOMER.CREATE,
       {
@@ -63,7 +64,6 @@ const Login = props => {
       {
          onCompleted: async ({ customer = {} }) => {
             const token = localStorage.getItem('token')
-            console.log({ token })
             const { email = '', sub: keycloakId = '' } = jwtDecode(token)
             if (isEmpty(customer)) {
                console.log('CUSTOMER DOESNT EXISTS')
@@ -102,28 +102,32 @@ const Login = props => {
                brandCustomers[0].isSubscriber
             ) {
                console.log('BRAND_CUSTOMER EXISTS & CUSTOMER IS SUBSCRIBED')
-               router.push('/menu')
                isClient && localStorage.removeItem('plan')
+               const landedOn = isClient
+                  ? localStorage.getItem('landed_on')
+                  : null
+               if (isClient && landedOn) {
+                  localStorage.removeItem('landed_on')
+                  window.location.href = landedOn
+               } else {
+                  router.push('/menu')
+               }
             } else {
                console.log('CUSTOMER ISNT SUBSCRIBED')
                if (isClient) {
-                  window.location.href =
-                     window.location.origin + '/get-started/select-plan'
+                  const landedOn = localStorage.getItem('landed_on')
+                  if (landedOn) {
+                     localStorage.removeItem('landed_on')
+                     window.location.href = landedOn
+                  } else {
+                     window.location.href =
+                        window.location.origin + '/get-started/select-plan'
+                  }
                }
             }
          },
       }
    )
-
-   React.useEffect(() => {
-      if (user?.keycloakId) {
-         if (user?.isSubscriber) router.push('/menu')
-         else if (isClient) {
-            window.location.href =
-               window.location.origin + '/get-started/select-plan'
-         }
-      }
-   }, [user])
 
    return (
       <Layout settings={settings} navigationMenus={navigationMenus}>
@@ -140,7 +144,11 @@ const Login = props => {
             {current === 'LOGIN' && (
                <LoginPanel
                   customer={customer}
-                  loading={loadingCustomerDetails || creatingCustomer}
+                  loading={
+                     loadingCustomerDetails ||
+                     creatingCustomer ||
+                     creatingBrandCustomer
+                  }
                />
             )}
          </Main>

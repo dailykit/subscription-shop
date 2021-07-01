@@ -15,7 +15,7 @@ import {
 } from '../../sections/select-delivery'
 import { BRAND, NAVIGATION_MENU, WEBSITE_PAGE } from '../../graphql'
 import { useMutation } from '@apollo/react-hooks'
-import { getSettings } from '../../utils'
+import { getSettings, isClient } from '../../utils'
 
 const ChangePlan = props => {
    const router = useRouter()
@@ -30,7 +30,8 @@ const ChangePlan = props => {
 
    React.useEffect(() => {
       if (!isAuthenticated && !isLoading) {
-         router.push('/subscription')
+         isClient && localStorage.setItem('landed_on', location.href)
+         router.push('/')
       }
    }, [isAuthenticated, isLoading])
 

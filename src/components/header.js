@@ -20,7 +20,7 @@ export const Header = ({ settings, navigationMenus }) => {
    const logout = () => {
       isClient && localStorage.removeItem('token')
       if (isClient) {
-         window.location.href = window.location.origin + '/subscription'
+         window.location.href = window.location.origin
       }
    }
 
@@ -29,8 +29,6 @@ export const Header = ({ settings, navigationMenus }) => {
 
    const [toggle, setToggle] = React.useState(true)
    const [isMobileNavVisible, setIsMobileNavVisible] = React.useState(false)
-
-   console.log('this is route name', router)
 
    const newNavigationMenus = DataWithChildNodes(navigationMenus)
    console.log('this is loading', isLoading)
@@ -113,15 +111,7 @@ export const Header = ({ settings, navigationMenus }) => {
                   </>
                ) : (
                   <Login
-                     onClick={() => {
-                        if (isClient) {
-                           localStorage.setItem(
-                              'source-route',
-                              window.location.pathname
-                           )
-                        }
-                        // router.push('/[brand]/login')
-                     }}
+                     onClick={() => router.push('/login')}
                      bg={theme?.accent}
                   >
                      <Link href="/login" as="/login">

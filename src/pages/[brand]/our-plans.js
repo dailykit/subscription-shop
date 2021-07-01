@@ -36,7 +36,6 @@ const SelectPlan = props => {
       }
    }, [data])
 
-   console.log('This is data', data)
    return (
       <Layout settings={settings} navigationMenus={navigationMenus}>
          <SEO title="Plans" />
@@ -109,7 +108,6 @@ export const getStaticProps = async ({ params }) => {
          dataByRoute.website_websitePage[0]['website']['navigationMenuId'],
    })
    const navigationMenus = navigationMenu.website_navigationMenuItem
-   console.log(settings)
 
    const parsedData = await fileParser(data.content_subscriptionDivIds)
 

@@ -59,7 +59,7 @@ export const StepsNavbar = () => {
    const logout = () => {
       isClient && localStorage.removeItem('token')
       if (isClient) {
-         window.location.href = window.location.origin + '/subscription'
+         window.location.href = window.location.origin
       }
    }
 

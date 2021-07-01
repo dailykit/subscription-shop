@@ -45,10 +45,10 @@ export const Layout = ({
          <Footer theme={theme}>
             <div>
                <section>
-                  <h2 tw="text-3xl">{brand?.name || 'Subscription Shop'}</h2>
+                  <h4 tw="text-2xl mb-4 mt-2">Contact Us</h4>
                   {location && <p tw="mt-2">{normalizeAddress(location)}</p>}
 
-                  {brand['Contact'] && (
+                  {brand?.['Contact'] && (
                      <>
                         <span tw="mt-4 flex items-center">
                            <MailIcon size={18} tw="stroke-current mr-2" />
@@ -59,10 +59,17 @@ export const Layout = ({
                               {brand['Contact'].email}
                            </a>
                         </span>
-                        <span tw="mt-4 flex items-center">
-                           <PhoneIcon size={18} tw="stroke-current mr-2" />
-                           {brand['Contact'].phoneNo}
-                        </span>
+                        {brand?.['Contact']?.phoneNo && (
+                           <a
+                              target="_blank"
+                              rel="noreferrer noopener"
+                              tw="mt-4 flex items-center"
+                              href={`https://api.whatsapp.com/send?phone=${brand?.['Contact']?.phoneNo}`}
+                           >
+                              <PhoneIcon size={18} tw="stroke-current mr-2" />
+                              {brand?.['Contact']?.phoneNo}
+                           </a>
+                        )}
                      </>
                   )}
                </section>
@@ -70,7 +77,7 @@ export const Layout = ({
                   <h4 tw="text-2xl mb-4 mt-2">Navigation</h4>
                   <ul>
                      <li tw="mb-3">
-                        <Link href="/subscription">Home</Link>
+                        <Link href="/">Home</Link>
                      </li>
                      {isAuthenticated && (
                         <li tw="mb-3">

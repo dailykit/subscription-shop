@@ -41,7 +41,8 @@ const ManageCards = props => {
    console.log('this is in cards', isAuthenticated, isLoading)
    React.useEffect(() => {
       if (!isAuthenticated && !isLoading) {
-         router.push('/subscription')
+         isClient && localStorage.setItem('landed_on', location.href)
+         router.push('/get-started/register')
       }
    }, [isAuthenticated, isLoading])
 

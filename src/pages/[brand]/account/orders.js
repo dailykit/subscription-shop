@@ -30,7 +30,8 @@ const Orders = props => {
    console.log('this is in orders', isAuthenticated, isLoading)
    React.useEffect(() => {
       if (!isAuthenticated && !isLoading) {
-         router.push('/subscription')
+         isClient && localStorage.setItem('landed_on', location.href)
+         router.push('/get-started/register')
       }
    }, [isAuthenticated, isLoading])
    return (
