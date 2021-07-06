@@ -460,7 +460,7 @@ const Content = () => {
                               )
                            </h4>
                            <Masonry
-                              breakpointCols={3}
+                              breakpointCols={4}
                               tw="grid gap-3"
                               css={[`display: flex`]}
                            >
@@ -515,6 +515,7 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
    }
 
    const imageRatio = useConfig().configOf('image-aspect-ratio', 'Visual')
+      ?.product
    const openRecipe = () =>
       navigate(`/subscription/recipes/?id=${node?.productOption?.id}`)
 
@@ -540,7 +541,7 @@ const Product = ({ node, theme, noProductImage, buildImageUrl }) => {
                   className="image__thumbnail"
                   css={css`
                      aspect-ratio: ${imageRatio && imageRatio.width
-                        ? imageRatio.height / imageRatio.width
+                        ? imageRatio.width / imageRatio.height
                         : 4 / 3};
                   `}
                />
@@ -698,7 +699,7 @@ const ImageWrapper = styled.div(
    ({ imageRatio }) => css`
       ${tw`flex items-center justify-center bg-gray-200 mb-2 rounded overflow-hidden cursor-pointer `}
       ${imageRatio && imageRatio.width
-         ? `aspect-ratio: ${imageRatio.height}/ ${imageRatio.width} }`
+         ? `aspect-ratio: ${imageRatio.width}/ ${imageRatio.height} }`
          : tw`aspect-w-4 aspect-h-3`}
    `
 )

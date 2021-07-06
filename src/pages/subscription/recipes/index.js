@@ -1,6 +1,6 @@
 import React from 'react'
 import Masonry from 'react-masonry-css'
-import tw, { styled } from 'twin.macro'
+import tw, { styled, css } from 'twin.macro'
 import { useLocation } from '@reach/router'
 import { useLazyQuery } from '@apollo/react-hooks'
 import { useToasts } from 'react-toast-notifications'
@@ -20,8 +20,10 @@ const Recipe = () => {
    const { addToast } = useToasts()
    const [productOption, setProductOption] = React.useState(null)
    const [recipe, setRecipe] = React.useState(null)
+   const [selectedImage, setSelectedImage] = React.useState(null)
    const { configOf, noProductImage } = useConfig('convention')
-
+   const imageRatio = useConfig().configOf('image-aspect-ratio', 'Visual')
+      ?.recipeImage
    const theme = configOf('theme-color', 'Visual')
 
    const [getRecipe, { loading }] = useLazyQuery(RECIPE_DETAILS, {
@@ -31,6 +33,10 @@ const Recipe = () => {
             setProductOption(productOption)
             if (productOption.simpleRecipeYield?.simpleRecipe) {
                setRecipe(productOption.simpleRecipeYield.simpleRecipe)
+               setSelectedImage(
+                  productOption.simpleRecipeYield.simpleRecipe?.assets
+                     ?.images[0]
+               )
             }
          }
       },
@@ -78,17 +84,43 @@ const Recipe = () => {
       <Layout>
          <SEO title={recipe.name} richresult={recipe.richResult} />
          <RecipeContainer>
-            <RecipeImage>
-               {recipe?.assets?.images?.length ? (
-                  <img
-                     src={recipe?.assets?.images[0]}
-                     alt={recipe.name}
-                     tw="w-full h-full border-gray-100 object-cover rounded-sm"
-                  />
-               ) : (
-                  'N/A'
+            <RecipeImages>
+               {recipe?.assets?.images?.length > 1 && (
+                  <div tw=" mx-2 my-4 flex md:block">
+                     {recipe?.assets?.images.map(image => (
+                        <img
+                           src={image}
+                           alt={recipe.name}
+                           tw="w-24 h-20 my-2 mx-2 object-cover rounded-sm cursor-pointer"
+                           onClick={() => setSelectedImage(image)}
+                           css={[
+                              `${
+                                 selectedImage === image &&
+                                 `border: 2px solid ${theme?.accent}`
+                              }`,
+                           ]}
+                        />
+                     ))}
+                  </div>
                )}
-            </RecipeImage>
+
+               <RecipeImage imageRatio={imageRatio}>
+                  {recipe?.assets?.images?.length ? (
+                     <img
+                        src={selectedImage}
+                        alt={recipe.name}
+                        tw="w-full h-full border-gray-100 object-cover rounded-sm"
+                        css={css`
+                           aspect-ratio: ${imageRatio && imageRatio.width
+                              ? imageRatio.width / imageRatio.height
+                              : 4 / 3};
+                        `}
+                     />
+                  ) : (
+                     'N/A'
+                  )}
+               </RecipeImage>
+            </RecipeImages>
             <h1 tw="py-4 text-2xl md:text-3xl tracking-wide text-teal-900">
                {recipe.name}
             </h1>
@@ -291,14 +323,23 @@ const RecipeContainer = styled.div`
    padding: 16px 0;
    width: calc(100vw - 40px);
 `
-
-const RecipeImage = styled.div`
-   height: 450px;
-   margin: 20px 0;
-   @media (max-width: 567px) {
-      height: 240px;
-   }
+const RecipeImages = styled.div`
+   ${tw`flex justify-between md:flex-row flex-col-reverse`}
 `
+
+const RecipeImage = styled.div(
+   ({ imageRatio }) => css`
+      height: 450px;
+      width: 100%;
+      margin: 20px auto;
+      ${imageRatio && imageRatio.width
+         ? `aspect-ratio: ${imageRatio.width}/ ${imageRatio.height} }`
+         : tw`aspect-w-4 aspect-h-3`}
+      @media (max-width: 567px) {
+         height: 240px;
+      }
+   `
+)
 const LockStep = styled.li`
    ${tw`h-auto mb-4 mx-2 mt-2 inline-block flex justify-center`},
    width: 30%
