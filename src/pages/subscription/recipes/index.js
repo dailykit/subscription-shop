@@ -192,31 +192,35 @@ const Recipe = () => {
                               <p tw="text-teal-900">{recipe.type}</p>
                            </div>
                         )} */}
-                     <div tw="mb-2 grid grid-cols-2 gap-4">
+                     <div tw="mb-2 gap-4">
                         {!!recipe.cuisine && (
-                           <div tw="flex flex-col items-center">
+                           <div tw="grid grid-cols-2 m-auto my-2 ">
                               <CuisineIcon size={50} color={theme?.accent} />
-                              <p tw="text-teal-900">{recipe.cuisine}</p>
+                              <p tw="text-teal-900 flex items-center">
+                                 {recipe.cuisine}
+                              </p>
                            </div>
                         )}
                         {!!recipe.author && (
-                           <div tw="flex flex-col items-center">
+                           <div tw="grid grid-cols-2 m-auto my-2">
                               <ChefIcon size={50} color={theme?.accent} />
-                              <p tw="text-teal-900">{recipe.author}</p>
+                              <p tw="text-teal-900 flex items-center">
+                                 {recipe.author}
+                              </p>
                            </div>
                         )}
                         {!!recipe.cookingTime && (
-                           <div tw="flex flex-col items-center">
+                           <div tw="grid grid-cols-2 m-auto my-2">
                               <TimeIcon size={50} color={theme?.accent} />
-                              <p tw="text-teal-900">
+                              <p tw="text-teal-900 flex items-center">
                                  {recipe.cookingTime} mins.
                               </p>
                            </div>
                         )}
                         {!!recipe.utensils?.length && (
-                           <div tw="flex flex-col items-center">
+                           <div tw="grid grid-cols-2 m-auto my-2">
                               <UtensilsIcon size={50} color={theme?.accent} />
-                              <p tw="text-teal-900">
+                              <p tw="text-teal-900 flex items-center">
                                  {recipe.utensils.join(', ')}
                               </p>
                            </div>
