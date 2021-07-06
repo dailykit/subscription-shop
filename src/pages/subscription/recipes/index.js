@@ -25,6 +25,7 @@ const Recipe = () => {
    const imageRatio = useConfig().configOf('image-aspect-ratio', 'Visual')
       ?.recipeImage
    const theme = configOf('theme-color', 'Visual')
+   const icons = configOf('recipe-details-icons', 'Visual')
 
    const [getRecipe, { loading }] = useLazyQuery(RECIPE_DETAILS, {
       onCompleted: ({ productOption }) => {
@@ -195,7 +196,15 @@ const Recipe = () => {
                      <div tw="mb-2 gap-4">
                         {!!recipe.cuisine && (
                            <div tw="grid grid-cols-2 m-auto my-2 ">
-                              <CuisineIcon size={50} color={theme?.accent} />
+                              {icons?.cuisine &&
+                              icons?.cuisine.trim().length > 0 ? (
+                                 <img
+                                    src={icons?.cuisine}
+                                    tw="w-16 h-16 object-cover rounded-full m-2"
+                                 />
+                              ) : (
+                                 <CuisineIcon size={50} color={theme?.accent} />
+                              )}
                               <p tw="text-teal-900 flex items-center">
                                  {recipe.cuisine}
                               </p>
@@ -203,7 +212,15 @@ const Recipe = () => {
                         )}
                         {!!recipe.author && (
                            <div tw="grid grid-cols-2 m-auto my-2">
-                              <ChefIcon size={50} color={theme?.accent} />
+                              {icons?.chef && icons?.chef.trim().length > 0 ? (
+                                 <img
+                                    src={icons?.chef}
+                                    tw="w-16 h-16 object-cover rounded-full m-2"
+                                 />
+                              ) : (
+                                 <ChefIcon size={50} color={theme?.accent} />
+                              )}
+
                               <p tw="text-teal-900 flex items-center">
                                  {recipe.author}
                               </p>
@@ -211,7 +228,15 @@ const Recipe = () => {
                         )}
                         {!!recipe.cookingTime && (
                            <div tw="grid grid-cols-2 m-auto my-2">
-                              <TimeIcon size={50} color={theme?.accent} />
+                              {icons?.time && icons?.time.trim().length > 0 ? (
+                                 <img
+                                    src={icons?.time}
+                                    tw="w-16 h-16 object-cover rounded-full m-2"
+                                 />
+                              ) : (
+                                 <TimeIcon size={50} color={theme?.accent} />
+                              )}
+
                               <p tw="text-teal-900 flex items-center">
                                  {recipe.cookingTime} mins.
                               </p>
@@ -219,7 +244,18 @@ const Recipe = () => {
                         )}
                         {!!recipe.utensils?.length && (
                            <div tw="grid grid-cols-2 m-auto my-2">
-                              <UtensilsIcon size={50} color={theme?.accent} />
+                              {icons?.utensils &&
+                              icons?.utensils.trim().length() > 0 ? (
+                                 <img
+                                    src={icons?.utensils}
+                                    tw="w-16 h-16 object-cover rounded-full m-2"
+                                 />
+                              ) : (
+                                 <UtensilsIcon
+                                    size={50}
+                                    color={theme?.accent}
+                                 />
+                              )}
                               <p tw="text-teal-900 flex items-center">
                                  {recipe.utensils.join(', ')}
                               </p>
